@@ -143,6 +143,8 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 6,
     paddingHorizontal: 14,
+    position: 'absolute',
+    right: 24,
   },
   todayText: {
     fontFamily: 'Outfit_700Bold',
