@@ -14,4 +14,5 @@ export const Colors = {
   whiteTranslucent80: 'rgba(255,255,255,0.8)',
   whiteTranslucent50: 'rgba(255,255,255,0.5)',
   whiteOverlay: 'rgba(255,255,255,0.1)',
+  festival: '#D97706',
 } as const;

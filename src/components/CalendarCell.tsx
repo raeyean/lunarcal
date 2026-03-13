@@ -9,11 +9,12 @@ interface CalendarCellProps {
   lunarText: string;
   isActive: boolean;
   isJieqi: boolean;
+  isFestival?: boolean;
   isEmpty: boolean;
   onPress: () => void;
 }
 
-export function CalendarCell({ day, lunarText, isActive, isJieqi, isEmpty, onPress }: CalendarCellProps) {
+export function CalendarCell({ day, lunarText, isActive, isJieqi, isFestival, isEmpty, onPress }: CalendarCellProps) {
   if (isEmpty) {
     return <View style={styles.container} />;
   }
@@ -33,7 +34,10 @@ export function CalendarCell({ day, lunarText, isActive, isJieqi, isEmpty, onPre
         styles.lunarText,
         isActive && styles.lunarTextActive,
         isJieqi && !isActive && styles.lunarTextJieqi,
-      ]}>
+        isFestival && !isActive && styles.lunarTextFestival,
+      ]}
+        numberOfLines={1}
+      >
         {lunarText}
       </Text>
     </TouchableOpacity>
@@ -69,6 +73,10 @@ const styles = StyleSheet.create({
   },
   lunarTextJieqi: {
     color: Colors.primary,
+    fontFamily: Fonts.interMedium,
+  },
+  lunarTextFestival: {
+    color: Colors.festival,
     fontFamily: Fonts.interMedium,
   },
 });

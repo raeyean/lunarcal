@@ -1,4 +1,5 @@
 import { Solar } from 'lunar-javascript';
+import { getSpecialEvents } from '../data/specialEvents';
 
 export interface DayData {
   solar: { year: number; month: number; day: number; weekDay: number };
@@ -19,6 +20,8 @@ export interface DayData {
   };
   jieqi: string | null;
   nextJieqi: { name: string; date: string } | null;
+  festivals: string[];
+  festivalShort: string | null;
   isCurrentMonth: boolean;
 }
 
@@ -62,6 +65,21 @@ export function getDayData(year: number, month: number, day: number, currentMont
     }
   }
 
+  // Collect festivals from library + special events
+  const festivals: string[] = [
+    ...lunar.getFestivals(),
+    ...lunar.getOtherFestivals(),
+  ];
+  const specialEvents = getSpecialEvents(lunar.getMonth(), lunar.getDay());
+  for (const evt of specialEvents) {
+    festivals.push(evt.name);
+  }
+  const festivalShort = specialEvents.length > 0
+    ? specialEvents[0].shortName
+    : festivals.length > 0
+      ? festivals[0]
+      : null;
+
   const chongDesc = `${lunar.getDayChongDesc()}，屬${chongAnimal}者今日不宜動土、出行`;
 
   return {
@@ -92,6 +110,8 @@ export function getDayData(year: number, month: number, day: number, currentMont
     },
     jieqi: jieqi || null,
     nextJieqi,
+    festivals,
+    festivalShort,
     isCurrentMonth: currentMonth ? month === currentMonth : true,
   };
 }

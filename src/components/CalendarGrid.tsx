@@ -41,7 +41,8 @@ export function CalendarGrid({
             }
 
             const day = globalIdx - firstWeekDay + 1;
-            const lunarText = dayData.jieqi || dayData.lunar.dayCn;
+            const isFestival = !!dayData.festivalShort;
+            const lunarText = dayData.jieqi || dayData.festivalShort || dayData.lunar.dayCn;
             const isJieqi = !!dayData.jieqi;
 
             return (
@@ -51,6 +52,7 @@ export function CalendarGrid({
                 lunarText={lunarText}
                 isActive={day === selectedDay}
                 isJieqi={isJieqi}
+                isFestival={isFestival && !isJieqi}
                 isEmpty={false}
                 onPress={() => onSelectDay(day)}
               />

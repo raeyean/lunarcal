@@ -11,9 +11,10 @@ interface BottomPanelProps {
 }
 
 export function BottomPanel({ dayData }: BottomPanelProps) {
-  const { lunar, ganzhi, yi, ji, clash } = dayData;
+  const { lunar, ganzhi, yi, ji, clash, festivals } = dayData;
 
   const dateStr = `${lunar.monthCn}月${lunar.dayCn} ${ganzhi.year}年 ${ganzhi.month}月 ${ganzhi.day}日`;
+  const festivalStr = festivals.length > 0 ? festivals[0] : null;
   const ganzhiStr = `天干地支：${ganzhi.day}日 · ${ganzhi.month}月 · ${ganzhi.year}年`;
 
   const yiStr1 = yi.slice(0, 3).join(' · ');
@@ -29,6 +30,9 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
       <View style={styles.dateRow}>
         <View style={styles.dateLeft}>
           <Text style={styles.dateNum}>{dateStr}</Text>
+          {festivalStr ? (
+            <Text style={styles.festival}>{festivalStr}</Text>
+          ) : null}
           <Text style={styles.ganzhi}>{ganzhiStr}</Text>
         </View>
         <ClashInfo emoji={clash.emoji} label={clashShort} />
@@ -69,6 +73,11 @@ const styles = StyleSheet.create({
   dateNum: {
     ...Typography.dateSummary,
     color: Colors.foreground,
+  },
+  festival: {
+    ...Typography.subtitle,
+    color: Colors.festival,
+    fontFamily: Fonts.interMedium,
   },
   ganzhi: {
     ...Typography.subtitle,

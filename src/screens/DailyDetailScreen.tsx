@@ -2,6 +2,7 @@ import React from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { GanzhiHero } from '../components/GanzhiHero';
 import { JieqiBanner } from '../components/JieqiBanner';
+import { FestivalBanner } from '../components/FestivalBanner';
 import { YiJiCard } from '../components/YiJiCard';
 import { ClashSection } from '../components/ClashSection';
 import { MonthHeader } from '../components/MonthHeader';
@@ -18,7 +19,7 @@ interface DailyDetailScreenProps {
 
 export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: DailyDetailScreenProps) {
   const dayData = getDayData(year, month, day);
-  const { lunar, ganzhi, yi, ji, clash, jieqi, nextJieqi } = dayData;
+  const { lunar, ganzhi, yi, ji, clash, jieqi, nextJieqi, festivals } = dayData;
 
   const lunarDateStr = `農曆 ${lunar.monthCn}月${lunar.dayCn} · ${ganzhi.year}年${ganzhi.month}月${ganzhi.day}日`;
 
@@ -45,6 +46,7 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
           lunarDateString={lunarDateStr}
         />
         <JieqiBanner text={jieqiText} />
+        <FestivalBanner festivals={festivals} />
         <View style={styles.yiJiRow}>
           <YiJiCard type="yi" items={yi} />
           <YiJiCard type="ji" items={ji} />

@@ -24,6 +24,10 @@ declare module 'lunar-javascript' {
     getDaySha(): string;
     getDayNaYin(): string;
     getJieQi(): string;
+    getFestivals(): string[];
+    getOtherFestivals(): string[];
+    getMonth(): number;
+    getDay(): number;
   }
 
   export class SolarMonth {
