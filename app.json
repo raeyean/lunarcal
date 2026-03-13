@@ -13,7 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.raeyean.LunarCal",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +29,16 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font",
+      "./plugins/withWidget"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e9499a56-d37a-40d2-b1a9-4a1793c8d7dd"
+      }
+    },
+    "owner": "raeyean"
   }
 }

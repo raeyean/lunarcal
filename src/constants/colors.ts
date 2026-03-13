@@ -1,0 +1,17 @@
+export const Colors = {
+  primary: '#f04324',
+  primaryLight: '#FEF0EC',
+  foreground: '#000000',
+  surface: '#F4F4F5',
+  jiDark: '#27272A',
+  badgeBg: '#E4E4E7',
+  muted: '#A1A1AA',
+  subtleText: '#71717A',
+  white: '#FFFFFF',
+  background: '#FFFFFF',
+  bottomPanelBg: '#FAFAFA',
+  divider: '#F4F4F5',
+  whiteTranslucent80: 'rgba(255,255,255,0.8)',
+  whiteTranslucent50: 'rgba(255,255,255,0.5)',
+  whiteOverlay: 'rgba(255,255,255,0.1)',
+} as const;
