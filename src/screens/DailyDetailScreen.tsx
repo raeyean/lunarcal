@@ -8,6 +8,7 @@ import { ClashSection } from '../components/ClashSection';
 import { MonthHeader } from '../components/MonthHeader';
 import { Colors } from '../constants/colors';
 import { getDayData, getChineseDayName, getEnglishDayName } from '../utils/lunar';
+import { useSwipeGesture } from '../hooks/useSwipeGesture';
 
 interface DailyDetailScreenProps {
   year: number;
@@ -20,6 +21,7 @@ interface DailyDetailScreenProps {
 export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: DailyDetailScreenProps) {
   const dayData = getDayData(year, month, day);
   const { lunar, ganzhi, yi, ji, clash, jieqi, nextJieqi, festivals } = dayData;
+  const swipeHandlers = useSwipeGesture({ onSwipeLeft: onNextDay, onSwipeRight: onPrevDay });
 
   const lunarDateStr = `農曆 ${lunar.monthCn}月${lunar.dayCn} · ${ganzhi.year}年${ganzhi.month}月${ganzhi.day}日`;
 
@@ -38,7 +40,7 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
         onPrev={onPrevDay}
         onNext={onNextDay}
       />
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner} {...swipeHandlers}>
         <GanzhiHero
           yearGanzhi={ganzhi.year}
           monthGanzhi={ganzhi.month}

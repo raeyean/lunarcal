@@ -7,6 +7,7 @@ import { BottomPanel } from '../components/BottomPanel';
 import { Colors } from '../constants/colors';
 import { getMonthDays, getChineseMonthName, getEnglishMonthName, getDayData } from '../utils/lunar';
 import { Solar } from 'lunar-javascript';
+import { useSwipeGesture } from '../hooks/useSwipeGesture';
 
 interface CalendarScreenProps {
   year: number;
@@ -25,11 +26,12 @@ export function CalendarScreen({
   const firstDay = Solar.fromYmd(year, month, 1);
   const firstWeekDay = firstDay.getWeek();
   const daysInMonth = new Date(year, month, 0).getDate();
+  const swipeHandlers = useSwipeGesture({ onSwipeLeft: onNextMonth, onSwipeRight: onPrevMonth });
 
   const selectedDayData = getDayData(year, month, selectedDay, month);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} {...swipeHandlers}>
       <MonthHeader
         titleCn={getChineseMonthName(year, month)}
         titleEn={getEnglishMonthName(year, month)}
