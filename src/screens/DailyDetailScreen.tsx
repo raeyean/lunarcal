@@ -5,6 +5,7 @@ import { JieqiBanner } from '../components/JieqiBanner';
 import { FestivalBanner } from '../components/FestivalBanner';
 import { YiJiCard } from '../components/YiJiCard';
 import { ClashSection } from '../components/ClashSection';
+import { TongshuSection } from '../components/TongshuSection';
 import { MonthHeader } from '../components/MonthHeader';
 import { useTheme } from '../context/ThemeContext';
 import { getDayData, getChineseDayName, getEnglishDayName } from '../utils/lunar';
@@ -21,7 +22,7 @@ interface DailyDetailScreenProps {
 export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: DailyDetailScreenProps) {
   const { colors } = useTheme();
   const dayData = getDayData(year, month, day);
-  const { lunar, ganzhi, yi, ji, clash, jieqi, nextJieqi, festivals } = dayData;
+  const { lunar, ganzhi, yi, ji, clash, tongshu, jieqi, nextJieqi, festivals } = dayData;
   const swipeHandlers = useSwipeGesture({ onSwipeLeft: onNextDay, onSwipeRight: onPrevDay });
 
   const lunarDateStr = `農曆 ${lunar.monthCn}月${lunar.dayCn} · ${ganzhi.year}年${ganzhi.month}月${ganzhi.day}日`;
@@ -60,7 +61,9 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
           description={clash.description}
           direction={clash.direction}
           element={clash.element}
+          taishen={clash.taishen}
         />
+        <TongshuSection data={tongshu} />
       </ScrollView>
     </View>
   );

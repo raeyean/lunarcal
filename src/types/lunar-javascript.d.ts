@@ -28,6 +28,25 @@ declare module 'lunar-javascript' {
     getOtherFestivals(): string[];
     getMonth(): number;
     getDay(): number;
+    getPengZuGan(): string;
+    getPengZuZhi(): string;
+    getDayPositionTai(): string;
+    getDayJiShen(): string[];
+    getDayXiongSha(): string[];
+    getDayTianShen(): string;
+    getDayTianShenType(): string;
+    getDayTianShenLuck(): string;
+    getZhiXing(): string;
+    getXiu(): string;
+    getXiuLuck(): string;
+    getXiuSong(): string;
+    getDayPositionXiDesc(): string;
+    getDayPositionCaiDesc(): string;
+    getDayPositionFuDesc(): string;
+    getDayLu(): string;
+    getYueXiang(): string;
+    getLiuYao(): string;
+    getWuHou(): string;
   }
 
   export class SolarMonth {

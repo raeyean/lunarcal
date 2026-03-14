@@ -1,6 +1,28 @@
 import { Solar } from 'lunar-javascript';
 import { getSpecialEvents } from '../data/specialEvents';
 
+export interface TongshuData {
+  taishen: string;
+  pengzuGan: string;
+  pengzuZhi: string;
+  jiShen: string[];
+  xiongSha: string[];
+  tianShen: string;
+  tianShenType: string;
+  tianShenLuck: string;
+  zhiXing: string;
+  xiu: string;
+  xiuLuck: string;
+  xiuSong: string;
+  positionXi: string;
+  positionCai: string;
+  positionFu: string;
+  dayLu: string;
+  yueXiang: string;
+  liuYao: string;
+  wuHou: string;
+}
+
 export interface DayData {
   solar: { year: number; month: number; day: number; weekDay: number };
   lunar: { monthCn: string; dayCn: string; yearCn: string };
@@ -17,7 +39,9 @@ export interface DayData {
     description: string;
     direction: string;
     element: string;
+    taishen: string;
   };
+  tongshu: TongshuData;
   jieqi: string | null;
   nextJieqi: { name: string; date: string } | null;
   festivals: string[];
@@ -81,6 +105,29 @@ export function getDayData(year: number, month: number, day: number, currentMont
       : null;
 
   const chongDesc = `${lunar.getDayChongDesc()}，屬${chongAnimal}者今日不宜動土、出行`;
+  const taishen = lunar.getDayPositionTai();
+
+  const tongshu: TongshuData = {
+    taishen,
+    pengzuGan: lunar.getPengZuGan(),
+    pengzuZhi: lunar.getPengZuZhi(),
+    jiShen: lunar.getDayJiShen(),
+    xiongSha: lunar.getDayXiongSha(),
+    tianShen: lunar.getDayTianShen(),
+    tianShenType: lunar.getDayTianShenType(),
+    tianShenLuck: lunar.getDayTianShenLuck(),
+    zhiXing: lunar.getZhiXing(),
+    xiu: lunar.getXiu(),
+    xiuLuck: lunar.getXiuLuck(),
+    xiuSong: lunar.getXiuSong(),
+    positionXi: lunar.getDayPositionXiDesc(),
+    positionCai: lunar.getDayPositionCaiDesc(),
+    positionFu: lunar.getDayPositionFuDesc(),
+    dayLu: lunar.getDayLu(),
+    yueXiang: lunar.getYueXiang(),
+    liuYao: lunar.getLiuYao(),
+    wuHou: lunar.getWuHou(),
+  };
 
   return {
     solar: {
@@ -107,7 +154,9 @@ export function getDayData(year: number, month: number, day: number, currentMont
       description: chongDesc,
       direction: `煞${sha}`,
       element: `五行：${wuxing}`,
+      taishen,
     },
+    tongshu,
     jieqi: jieqi || null,
     nextJieqi,
     festivals,

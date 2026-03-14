@@ -10,9 +10,10 @@ interface ClashSectionProps {
   description: string;
   direction: string;
   element: string;
+  taishen: string;
 }
 
-export function ClashSection({ animal, emoji, description, direction, element }: ClashSectionProps) {
+export function ClashSection({ animal, emoji, description, direction, element, taishen }: ClashSectionProps) {
   const { colors } = useTheme();
 
   return (
@@ -29,7 +30,7 @@ export function ClashSection({ animal, emoji, description, direction, element }:
       </View>
       <View style={styles.badges}>
         <Badge label={direction} />
-        <Badge label="胎神佔方" />
+        <Badge label={`胎神：${taishen}`} />
         <Badge label={element} />
       </View>
     </View>
