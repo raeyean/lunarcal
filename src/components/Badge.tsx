@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 
 interface BadgeProps {
@@ -8,16 +8,17 @@ interface BadgeProps {
 }
 
 export function Badge({ label }: BadgeProps) {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{label}</Text>
+    <View style={[styles.container, { backgroundColor: colors.badgeBg }]}>
+      <Text style={[styles.text, { color: colors.subtleText }]}>{label}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.badgeBg,
     borderRadius: 8,
     paddingVertical: 4,
     paddingHorizontal: 10,
@@ -26,6 +27,5 @@ const styles = StyleSheet.create({
   },
   text: {
     ...Typography.badgeText,
-    color: Colors.subtleText,
   },
 });

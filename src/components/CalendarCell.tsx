@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Fonts } from '../constants/typography';
 
@@ -15,26 +15,30 @@ interface CalendarCellProps {
 }
 
 export function CalendarCell({ day, lunarText, isActive, isJieqi, isFestival, isEmpty, onPress }: CalendarCellProps) {
+  const { colors } = useTheme();
+
   if (isEmpty) {
     return <View style={styles.container} />;
   }
 
   return (
     <TouchableOpacity
-      style={[styles.container, isActive && styles.activeContainer]}
+      style={[styles.container, isActive && { backgroundColor: colors.primary, borderRadius: 12 }]}
       onPress={onPress}
     >
       <Text style={[
         styles.dayNumber,
-        isActive && styles.dayNumberActive,
+        { color: colors.foreground },
+        isActive && { ...Typography.calendarDayActive, color: colors.white },
       ]}>
         {day}
       </Text>
       <Text style={[
         styles.lunarText,
-        isActive && styles.lunarTextActive,
-        isJieqi && !isActive && styles.lunarTextJieqi,
-        isFestival && !isActive && styles.lunarTextFestival,
+        { color: colors.muted },
+        isActive && { color: colors.white },
+        isJieqi && !isActive && { color: colors.primary, fontFamily: Fonts.interMedium },
+        isFestival && !isActive && { color: colors.festival, fontFamily: Fonts.interMedium },
       ]}
         numberOfLines={1}
       >
@@ -52,31 +56,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 2,
   },
-  activeContainer: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-  },
   dayNumber: {
     ...Typography.calendarDay,
-    color: Colors.foreground,
-  },
-  dayNumberActive: {
-    ...Typography.calendarDayActive,
-    color: Colors.white,
   },
   lunarText: {
     ...Typography.lunarDateCell,
-    color: Colors.muted,
-  },
-  lunarTextActive: {
-    color: Colors.white,
-  },
-  lunarTextJieqi: {
-    color: Colors.primary,
-    fontFamily: Fonts.interMedium,
-  },
-  lunarTextFestival: {
-    color: Colors.festival,
-    fontFamily: Fonts.interMedium,
   },
 });

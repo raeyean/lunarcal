@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Fonts } from '../constants/typography';
 import { ClashInfo } from './ClashInfo';
@@ -11,6 +11,7 @@ interface BottomPanelProps {
 }
 
 export function BottomPanel({ dayData }: BottomPanelProps) {
+  const { colors } = useTheme();
   const { lunar, ganzhi, yi, ji, clash, festivals } = dayData;
 
   const dateStr = `${lunar.monthCn}月${lunar.dayCn} ${ganzhi.year}年 ${ganzhi.month}月 ${ganzhi.day}日`;
@@ -26,27 +27,27 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
   const clashShort = clash.animal.split(' ')[0];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.bottomPanelBg }]}>
       <View style={styles.dateRow}>
         <View style={styles.dateLeft}>
-          <Text style={styles.dateNum}>{dateStr}</Text>
+          <Text style={[styles.dateNum, { color: colors.foreground }]}>{dateStr}</Text>
           {festivalStr ? (
-            <Text style={styles.festival}>{festivalStr}</Text>
+            <Text style={[styles.festival, { color: colors.festival }]}>{festivalStr}</Text>
           ) : null}
-          <Text style={styles.ganzhi}>{ganzhiStr}</Text>
+          <Text style={[styles.ganzhi, { color: colors.subtleText }]}>{ganzhiStr}</Text>
         </View>
         <ClashInfo emoji={clash.emoji} label={clashShort} />
       </View>
       <View style={styles.yiJiRow}>
-        <View style={styles.yiJiCol}>
-          <Text style={[styles.yiJiLabel, { color: Colors.primary }]}>宜</Text>
-          {yiStr1 ? <Text style={styles.yiJiText}>{yiStr1}</Text> : null}
-          {yiStr2 ? <Text style={styles.yiJiText}>{yiStr2}</Text> : null}
+        <View style={[styles.yiJiCol, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.yiJiLabel, { color: colors.primary }]}>宜</Text>
+          {yiStr1 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{yiStr1}</Text> : null}
+          {yiStr2 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{yiStr2}</Text> : null}
         </View>
-        <View style={styles.yiJiCol}>
-          <Text style={[styles.yiJiLabel, { color: Colors.jiDark }]}>忌</Text>
-          {jiStr1 ? <Text style={styles.yiJiText}>{jiStr1}</Text> : null}
-          {jiStr2 ? <Text style={styles.yiJiText}>{jiStr2}</Text> : null}
+        <View style={[styles.yiJiCol, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.yiJiLabel, { color: colors.jiDark }]}>忌</Text>
+          {jiStr1 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{jiStr1}</Text> : null}
+          {jiStr2 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{jiStr2}</Text> : null}
         </View>
       </View>
     </View>
@@ -56,7 +57,6 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.bottomPanelBg,
     padding: 16,
     paddingHorizontal: 24,
     gap: 12,
@@ -72,16 +72,13 @@ const styles = StyleSheet.create({
   },
   dateNum: {
     ...Typography.dateSummary,
-    color: Colors.foreground,
   },
   festival: {
     ...Typography.subtitle,
-    color: Colors.festival,
     fontFamily: Fonts.interMedium,
   },
   ganzhi: {
     ...Typography.subtitle,
-    color: Colors.subtleText,
   },
   yiJiRow: {
     flexDirection: 'row',
@@ -89,7 +86,6 @@ const styles = StyleSheet.create({
   },
   yiJiCol: {
     flex: 1,
-    backgroundColor: Colors.surface,
     borderRadius: 12,
     padding: 12,
     gap: 6,
@@ -100,6 +96,5 @@ const styles = StyleSheet.create({
   },
   yiJiText: {
     ...Typography.subtitle,
-    color: Colors.subtleText,
   },
 });

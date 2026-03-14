@@ -4,7 +4,7 @@ import { MonthHeader } from '../components/MonthHeader';
 import { WeekHeader } from '../components/WeekHeader';
 import { CalendarGrid } from '../components/CalendarGrid';
 import { BottomPanel } from '../components/BottomPanel';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { getMonthDays, getChineseMonthName, getEnglishMonthName, getDayData } from '../utils/lunar';
 import { Solar } from 'lunar-javascript';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
@@ -22,6 +22,7 @@ export function CalendarScreen({
   year, month, selectedDay,
   onPrevMonth, onNextMonth, onSelectDay,
 }: CalendarScreenProps) {
+  const { colors } = useTheme();
   const weeks = getMonthDays(year, month);
   const firstDay = Solar.fromYmd(year, month, 1);
   const firstWeekDay = firstDay.getWeek();
@@ -31,7 +32,7 @@ export function CalendarScreen({
   const selectedDayData = getDayData(year, month, selectedDay, month);
 
   return (
-    <View style={styles.container} {...swipeHandlers}>
+    <View style={[styles.container, { backgroundColor: colors.background }]} {...swipeHandlers}>
       <MonthHeader
         titleCn={getChineseMonthName(year, month)}
         titleEn={getEnglishMonthName(year, month)}
@@ -46,7 +47,7 @@ export function CalendarScreen({
         firstWeekDay={firstWeekDay}
         onSelectDay={onSelectDay}
       />
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.divider }]} />
       <BottomPanel dayData={selectedDayData} />
     </View>
   );
@@ -55,10 +56,8 @@ export function CalendarScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.divider,
   },
 });

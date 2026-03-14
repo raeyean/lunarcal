@@ -51,7 +51,7 @@ struct LunarCalWidget: Widget {
         StaticConfiguration(kind: kind, provider: LunarCalProvider()) { entry in
             LunarCalWidgetEntryView(entry: entry)
                 .containerBackground(for: .widget) {
-                    Color.white
+                    Color.clear
                 }
         }
         .configurationDisplayName("風水日曆")

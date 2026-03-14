@@ -18,19 +18,10 @@ import {
 import { CalendarScreen } from './src/screens/CalendarScreen';
 import { DailyDetailScreen } from './src/screens/DailyDetailScreen';
 import { TogglePill } from './src/components/TogglePill';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 
-export default function App() {
-  const [fontsLoaded] = useFonts({
-    Outfit_400Regular,
-    Outfit_500Medium,
-    Outfit_600SemiBold,
-    Outfit_700Bold,
-    Outfit_800ExtraBold,
-    Outfit_900Black,
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-  });
+function AppContent() {
+  const { colors, isDark, toggleTheme } = useTheme();
 
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -88,17 +79,16 @@ export default function App() {
     return year === now.getFullYear() && month === now.getMonth() + 1 && selectedDay === now.getDate();
   })();
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <View style={styles.toggleWrapper}>
+        <TouchableOpacity onPress={toggleTheme} style={styles.themeButton}>
+          <Text style={styles.themeIcon}>{isDark ? '☀️' : '🌙'}</Text>
+        </TouchableOpacity>
         <TogglePill activeTab={activeTab} onToggle={handleToggle} />
         {!isToday && (
-          <TouchableOpacity style={styles.todayButton} onPress={handleGoToday}>
+          <TouchableOpacity style={[styles.todayButton, { backgroundColor: colors.primary }]} onPress={handleGoToday}>
             <Text style={styles.todayText}>今天</Text>
           </TouchableOpacity>
         )}
@@ -125,10 +115,33 @@ export default function App() {
   );
 }
 
+export default function App() {
+  const [fontsLoaded] = useFonts({
+    Outfit_400Regular,
+    Outfit_500Medium,
+    Outfit_600SemiBold,
+    Outfit_700Bold,
+    Outfit_800ExtraBold,
+    Outfit_900Black,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   toggleWrapper: {
     flexDirection: 'row',
@@ -138,8 +151,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     gap: 12,
   },
+  themeButton: {
+    position: 'absolute',
+    left: 24,
+  },
+  themeIcon: {
+    fontSize: 20,
+  },
   todayButton: {
-    backgroundColor: '#f04324',
     borderRadius: 14,
     paddingVertical: 6,
     paddingHorizontal: 14,

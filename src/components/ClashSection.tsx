@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Badge } from './Badge';
 
@@ -13,16 +13,18 @@ interface ClashSectionProps {
 }
 
 export function ClashSection({ animal, emoji, description, direction, element }: ClashSectionProps) {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.sectionTitle}>相冲生肖</Text>
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
+      <Text style={[styles.sectionTitle, { color: colors.foreground }]}>相冲生肖</Text>
       <View style={styles.animalRow}>
-        <View style={styles.emojiCircle}>
+        <View style={[styles.emojiCircle, { backgroundColor: colors.background }]}>
           <Text style={styles.emoji}>{emoji}</Text>
         </View>
         <View style={styles.detail}>
-          <Text style={styles.clashName}>{animal}</Text>
-          <Text style={styles.clashDesc}>{description}</Text>
+          <Text style={[styles.clashName, { color: colors.foreground }]}>{animal}</Text>
+          <Text style={[styles.clashDesc, { color: colors.subtleText }]}>{description}</Text>
         </View>
       </View>
       <View style={styles.badges}>
@@ -36,14 +38,12 @@ export function ClashSection({ animal, emoji, description, direction, element }:
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.surface,
     borderRadius: 16,
     padding: 16,
     gap: 12,
   },
   sectionTitle: {
     ...Typography.sectionTitle,
-    color: Colors.foreground,
   },
   animalRow: {
     flexDirection: 'row',
@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colors.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -67,11 +66,9 @@ const styles = StyleSheet.create({
   },
   clashName: {
     ...Typography.clashName,
-    color: Colors.foreground,
   },
   clashDesc: {
     ...Typography.body,
-    color: Colors.subtleText,
     lineHeight: 17,
   },
   badges: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Fonts } from '../constants/typography';
 
@@ -10,21 +10,23 @@ interface TogglePillProps {
 }
 
 export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
       <TouchableOpacity
-        style={[styles.tab, activeTab === 'daily' && styles.tabActive]}
+        style={[styles.tab, activeTab === 'daily' && { backgroundColor: colors.primary }]}
         onPress={() => onToggle('daily')}
       >
-        <Text style={[styles.tabText, activeTab === 'daily' && styles.tabTextActive]}>
+        <Text style={[styles.tabText, { color: colors.muted }, activeTab === 'daily' && { color: colors.white }]}>
           日詳
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.tab, activeTab === 'calendar' && styles.tabActive]}
+        style={[styles.tab, activeTab === 'calendar' && { backgroundColor: colors.primary }]}
         onPress={() => onToggle('calendar')}
       >
-        <Text style={[styles.tabText, activeTab === 'calendar' && styles.tabTextActive]}>
+        <Text style={[styles.tabText, { color: colors.muted }, activeTab === 'calendar' && { color: colors.white }]}>
           月曆
         </Text>
       </TouchableOpacity>
@@ -35,7 +37,6 @@ export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: Colors.surface,
     borderRadius: 24,
     padding: 4,
     width: 240,
@@ -47,16 +48,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 20,
   },
-  tabActive: {
-    backgroundColor: Colors.primary,
-  },
   tabText: {
     ...Typography.toggleActive,
     fontFamily: Fonts.outfitMedium,
-    color: Colors.muted,
-  },
-  tabTextActive: {
-    ...Typography.toggleActive,
-    color: Colors.white,
   },
 });

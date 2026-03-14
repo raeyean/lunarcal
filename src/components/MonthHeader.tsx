@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
-import { Fonts } from '../constants/typography';
 
 interface MonthHeaderProps {
   titleCn: string;
@@ -12,17 +11,19 @@ interface MonthHeaderProps {
 }
 
 export function MonthHeader({ titleCn, titleEn, onPrev, onNext }: MonthHeaderProps) {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={onPrev} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-        <Text style={styles.arrow}>‹</Text>
+        <Text style={[styles.arrow, { color: colors.foreground }]}>‹</Text>
       </TouchableOpacity>
       <View style={styles.titleGroup}>
-        <Text style={styles.titleCn}>{titleCn}</Text>
-        <Text style={styles.titleEn}>{titleEn}</Text>
+        <Text style={[styles.titleCn, { color: colors.foreground }]}>{titleCn}</Text>
+        <Text style={[styles.titleEn, { color: colors.muted }]}>{titleEn}</Text>
       </View>
       <TouchableOpacity onPress={onNext} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-        <Text style={styles.arrow}>›</Text>
+        <Text style={[styles.arrow, { color: colors.foreground }]}>›</Text>
       </TouchableOpacity>
     </View>
   );
@@ -42,15 +43,12 @@ const styles = StyleSheet.create({
   },
   titleCn: {
     ...Typography.screenHeader,
-    color: Colors.foreground,
   },
   titleEn: {
     ...Typography.monthEnglish,
-    color: Colors.muted,
   },
   arrow: {
     fontSize: 28,
-    color: Colors.foreground,
     fontWeight: '300',
   },
 });

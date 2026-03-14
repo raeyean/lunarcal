@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Fonts } from '../constants/typography';
 
@@ -12,31 +12,32 @@ interface GanzhiHeroProps {
 }
 
 export function GanzhiHero({ yearGanzhi, monthGanzhi, dayGanzhi, lunarDateString }: GanzhiHeroProps) {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>天干地支</Text>
+    <View style={[styles.container, { backgroundColor: colors.primary }]}>
+      <Text style={[styles.label, { color: colors.whiteTranslucent50 }]}>天干地支</Text>
       <View style={styles.pillarsRow}>
         <View style={styles.pillar}>
-          <Text style={styles.pillarLabel}>年</Text>
-          <Text style={styles.pillarValue}>{yearGanzhi}</Text>
+          <Text style={[styles.pillarLabel, { color: colors.whiteTranslucent50 }]}>年</Text>
+          <Text style={[styles.pillarValue, { color: colors.white }]}>{yearGanzhi}</Text>
         </View>
         <View style={styles.pillar}>
-          <Text style={styles.pillarLabel}>月</Text>
-          <Text style={styles.pillarValue}>{monthGanzhi}</Text>
+          <Text style={[styles.pillarLabel, { color: colors.whiteTranslucent50 }]}>月</Text>
+          <Text style={[styles.pillarValue, { color: colors.white }]}>{monthGanzhi}</Text>
         </View>
         <View style={styles.pillar}>
-          <Text style={styles.pillarLabel}>日</Text>
-          <Text style={styles.pillarValue}>{dayGanzhi}</Text>
+          <Text style={[styles.pillarLabel, { color: colors.whiteTranslucent50 }]}>日</Text>
+          <Text style={[styles.pillarValue, { color: colors.white }]}>{dayGanzhi}</Text>
         </View>
       </View>
-      <Text style={styles.subtitle}>{lunarDateString}</Text>
+      <Text style={[styles.subtitle, { color: colors.whiteTranslucent80 }]}>{lunarDateString}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.primary,
     borderRadius: 16,
     padding: 24,
     gap: 8,
@@ -45,7 +46,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.interMedium,
     fontSize: 11,
     letterSpacing: 2,
-    color: Colors.whiteTranslucent50,
   },
   pillarsRow: {
     flexDirection: 'row',
@@ -58,15 +58,12 @@ const styles = StyleSheet.create({
   pillarLabel: {
     fontFamily: Fonts.inter,
     fontSize: 10,
-    color: Colors.whiteTranslucent50,
   },
   pillarValue: {
     ...Typography.heroGanzhi,
-    color: Colors.white,
   },
   subtitle: {
     fontFamily: Fonts.inter,
     fontSize: 11,
-    color: Colors.whiteTranslucent80,
   },
 });

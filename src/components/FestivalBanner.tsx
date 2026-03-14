@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 
 interface FestivalBannerProps {
@@ -8,14 +8,16 @@ interface FestivalBannerProps {
 }
 
 export function FestivalBanner({ festivals }: FestivalBannerProps) {
+  const { colors } = useTheme();
+
   if (festivals.length === 0) return null;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.festivalLight }]}>
       {festivals.map((name, i) => (
         <View key={i} style={styles.row}>
-          <View style={styles.dot} />
-          <Text style={styles.text}>{name}</Text>
+          <View style={[styles.dot, { backgroundColor: colors.festival }]} />
+          <Text style={[styles.text, { color: colors.festival }]}>{name}</Text>
         </View>
       ))}
     </View>
@@ -24,7 +26,6 @@ export function FestivalBanner({ festivals }: FestivalBannerProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FEF7EC',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -39,10 +40,8 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.festival,
   },
   text: {
     ...Typography.jieqiBanner,
-    color: Colors.festival,
   },
 });

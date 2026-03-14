@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 
 interface JieqiBannerProps {
@@ -8,12 +8,14 @@ interface JieqiBannerProps {
 }
 
 export function JieqiBanner({ text }: JieqiBannerProps) {
+  const { colors } = useTheme();
+
   if (!text) return null;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.dot} />
-      <Text style={styles.text}>{text}</Text>
+    <View style={[styles.container, { backgroundColor: colors.primaryLight }]}>
+      <View style={[styles.dot, { backgroundColor: colors.primary }]} />
+      <Text style={[styles.text, { color: colors.primary }]}>{text}</Text>
     </View>
   );
 }
@@ -22,7 +24,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.primaryLight,
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -32,10 +33,8 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.primary,
   },
   text: {
     ...Typography.jieqiBanner,
-    color: Colors.primary,
   },
 });

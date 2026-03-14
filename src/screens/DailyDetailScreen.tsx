@@ -6,7 +6,7 @@ import { FestivalBanner } from '../components/FestivalBanner';
 import { YiJiCard } from '../components/YiJiCard';
 import { ClashSection } from '../components/ClashSection';
 import { MonthHeader } from '../components/MonthHeader';
-import { Colors } from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { getDayData, getChineseDayName, getEnglishDayName } from '../utils/lunar';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 
@@ -19,6 +19,7 @@ interface DailyDetailScreenProps {
 }
 
 export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: DailyDetailScreenProps) {
+  const { colors } = useTheme();
   const dayData = getDayData(year, month, day);
   const { lunar, ganzhi, yi, ji, clash, jieqi, nextJieqi, festivals } = dayData;
   const swipeHandlers = useSwipeGesture({ onSwipeLeft: onNextDay, onSwipeRight: onPrevDay });
@@ -33,7 +34,7 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <MonthHeader
         titleCn={getChineseDayName(year, month, day)}
         titleEn={getEnglishDayName(year, month, day)}
@@ -68,7 +69,6 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   content: {
     flex: 1,
