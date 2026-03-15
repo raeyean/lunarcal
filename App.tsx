@@ -96,6 +96,7 @@ function AppContent() {
       </View>
       {activeTab === 'calendar' ? (
         <CalendarScreen
+          key={`${year}-${month}`}
           year={year}
           month={month}
           selectedDay={selectedDay}
@@ -105,6 +106,7 @@ function AppContent() {
         />
       ) : (
         <DailyDetailScreen
+          key={`${year}-${month}-${selectedDay}`}
           year={year}
           month={month}
           day={selectedDay}
