@@ -47,6 +47,9 @@ declare module 'lunar-javascript' {
     getYueXiang(): string;
     getLiuYao(): string;
     getWuHou(): string;
+    static fromYmd(year: number, month: number, day: number): Lunar;
+    getYear(): number;
+    getSolar(): Solar;
   }
 
   export class SolarMonth {
