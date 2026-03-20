@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Modal,
   View,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Switch,
   StyleSheet,
   Platform,
+  Animated,
 } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/ThemeContext';
@@ -33,10 +35,25 @@ export function SettingsModal({ visible, onClose, isDark, toggleTheme }: Setting
     minute: 0,
   });
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(300)).current;
 
   useEffect(() => {
     if (visible) {
+      setModalVisible(true);
       getNotificationSettings().then(setSettings);
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        useNativeDriver: true,
+        tension: 65,
+        friction: 11,
+      }).start();
+    } else {
+      Animated.timing(slideAnim, {
+        toValue: 300,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => setModalVisible(false));
     }
   }, [visible]);
 
@@ -69,9 +86,12 @@ export function SettingsModal({ visible, onClose, isDark, toggleTheme }: Setting
   pickerDate.setHours(settings.hour, settings.minute, 0, 0);
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
-      <View style={styles.overlay}>
-        <View style={[styles.sheet, { backgroundColor: colors.background }]}>
+    <Modal visible={modalVisible} animationType="none" transparent>
+      <View style={styles.container}>
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
+        <Animated.View style={[styles.sheet, { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] }]}>
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.foreground }]}>設定</Text>
             <TouchableOpacity onPress={onClose}>
@@ -130,16 +150,19 @@ export function SettingsModal({ visible, onClose, isDark, toggleTheme }: Setting
               )}
             </View>
           )}
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
+  container: {
     flex: 1,
     justifyContent: 'flex-end',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
