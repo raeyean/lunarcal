@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -20,6 +20,9 @@ import { CalendarScreen } from './src/screens/CalendarScreen';
 import { DailyDetailScreen } from './src/screens/DailyDetailScreen';
 import { TogglePill } from './src/components/TogglePill';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import * as BackgroundFetch from 'expo-background-fetch';
+import { scheduleAllLunarNotifications } from './src/utils/lunarNotifications';
+import { BACKGROUND_NOTIFICATION_TASK } from './src/constants/tasks';
 
 function AppContent() {
   const { colors, isDark, toggleTheme } = useTheme();
@@ -29,6 +32,22 @@ function AppContent() {
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [selectedDay, setSelectedDay] = useState(today.getDate());
   const [activeTab, setActiveTab] = useState<'daily' | 'calendar'>('daily');
+
+  useEffect(() => {
+    async function initNotifications() {
+      await scheduleAllLunarNotifications();
+      try {
+        await BackgroundFetch.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK, {
+          minimumInterval: 60 * 60 * 24, // once per day
+          stopOnTerminate: false,
+          startOnBoot: true,
+        });
+      } catch {
+        // Background fetch registration may fail on some platforms (e.g., web)
+      }
+    }
+    initNotifications();
+  }, []);
 
   const handlePrevMonth = useCallback(() => {
     if (month === 1) {
