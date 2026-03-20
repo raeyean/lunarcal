@@ -1,8 +1,18 @@
 import { registerRootComponent } from 'expo';
+import * as TaskManager from 'expo-task-manager';
+import * as BackgroundFetch from 'expo-background-fetch';
+import { scheduleAllLunarNotifications } from './src/utils/lunarNotifications';
+import { BACKGROUND_NOTIFICATION_TASK } from './src/constants/tasks';
 
 import App from './App';
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
+TaskManager.defineTask(BACKGROUND_NOTIFICATION_TASK, async () => {
+  try {
+    await scheduleAllLunarNotifications();
+    return BackgroundFetch.BackgroundFetchResult.NewData;
+  } catch {
+    return BackgroundFetch.BackgroundFetchResult.Failed;
+  }
+});
+
 registerRootComponent(App);
