@@ -23,6 +23,7 @@ import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import * as BackgroundFetch from 'expo-background-fetch';
 import { scheduleAllLunarNotifications } from './src/utils/lunarNotifications';
 import { BACKGROUND_NOTIFICATION_TASK } from './src/constants/tasks';
+import { SettingsModal } from './src/components/SettingsModal';
 
 function AppContent() {
   const { colors, isDark, toggleTheme } = useTheme();
@@ -32,6 +33,7 @@ function AppContent() {
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [selectedDay, setSelectedDay] = useState(today.getDate());
   const [activeTab, setActiveTab] = useState<'daily' | 'calendar'>('daily');
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   useEffect(() => {
     async function initNotifications() {
@@ -103,8 +105,8 @@ function AppContent() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <View style={styles.toggleWrapper}>
-        <TouchableOpacity onPress={toggleTheme} style={styles.themeButton}>
-          <Text style={styles.themeIcon}>{isDark ? '☀️' : '🌙'}</Text>
+        <TouchableOpacity onPress={() => setSettingsVisible(true)} style={styles.themeButton}>
+          <Text style={styles.themeIcon}>{'⚙️'}</Text>
         </TouchableOpacity>
         <TogglePill activeTab={activeTab} onToggle={handleToggle} />
         {!isToday && (
@@ -133,6 +135,12 @@ function AppContent() {
           onNextDay={handleNextDay}
         />
       )}
+      <SettingsModal
+        visible={settingsVisible}
+        onClose={() => setSettingsVisible(false)}
+        isDark={isDark}
+        toggleTheme={toggleTheme}
+      />
     </SafeAreaView>
   );
 }
