@@ -24,6 +24,8 @@ import * as BackgroundFetch from 'expo-background-fetch';
 import { scheduleAllLunarNotifications } from './src/utils/lunarNotifications';
 import { BACKGROUND_NOTIFICATION_TASK } from './src/constants/tasks';
 import { SettingsModal } from './src/components/SettingsModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TodayWidget } from './src/components/TodayWidget';
 
 function AppContent() {
   const { colors, isDark, toggleTheme } = useTheme();
@@ -34,6 +36,24 @@ function AppContent() {
   const [selectedDay, setSelectedDay] = useState(today.getDate());
   const [activeTab, setActiveTab] = useState<'daily' | 'calendar'>('daily');
   const [settingsVisible, setSettingsVisible] = useState(false);
+  const [showWidget, setShowWidget] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem('todayWidgetDismissedDate').then(val => {
+      const todayStr = new Date().toISOString().split('T')[0];
+      setShowWidget(val !== todayStr);
+    });
+  }, []);
+
+  const handleWidgetDismiss = useCallback(() => {
+    setShowWidget(false);
+  }, []);
+
+  const handleWidgetDismissToday = useCallback(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    AsyncStorage.setItem('todayWidgetDismissedDate', todayStr);
+    setShowWidget(false);
+  }, []);
 
   useEffect(() => {
     async function initNotifications() {
@@ -140,6 +160,11 @@ function AppContent() {
         onClose={() => setSettingsVisible(false)}
         isDark={isDark}
         toggleTheme={toggleTheme}
+      />
+      <TodayWidget
+        visible={showWidget}
+        onDismiss={handleWidgetDismiss}
+        onDismissToday={handleWidgetDismissToday}
       />
     </SafeAreaView>
   );
