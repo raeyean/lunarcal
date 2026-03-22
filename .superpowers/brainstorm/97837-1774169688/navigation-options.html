@@ -1,0 +1,97 @@
+<h2>Where should the Auspicious Date Finder live?</h2>
+<p class="subtitle">Compare the two navigation approaches</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <!-- Mock: Tab approach -->
+      <div style="background: #1a1a1a; border-radius: 12px; padding: 16px; color: #f0f0f0; font-family: system-ui;">
+        <!-- Status bar -->
+        <div style="text-align: center; font-size: 11px; color: #888; margin-bottom: 12px;">9:41</div>
+
+        <!-- Toggle pill with 3 tabs -->
+        <div style="display: flex; background: #2a2a2a; border-radius: 20px; padding: 3px; margin-bottom: 16px;">
+          <div style="flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; color: #888; border-radius: 18px;">Daily</div>
+          <div style="flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; color: #888; border-radius: 18px;">Calendar</div>
+          <div style="flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; background: #f04324; color: white; border-radius: 18px; font-weight: 600;">Find Date</div>
+        </div>
+
+        <!-- Finder content preview -->
+        <div style="background: #2a2a2a; border-radius: 12px; padding: 14px; margin-bottom: 10px;">
+          <div style="font-size: 11px; color: #888; margin-bottom: 8px;">ACTIVITY</div>
+          <div style="font-size: 16px; margin-bottom: 4px;">嫁娶</div>
+          <div style="font-size: 11px; color: #666;">Marriage & Wedding</div>
+        </div>
+
+        <div style="background: #2a2a2a; border-radius: 12px; padding: 14px; margin-bottom: 10px;">
+          <div style="font-size: 11px; color: #888; margin-bottom: 8px;">YOUR ZODIAC</div>
+          <div style="font-size: 16px;">🐴 馬</div>
+        </div>
+
+        <div style="background: #2a2a2a; border-radius: 12px; padding: 14px;">
+          <div style="font-size: 11px; color: #888; margin-bottom: 8px;">RESULTS</div>
+          <div style="font-size: 13px; color: #aaa;">3 auspicious dates found...</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: New Tab</h3>
+      <p>Add "Find Date" as a third tab in the existing toggle pill. Always one tap away. Feels like a core feature.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Instantly discoverable</li><li>One tap to access</li><li>Feels like a first-class feature</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Toggle pill gets crowded (3 tabs)</li><li>May clutter the main navigation</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <!-- Mock: Dedicated screen via header icon -->
+      <div style="background: #1a1a1a; border-radius: 12px; padding: 16px; color: #f0f0f0; font-family: system-ui;">
+        <!-- Status bar -->
+        <div style="text-align: center; font-size: 11px; color: #888; margin-bottom: 12px;">9:41</div>
+
+        <!-- Header with icon -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div style="width: 28px;"></div>
+          <div style="display: flex; background: #2a2a2a; border-radius: 20px; padding: 3px; flex: 1; margin: 0 12px;">
+            <div style="flex: 1; text-align: center; padding: 8px; font-size: 13px; background: #f04324; color: white; border-radius: 18px; font-weight: 600;">Daily</div>
+            <div style="flex: 1; text-align: center; padding: 8px; font-size: 13px; color: #888; border-radius: 18px;">Calendar</div>
+          </div>
+          <div style="font-size: 20px; cursor: pointer;" title="Find auspicious date">🔍</div>
+        </div>
+
+        <!-- Arrow showing it opens a new screen -->
+        <div style="text-align: center; margin: 8px 0; color: #f04324; font-size: 13px;">tap 🔍 opens...</div>
+
+        <!-- Dedicated screen preview -->
+        <div style="border: 1px solid #333; border-radius: 12px; padding: 14px;">
+          <div style="display: flex; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 13px; color: #888;">&#x25C0;</span>
+            <span style="flex: 1; text-align: center; font-size: 15px; font-weight: 600;">Find Auspicious Date</span>
+          </div>
+          <div style="background: #2a2a2a; border-radius: 8px; padding: 10px; margin-bottom: 8px;">
+            <div style="font-size: 10px; color: #888;">ACTIVITY</div>
+            <div style="font-size: 14px;">嫁娶</div>
+          </div>
+          <div style="background: #2a2a2a; border-radius: 8px; padding: 10px; margin-bottom: 8px;">
+            <div style="font-size: 10px; color: #888;">ZODIAC</div>
+            <div style="font-size: 14px;">🐴 馬</div>
+          </div>
+          <div style="background: #2a2a2a; border-radius: 8px; padding: 10px;">
+            <div style="font-size: 10px; color: #888;">RESULTS</div>
+            <div style="font-size: 12px; color: #aaa;">3 dates found...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C: Dedicated Screen (Header Icon)</h3>
+      <p>Add a search/compass icon to the header bar. Opens a full dedicated screen with back navigation. Keeps the main view clean.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Main nav stays clean (2 tabs)</li><li>Full screen for results</li><li>Room to grow the feature</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Less discoverable (icon vs tab)</li><li>Extra tap to access</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
