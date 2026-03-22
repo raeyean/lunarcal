@@ -58,7 +58,7 @@ Segmented control with four options: **30 / 60 / 90 / 180** days from today. Def
 2. Iterate day-by-day in 30-day chunks
 3. For each day, call `getDayData(year, month, day)`
 4. **Include** if the selected activity appears in `dayData.yi`
-5. **Exclude** if `dayData.clash.animal` matches the user's zodiac animal (string match on Chinese name, e.g., "馬")
+5. **Exclude** if the day's clash animal matches the user's zodiac. Note: `dayData.clash.animal` is formatted as `"沖馬 (壬午)"`, so the scan engine should call `lunar.getDayChongShengXiao()` directly to get the bare animal name (e.g., `"馬"`) for matching
 6. Collect matching dates with metadata into results array
 7. When user scrolls near bottom, scan next 30-day chunk (up to range limit)
 
@@ -72,7 +72,8 @@ interface AuspiciousResult {
   weekDay: number          // 0-6
   yi: string[]             // full 宜 list for context
   ji: string[]             // full 忌 list for context
-  tianShenType: string     // 吉/凶 for extra info
+  tianShen: string          // deity name (e.g., "天德")
+  tianShenType: string     // 吉/凶
 }
 ```
 
