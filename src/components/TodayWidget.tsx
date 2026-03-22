@@ -40,8 +40,8 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, gestureState) =>
+        gestureState.dy > 10 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
       onMoveShouldSetPanResponderCapture: (_, gestureState) =>
         gestureState.dy > 10 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
       onPanResponderMove: (_, gestureState) => {

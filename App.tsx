@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 14,
     position: 'absolute',
-    right: 24,
+    right: 60,
   },
   todayText: {
     fontFamily: 'Outfit_700Bold',
@@ -246,6 +246,6 @@ const styles = StyleSheet.create({
   },
   finderButton: {
     position: 'absolute',
-    right: 60,
+    right: 24,
   },
 });

@@ -152,7 +152,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity onPress={handleClose} style={styles.backButton}>
-            <Text style={[styles.backArrow, { color: colors.primary }]}>{'◀'}</Text>
+            <Text style={[styles.backArrow, { color: colors.primary }]}>{'‹'}</Text>
           </TouchableOpacity>
           <Text style={[styles.title, { color: colors.foreground }]}>擇吉日</Text>
           <View style={styles.backButton} />
@@ -287,7 +287,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backArrow: {
-    fontSize: 18,
+    fontSize: 28,
+    fontWeight: '300',
+    marginTop: -2,
   },
   title: {
     fontFamily: Fonts.outfitBold,
