@@ -11,6 +11,7 @@ import {
   Modal,
   Animated,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { ActivityPicker } from '../components/ActivityPicker';
@@ -20,6 +21,8 @@ import { scanChunk, AuspiciousResult } from '../utils/auspiciousScan';
 import { getZodiac, setZodiac } from '../utils/zodiacStorage';
 
 const RANGE_OPTIONS = [30, 60, 90, 180];
+const SEPARATOR_STYLE = { height: 8 };
+const ItemSeparator = () => <View style={SEPARATOR_STYLE} />;
 
 interface AuspiciousFinderScreenProps {
   visible: boolean;
@@ -29,6 +32,7 @@ interface AuspiciousFinderScreenProps {
 
 export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: AuspiciousFinderScreenProps) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const [activity, setActivity] = useState<string | null>(null);
   const [zodiac, setZodiacState] = useState<string | null>(null);
@@ -125,14 +129,14 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
       return (
         <View style={styles.footer}>
           <ActivityIndicator color={colors.primary} />
-          <Text style={[styles.footerText, { color: colors.muted }]}>Loading more...</Text>
+          <Text style={[styles.footerText, { color: colors.muted }]}>載入更多...</Text>
         </View>
       );
     }
     if (searched && !hasMore && results.length > 0) {
       return (
         <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: colors.muted }]}>No more dates in range</Text>
+          <Text style={[styles.footerText, { color: colors.muted }]}>搜索範圍內沒有更多吉日</Text>
         </View>
       );
     }
@@ -146,7 +150,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
         { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] },
       ]}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity onPress={handleClose} style={styles.backButton}>
             <Text style={[styles.backArrow, { color: colors.primary }]}>{'◀'}</Text>
           </TouchableOpacity>
@@ -249,7 +253,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
                   />
                 )}
                 contentContainerStyle={styles.resultsList}
-                ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+                ItemSeparatorComponent={ItemSeparator}
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.3}
                 ListHeaderComponent={
@@ -276,7 +280,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: 60,
     paddingBottom: 12,
   },
   backButton: {
