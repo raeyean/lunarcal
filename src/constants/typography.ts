@@ -51,7 +51,7 @@ export const Typography = {
   } as TextStyle,
   lunarDateCell: {
     fontFamily: Fonts.inter,
-    fontSize: 9,
+    fontSize: 10,
   } as TextStyle,
   jieqiBanner: {
     fontFamily: Fonts.interMedium,

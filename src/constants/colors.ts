@@ -7,8 +7,8 @@ export const LightColors = {
   surface: '#F4F4F5',
   jiDark: '#27272A',
   badgeBg: '#E4E4E7',
-  muted: '#A1A1AA',
-  subtleText: '#71717A',
+  muted: '#78788A',
+  subtleText: '#5A5A63',
   white: '#FFFFFF',
   background: '#FFFFFF',
   bottomPanelBg: '#FAFAFA',
@@ -16,8 +16,10 @@ export const LightColors = {
   whiteTranslucent80: 'rgba(255,255,255,0.8)',
   whiteTranslucent50: 'rgba(255,255,255,0.5)',
   whiteOverlay: 'rgba(255,255,255,0.1)',
-  festival: '#D97706',
+  festival: '#B45C04',
   festivalLight: '#FEF7EC',
+  jiShen: 'rgba(240,67,36,0.75)',
+  success: '#16a34a',
 } as const;
 
 export const DarkColors: ThemeColors = {
@@ -27,8 +29,8 @@ export const DarkColors: ThemeColors = {
   surface: '#1E1E1E',
   jiDark: '#D4D4D8',
   badgeBg: '#333333',
-  muted: '#808080',
-  subtleText: '#A0A0A0',
+  muted: '#9E9EA8',
+  subtleText: '#B0B0B8',
   white: '#FFFFFF',
   background: '#121212',
   bottomPanelBg: '#1A1A1A',
@@ -38,6 +40,8 @@ export const DarkColors: ThemeColors = {
   whiteOverlay: 'rgba(255,255,255,0.1)',
   festival: '#F59E0B',
   festivalLight: '#2A2210',
+  jiShen: 'rgba(255,107,74,0.75)',
+  success: '#4ade80',
 } as const;
 
 // Keep backwards-compatible export for any remaining static references

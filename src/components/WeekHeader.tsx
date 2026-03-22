@@ -21,13 +21,14 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 4,
   },
   dayText: {
     ...Typography.weekDay,
-    width: 44,
+    flex: 1,
+    maxWidth: 52,
     textAlign: 'center',
   },
 });

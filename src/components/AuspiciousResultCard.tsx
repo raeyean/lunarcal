@@ -15,7 +15,7 @@ interface AuspiciousResultCardProps {
 
 export function AuspiciousResultCard({ result, matchedActivity, onPress }: AuspiciousResultCardProps) {
   const { colors } = useTheme();
-  const luckColor = result.tianShenType === '吉' ? '#4ade80' : colors.muted;
+  const luckColor = result.tianShenType === '吉' ? colors.success : colors.muted;
 
   return (
     <TouchableOpacity

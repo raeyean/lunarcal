@@ -49,10 +49,11 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
                         },
                       ]}
                       onPress={() => onSelect(activity)}
+                      activeOpacity={0.6}
                     >
                       <Text style={[
                         styles.chipText,
-                        { color: isSelected ? '#FFFFFF' : colors.foreground },
+                        { color: isSelected ? colors.white : colors.foreground },
                       ]}>
                         {activity}
                       </Text>
@@ -94,7 +95,7 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
               >
                 <Text style={[
                   styles.chipText,
-                  { color: isSelected ? '#FFFFFF' : colors.foreground },
+                  { color: isSelected ? colors.white : colors.foreground },
                 ]}>
                   {activity}
                 </Text>

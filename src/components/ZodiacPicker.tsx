@@ -33,6 +33,7 @@ export function ZodiacPicker({ selected, onSelect }: ZodiacPickerProps) {
               isSelected && { borderColor: colors.primary, borderWidth: 2 },
             ]}
             onPress={() => onSelect(name)}
+            activeOpacity={0.6}
           >
             <Text style={styles.emoji}>{emoji}</Text>
             <Text style={[

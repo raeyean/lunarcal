@@ -28,7 +28,7 @@ function TagRow({ label, items, color }: { label: string; items: string[]; color
       <View style={styles.tagRow}>
         {items.map((item, idx) => (
           <View key={idx} style={[styles.tag, { backgroundColor: color || colors.badgeBg }]}>
-            <Text style={[styles.tagText, { color: color ? '#FFFFFF' : colors.foreground }]}>{item}</Text>
+            <Text style={[styles.tagText, { color: color ? colors.white : colors.foreground }]}>{item}</Text>
           </View>
         ))}
       </View>
@@ -70,7 +70,7 @@ export function TongshuSection({ data }: TongshuSectionProps) {
         <TagRow
           label="吉神宜趨"
           items={data.jiShen}
-          color="rgba(240,67,36,0.75)"
+          color={colors.jiShen}
         />
         <TagRow
           label="凶煞宜忌"

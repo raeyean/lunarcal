@@ -15,14 +15,14 @@ export function MonthHeader({ titleCn, titleEn, onPrev, onNext }: MonthHeaderPro
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={onPrev} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+      <TouchableOpacity onPress={onPrev} style={styles.arrowButton} activeOpacity={0.6}>
         <Text style={[styles.arrow, { color: colors.foreground }]}>‹</Text>
       </TouchableOpacity>
       <View style={styles.titleGroup}>
         <Text style={[styles.titleCn, { color: colors.foreground }]}>{titleCn}</Text>
         <Text style={[styles.titleEn, { color: colors.muted }]}>{titleEn}</Text>
       </View>
-      <TouchableOpacity onPress={onNext} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+      <TouchableOpacity onPress={onNext} style={styles.arrowButton} activeOpacity={0.6}>
         <Text style={[styles.arrow, { color: colors.foreground }]}>›</Text>
       </TouchableOpacity>
     </View>
@@ -46,6 +46,12 @@ const styles = StyleSheet.create({
   },
   titleEn: {
     ...Typography.monthEnglish,
+  },
+  arrowButton: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   arrow: {
     fontSize: 28,

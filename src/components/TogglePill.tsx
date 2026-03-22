@@ -17,6 +17,7 @@ export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
       <TouchableOpacity
         style={[styles.tab, activeTab === 'daily' && { backgroundColor: colors.primary }]}
         onPress={() => onToggle('daily')}
+        activeOpacity={0.6}
       >
         <Text style={[styles.tabText, { color: colors.muted }, activeTab === 'daily' && { color: colors.white }]}>
           日詳
@@ -25,6 +26,7 @@ export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
       <TouchableOpacity
         style={[styles.tab, activeTab === 'calendar' && { backgroundColor: colors.primary }]}
         onPress={() => onToggle('calendar')}
+        activeOpacity={0.6}
       >
         <Text style={[styles.tabText, { color: colors.muted }, activeTab === 'calendar' && { color: colors.white }]}>
           月曆
@@ -39,7 +41,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 24,
     padding: 4,
-    width: 240,
+    maxWidth: 240,
+    width: '60%',
     height: 40,
   },
   tab: {

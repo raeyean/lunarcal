@@ -76,11 +76,11 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
   const jiItems = ji.slice(0, 3);
 
   const gradientColors: [string, string] = isDark
-    ? ['rgba(240,67,36,0.25)', 'rgba(18,18,18,1)']
-    : ['rgba(255,245,240,1)', 'rgba(255,255,255,1)'];
+    ? [`${colors.primary}40`, colors.background]
+    : [colors.primaryLight, colors.background];
 
-  const subCardYiBg = isDark ? 'rgba(240,67,36,0.12)' : 'rgba(240,67,36,0.08)';
-  const subCardYiBorder = isDark ? 'rgba(240,67,36,0.25)' : 'rgba(240,67,36,0.2)';
+  const subCardYiBg = `${colors.primary}${isDark ? '1F' : '14'}`;
+  const subCardYiBorder = `${colors.primary}${isDark ? '40' : '33'}`;
   const subCardJiBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)';
   const subCardJiBorder = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)';
 

@@ -25,6 +25,7 @@ export function CalendarCell({ day, lunarText, isActive, isJieqi, isFestival, is
     <TouchableOpacity
       style={[styles.container, isActive && { backgroundColor: colors.primary, borderRadius: 12 }]}
       onPress={onPress}
+      activeOpacity={0.6}
     >
       <Text style={[
         styles.dayNumber,
@@ -50,7 +51,8 @@ export function CalendarCell({ day, lunarText, isActive, isJieqi, isFestival, is
 
 const styles = StyleSheet.create({
   container: {
-    width: 44,
+    flex: 1,
+    maxWidth: 52,
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
