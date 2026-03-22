@@ -141,11 +141,6 @@ function AppContent() {
         <TouchableOpacity onPress={() => setFinderVisible(true)} style={styles.finderButton}>
           <Text style={[styles.themeIcon, { color: colors.muted }]}>{'🧭'}</Text>
         </TouchableOpacity>
-        {!isToday && (
-          <TouchableOpacity style={[styles.todayButton, { backgroundColor: colors.primary }]} onPress={handleGoToday}>
-            <Text style={styles.todayText}>今天</Text>
-          </TouchableOpacity>
-        )}
       </View>
       {activeTab === 'calendar' ? (
         <CalendarScreen
@@ -183,6 +178,15 @@ function AppContent() {
         onClose={() => setFinderVisible(false)}
         onSelectDate={handleFinderSelectDate}
       />
+      {!isToday && (
+        <TouchableOpacity
+          style={[styles.todayFab, { backgroundColor: colors.primary }]}
+          onPress={handleGoToday}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.todayText}>今天</Text>
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 }
@@ -246,18 +250,22 @@ const styles = StyleSheet.create({
   themeIcon: {
     fontSize: 20,
   },
-  todayButton: {
-    borderRadius: 14,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    minHeight: 44,
-    justifyContent: 'center',
+  todayFab: {
     position: 'absolute',
-    right: 60,
+    bottom: 32,
+    right: 24,
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   todayText: {
     fontFamily: 'Outfit_700Bold',
-    fontSize: 13,
+    fontSize: 14,
     color: '#FFFFFF',
   },
   finderButton: {
