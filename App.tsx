@@ -26,6 +26,7 @@ import { BACKGROUND_NOTIFICATION_TASK } from './src/constants/tasks';
 import { SettingsModal } from './src/components/SettingsModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TodayWidget } from './src/components/TodayWidget';
+import { AuspiciousFinderScreen } from './src/screens/AuspiciousFinderScreen';
 
 function AppContent() {
   const { colors, isDark, toggleTheme } = useTheme();
@@ -37,6 +38,7 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState<'daily' | 'calendar'>('daily');
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [showWidget, setShowWidget] = useState(false);
+  const [finderVisible, setFinderVisible] = useState(false);
 
   useEffect(() => {
     AsyncStorage.getItem('todayWidgetDismissedDate').then(val => {
@@ -121,6 +123,13 @@ function AppContent() {
     return year === now.getFullYear() && month === now.getMonth() + 1 && selectedDay === now.getDate();
   })();
 
+  const handleFinderSelectDate = useCallback((y: number, m: number, d: number) => {
+    setYear(y);
+    setMonth(m);
+    setSelectedDay(d);
+    setActiveTab('daily');
+  }, []);
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
@@ -129,6 +138,9 @@ function AppContent() {
           <Text style={[styles.themeIcon, { color: colors.muted }]}>{'⚙'}</Text>
         </TouchableOpacity>
         <TogglePill activeTab={activeTab} onToggle={handleToggle} />
+        <TouchableOpacity onPress={() => setFinderVisible(true)} style={styles.finderButton}>
+          <Text style={[styles.themeIcon, { color: colors.muted }]}>{'🧭'}</Text>
+        </TouchableOpacity>
         {!isToday && (
           <TouchableOpacity style={[styles.todayButton, { backgroundColor: colors.primary }]} onPress={handleGoToday}>
             <Text style={styles.todayText}>今天</Text>
@@ -165,6 +177,11 @@ function AppContent() {
         visible={showWidget}
         onDismiss={handleWidgetDismiss}
         onDismissToday={handleWidgetDismissToday}
+      />
+      <AuspiciousFinderScreen
+        visible={finderVisible}
+        onClose={() => setFinderVisible(false)}
+        onSelectDate={handleFinderSelectDate}
       />
     </SafeAreaView>
   );
@@ -226,5 +243,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit_700Bold',
     fontSize: 13,
     color: '#FFFFFF',
+  },
+  finderButton: {
+    position: 'absolute',
+    right: 60,
   },
 });
