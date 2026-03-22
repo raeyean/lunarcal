@@ -1,0 +1,4 @@
+{"type":"server-started","port":59470,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:59470","screen_dir":"/Users/ryanwong/Documents/Personal/project/react-native/LunarCal/.superpowers/brainstorm/34951-1774102180"}
+{"type":"screen-added","file":"/Users/ryanwong/Documents/Personal/project/react-native/LunarCal/.superpowers/brainstorm/34951-1774102180/today-widget-layout.html"}
+{"type":"screen-added","file":"/Users/ryanwong/Documents/Personal/project/react-native/LunarCal/.superpowers/brainstorm/34951-1774102180/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

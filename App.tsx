@@ -126,7 +126,7 @@ function AppContent() {
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <View style={styles.toggleWrapper}>
         <TouchableOpacity onPress={() => setSettingsVisible(true)} style={styles.themeButton}>
-          <Text style={styles.themeIcon}>{'⚙️'}</Text>
+          <Text style={[styles.themeIcon, { color: colors.muted }]}>{'⚙'}</Text>
         </TouchableOpacity>
         <TogglePill activeTab={activeTab} onToggle={handleToggle} />
         {!isToday && (

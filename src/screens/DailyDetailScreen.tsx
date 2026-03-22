@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, ScrollView, Animated, StyleSheet } from 'react-native';
 import { GanzhiHero } from '../components/GanzhiHero';
 import { JieqiBanner } from '../components/JieqiBanner';
@@ -7,9 +7,11 @@ import { YiJiCard } from '../components/YiJiCard';
 import { ClashSection } from '../components/ClashSection';
 import { TongshuSection } from '../components/TongshuSection';
 import { MonthHeader } from '../components/MonthHeader';
+import { EventDetailModal } from '../components/EventDetailModal';
 import { useTheme } from '../context/ThemeContext';
 import { getDayData, getChineseDayName, getEnglishDayName } from '../utils/lunar';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
+import { getEventDescription, extractEventName } from '../data/eventDescriptions';
 
 interface DailyDetailScreenProps {
   year: number;
@@ -27,6 +29,15 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
     onSwipeLeft: onNextDay,
     onSwipeRight: onPrevDay,
   });
+  const [eventModal, setEventModal] = useState<{ name: string; description: string } | null>(null);
+
+  const handleEventPress = useCallback((text: string) => {
+    const name = extractEventName(text);
+    const description = getEventDescription(text);
+    if (description) {
+      setEventModal({ name, description });
+    }
+  }, []);
 
   const prevDate = new Date(year, month - 1, day - 1);
   const nextDate = new Date(year, month - 1, day + 1);
@@ -62,8 +73,8 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
             dayGanzhi={ganzhi.day}
             lunarDateString={lunarDateStr}
           />
-          <JieqiBanner text={jieqiText} />
-          <FestivalBanner festivals={festivals} />
+          <JieqiBanner text={jieqiText} onPress={handleEventPress} />
+          <FestivalBanner festivals={festivals} onPressFestival={handleEventPress} />
           <View style={styles.yiJiRow}>
             <YiJiCard type="yi" items={yi} />
             <YiJiCard type="ji" items={ji} />
@@ -89,6 +100,12 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
         {renderDayPanel(year, month, day, true)}
         {renderDayPanel(nextDate.getFullYear(), nextDate.getMonth() + 1, nextDate.getDate(), false)}
       </Animated.View>
+      <EventDetailModal
+        visible={eventModal !== null}
+        name={eventModal?.name ?? ''}
+        description={eventModal?.description ?? ''}
+        onClose={() => setEventModal(null)}
+      />
     </View>
   );
 }

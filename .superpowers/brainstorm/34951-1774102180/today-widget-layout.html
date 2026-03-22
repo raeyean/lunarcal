@@ -1,0 +1,98 @@
+<h2>Today Widget Layout</h2>
+<p class="subtitle">Swipe-down dismissable overlay card on app open. Pick the layout that feels right.</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <!-- Layout A: Centered hero style -->
+      <div style="background: rgba(255,255,255,0.06); border-radius: 20px; padding: 28px 24px; text-align: center; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
+        <div style="color: rgba(255,255,255,0.5); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;">Today</div>
+        <div style="color: #fff; font-size: 14px; margin-bottom: 4px;">Agricultural Calendar March 21, 2026</div>
+        <div style="color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 20px;">Two month, Twenty-three day</div>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 24px;">
+          <div style="background: rgba(240,67,36,0.15); color: #ff6b4a; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700;">Bing Yin Year</div>
+          <div style="background: rgba(240,67,36,0.15); color: #ff6b4a; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700;">Xin Mao Month</div>
+          <div style="background: rgba(240,67,36,0.15); color: #ff6b4a; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700;">Ren Xu Day</div>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
+              <div style="width: 3px; height: 16px; background: #ff6b4a; border-radius: 2px;"></div>
+              <div style="color: #ff6b4a; font-weight: 800; font-size: 16px;">Yi</div>
+            </div>
+            <div style="color: rgba(255,255,255,0.8); font-size: 12px; line-height: 1.8;">Prayer<br>Engagement<br>Travel</div>
+          </div>
+          <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
+              <div style="width: 3px; height: 16px; background: #999; border-radius: 2px;"></div>
+              <div style="color: #ccc; font-weight: 800; font-size: 16px;">Ji</div>
+            </div>
+            <div style="color: rgba(255,255,255,0.8); font-size: 12px; line-height: 1.8;">Moving<br>Funeral<br>Surgery</div>
+          </div>
+        </div>
+        <div style="margin-top: 20px; color: rgba(255,255,255,0.3); font-size: 11px;">Swipe down to dismiss</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Centered Card</h3>
+      <p>Frosted glass card centered on screen. Ganzhi as pills, Yi/Ji in two columns below. Clean and balanced.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <!-- Layout B: Large Ganzhi hero with compact Yi/Ji -->
+      <div style="background: rgba(255,255,255,0.06); border-radius: 20px; padding: 28px 24px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="color: rgba(255,255,255,0.5); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px;">March 21 Saturday</div>
+        <div style="color: #ff6b4a; font-size: 42px; font-weight: 900; letter-spacing: 6px; margin-bottom: 4px;">Ren Xu</div>
+        <div style="color: rgba(255,255,255,0.5); font-size: 12px; margin-bottom: 6px;">Bing Yin Year  Xin Mao Month</div>
+        <div style="color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 24px;">Agricultural Calendar February Twenty-three</div>
+        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 0 20px 20px;"></div>
+        <div style="display: flex; gap: 24px; justify-content: center;">
+          <div style="text-align: left;">
+            <div style="color: #ff6b4a; font-weight: 700; font-size: 13px; margin-bottom: 8px;">Yi Yi</div>
+            <div style="color: rgba(255,255,255,0.7); font-size: 12px; line-height: 1.8;">Prayer  Engagement  Travel</div>
+          </div>
+          <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
+          <div style="text-align: left;">
+            <div style="color: #999; font-weight: 700; font-size: 13px; margin-bottom: 8px;">Ji Ji</div>
+            <div style="color: rgba(255,255,255,0.7); font-size: 12px; line-height: 1.8;">Moving  Funeral  Surgery</div>
+          </div>
+        </div>
+        <div style="margin-top: 20px; color: rgba(255,255,255,0.3); font-size: 11px;">Swipe down to dismiss</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: Hero Ganzhi</h3>
+      <p>Day Ganzhi as large hero text, year/month smaller. Yi/Ji as compact inline lists separated by a divider. More dramatic.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <!-- Layout C: Full-screen overlay with stacked sections -->
+      <div style="border-radius: 20px; padding: 28px 24px; text-align: left; background: linear-gradient(180deg, rgba(240,67,36,0.12) 0%, rgba(255,255,255,0.04) 100%); border: 1px solid rgba(255,255,255,0.1);">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="color: rgba(255,255,255,0.5); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">Today at a Glance</div>
+          <div style="color: #fff; font-size: 28px; font-weight: 900; letter-spacing: 2px;">Ren Xu Day</div>
+          <div style="color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 4px;">Bing Yin Year Xin Mao Month | Agricultural Calendar Feb 23</div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <div style="flex: 1; background: rgba(240,67,36,0.1); border-radius: 14px; padding: 14px; border: 1px solid rgba(240,67,36,0.2);">
+            <div style="color: #ff6b4a; font-weight: 800; font-size: 18px; margin-bottom: 10px; text-align: center;">Yi</div>
+            <div style="color: rgba(255,255,255,0.8); font-size: 12px; line-height: 2; text-align: center;">Prayer<br>Engagement<br>Travel</div>
+          </div>
+          <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 14px; padding: 14px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="color: #ccc; font-weight: 800; font-size: 18px; margin-bottom: 10px; text-align: center;">Ji</div>
+            <div style="color: rgba(255,255,255,0.8); font-size: 12px; line-height: 2; text-align: center;">Moving<br>Funeral<br>Surgery</div>
+          </div>
+        </div>
+        <div style="margin-top: 20px; text-align: center; color: rgba(255,255,255,0.3); font-size: 11px;">Swipe down to dismiss</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C: Gradient Card</h3>
+      <p>Warm gradient background with day Ganzhi as hero. Yi/Ji in two tinted cards -- Yi has a warm accent border, Ji is neutral. More visual warmth.</p>
+    </div>
+  </div>
+</div>

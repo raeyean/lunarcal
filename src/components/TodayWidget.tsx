@@ -26,7 +26,12 @@ const DISMISS_THRESHOLD = 150;
 export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetProps) {
   const { colors, isDark } = useTheme();
   const translateY = useRef(new Animated.Value(0)).current;
-  const opacity = useRef(new Animated.Value(1)).current;
+
+  const animatedOpacity = translateY.interpolate({
+    inputRange: [0, SCREEN_HEIGHT * 0.5],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
 
   const today = useMemo(() => {
     const now = new Date();
@@ -35,39 +40,30 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, gestureState) => gestureState.dy > 5,
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponderCapture: (_, gestureState) =>
+        gestureState.dy > 10 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
       onPanResponderMove: (_, gestureState) => {
         if (gestureState.dy > 0) {
           translateY.setValue(gestureState.dy);
-          opacity.setValue(1 - gestureState.dy / (SCREEN_HEIGHT * 0.5));
         }
       },
       onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dy > DISMISS_THRESHOLD) {
-          Animated.parallel([
-            Animated.timing(translateY, {
-              toValue: SCREEN_HEIGHT,
-              duration: 250,
-              useNativeDriver: true,
-            }),
-            Animated.timing(opacity, {
-              toValue: 0,
-              duration: 250,
-              useNativeDriver: true,
-            }),
-          ]).start(() => {
+        if (gestureState.dy > DISMISS_THRESHOLD || gestureState.vy > 0.5) {
+          Animated.timing(translateY, {
+            toValue: SCREEN_HEIGHT,
+            duration: 250,
+            useNativeDriver: true,
+          }).start(() => {
             translateY.setValue(0);
-            opacity.setValue(1);
             onDismiss();
           });
         } else {
           Animated.spring(translateY, {
             toValue: 0,
-            useNativeDriver: true,
-          }).start();
-          Animated.spring(opacity, {
-            toValue: 1,
+            tension: 40,
+            friction: 7,
             useNativeDriver: true,
           }).start();
         }
@@ -80,8 +76,8 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
   const jiItems = ji.slice(0, 3);
 
   const gradientColors: [string, string] = isDark
-    ? ['rgba(240,67,36,0.15)', 'rgba(18,18,18,0.95)']
-    : ['rgba(240,67,36,0.12)', 'rgba(255,255,255,0.95)'];
+    ? ['rgba(240,67,36,0.25)', 'rgba(18,18,18,1)']
+    : ['rgba(255,245,240,1)', 'rgba(255,255,255,1)'];
 
   const subCardYiBg = isDark ? 'rgba(240,67,36,0.12)' : 'rgba(240,67,36,0.08)';
   const subCardYiBorder = isDark ? 'rgba(240,67,36,0.25)' : 'rgba(240,67,36,0.2)';
@@ -90,13 +86,13 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
 
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <View style={[styles.backdrop, { backgroundColor: isDark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.4)' }]}>
+      <View style={[styles.backdrop, { backgroundColor: isDark ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.5)' }]}>
         <Animated.View
-          style={[styles.cardWrapper, { transform: [{ translateY }], opacity }]}
+          style={[styles.cardWrapper, { transform: [{ translateY }], opacity: animatedOpacity }]}
           {...panResponder.panHandlers}
         >
           <LinearGradient colors={gradientColors} style={[styles.card, { borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)' }]}>
-            <Text style={[styles.label, { color: colors.muted }]}>TODAY AT A GLANCE</Text>
+            <Text style={[styles.label, { color: colors.muted }]}>今日一覽</Text>
 
             <Text style={[styles.heroGanzhi, { color: colors.primary }]}>
               {ganzhi.day}日
@@ -122,12 +118,12 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
             </View>
 
             <Text style={[styles.hint, { color: colors.muted }]}>
-              Swipe down to dismiss
+              向下滑動關閉
             </Text>
 
             <TouchableOpacity onPress={onDismissToday}>
               <Text style={[styles.dismissToday, { color: colors.subtleText }]}>
-                Don't show again today
+                今日不再顯示
               </Text>
             </TouchableOpacity>
           </LinearGradient>

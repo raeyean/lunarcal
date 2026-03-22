@@ -1,22 +1,27 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 
 interface JieqiBannerProps {
   text: string;
+  onPress?: (text: string) => void;
 }
 
-export function JieqiBanner({ text }: JieqiBannerProps) {
+export function JieqiBanner({ text, onPress }: JieqiBannerProps) {
   const { colors } = useTheme();
 
   if (!text) return null;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.primaryLight }]}>
+    <TouchableOpacity
+      style={[styles.container, { backgroundColor: colors.primaryLight }]}
+      onPress={() => onPress?.(text)}
+      activeOpacity={0.6}
+    >
       <View style={[styles.dot, { backgroundColor: colors.primary }]} />
       <Text style={[styles.text, { color: colors.primary }]}>{text}</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
