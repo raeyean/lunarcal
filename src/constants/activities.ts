@@ -17,4 +17,15 @@ export const ACTIVITY_CATEGORIES: ActivityCategory[] = [
   { key: 'agriculture', label: '農牧', activities: ['栽種', '牧養', '納畜', '伐木'] },
 ];
 
-export const ALL_ACTIVITIES: string[] = ACTIVITY_CATEGORIES.flatMap(c => c.activities);
+// Additional common activities from lunar-javascript not covered by curated categories
+const EXTRA_ACTIVITIES = [
+  '納財', '沐浴', '解除', '掃舍', '塞穴', '餘事勿取',
+  '安香', '會親友', '進人口', '經絡', '醞釀',
+  '裁衣', '合帳', '安機械', '放水', '開渠',
+  '求醫', '治病', '詞訟', '取漁', '畋獵',
+];
+
+export const ALL_ACTIVITIES: string[] = [
+  ...ACTIVITY_CATEGORIES.flatMap(c => c.activities),
+  ...EXTRA_ACTIVITIES,
+];

@@ -184,7 +184,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
                       styles.rangeText,
                       { color: isSelected ? '#FFFFFF' : colors.foreground },
                     ]}>
-                      {option} days
+                      {option} 天
                     </Text>
                   </TouchableOpacity>
                 );
@@ -221,7 +221,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
                 </View>
               )}
               <View style={[styles.filterChip, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.filterChipText, { color: colors.muted }]}>{range} days</Text>
+                <Text style={[styles.filterChipText, { color: colors.muted }]}>{range} 天</Text>
               </View>
               <TouchableOpacity onPress={() => { setSearched(false); setResults([]); setHasMore(false); }}>
                 <Text style={[styles.modifyText, { color: colors.primary }]}>修改</Text>
