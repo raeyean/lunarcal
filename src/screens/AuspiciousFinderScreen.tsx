@@ -151,11 +151,11 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
       ]}>
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-          <TouchableOpacity onPress={handleClose} style={styles.backButton}>
-            <Text style={[styles.backArrow, { color: colors.primary }]}>{'‹'}</Text>
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton} activeOpacity={0.6}>
+            <Text style={[styles.closeIcon, { color: colors.muted }]}>{'✕'}</Text>
           </TouchableOpacity>
           <Text style={[styles.title, { color: colors.foreground }]}>擇吉日</Text>
-          <View style={styles.backButton} />
+          <View style={styles.closeButton} />
         </View>
 
         {!searched ? (
@@ -282,14 +282,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
   },
-  backButton: {
-    width: 40,
+  closeButton: {
+    width: 44,
+    height: 44,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  backArrow: {
-    fontSize: 28,
-    fontWeight: '300',
-    marginTop: -2,
+  closeIcon: {
+    fontSize: 18,
+    fontWeight: '600',
   },
   title: {
     fontFamily: Fonts.outfitBold,
