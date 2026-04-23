@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, AppState, AppStateStatus } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -27,6 +27,7 @@ import { SettingsModal } from './src/components/SettingsModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TodayWidget } from './src/components/TodayWidget';
 import { AuspiciousFinderScreen } from './src/screens/AuspiciousFinderScreen';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
 
 function AppContent() {
   const { colors, isDark, toggleTheme } = useTheme();
@@ -57,6 +58,8 @@ function AppContent() {
     setShowWidget(false);
   }, []);
 
+  const appState = useRef(AppState.currentState);
+
   useEffect(() => {
     async function initNotifications() {
       await scheduleAllLunarNotifications();
@@ -71,6 +74,17 @@ function AppContent() {
       }
     }
     initNotifications();
+
+    // Reschedule when the app comes to the foreground in case background fetch
+    // was killed by the OS (common on Android with battery optimisation).
+    const subscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
+      if (appState.current.match(/inactive|background/) && nextState === 'active') {
+        scheduleAllLunarNotifications();
+      }
+      appState.current = nextState;
+    });
+
+    return () => subscription.remove();
   }, []);
 
   const handlePrevMonth = useCallback(() => {
@@ -134,34 +148,46 @@ function AppContent() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <View style={styles.toggleWrapper}>
-        <TouchableOpacity onPress={() => setSettingsVisible(true)} style={styles.themeButton}>
+        <TouchableOpacity
+          onPress={() => setSettingsVisible(true)}
+          style={styles.themeButton}
+          accessibilityRole="button"
+          accessibilityLabel="設定"
+        >
           <Text style={[styles.themeIcon, { color: colors.muted }]}>{'⚙'}</Text>
         </TouchableOpacity>
         <TogglePill activeTab={activeTab} onToggle={handleToggle} />
-        <TouchableOpacity onPress={() => setFinderVisible(true)} style={styles.finderButton}>
+        <TouchableOpacity
+          onPress={() => setFinderVisible(true)}
+          style={styles.finderButton}
+          accessibilityRole="button"
+          accessibilityLabel="擇吉日曆"
+        >
           <Text style={[styles.themeIcon, { color: colors.muted }]}>{'🧭'}</Text>
         </TouchableOpacity>
       </View>
-      {activeTab === 'calendar' ? (
-        <CalendarScreen
-          key={`${year}-${month}`}
-          year={year}
-          month={month}
-          selectedDay={selectedDay}
-          onPrevMonth={handlePrevMonth}
-          onNextMonth={handleNextMonth}
-          onSelectDay={setSelectedDay}
-        />
-      ) : (
-        <DailyDetailScreen
-          key={`${year}-${month}-${selectedDay}`}
-          year={year}
-          month={month}
-          day={selectedDay}
-          onPrevDay={handlePrevDay}
-          onNextDay={handleNextDay}
-        />
-      )}
+      <ErrorBoundary>
+        {activeTab === 'calendar' ? (
+          <CalendarScreen
+            key={`${year}-${month}`}
+            year={year}
+            month={month}
+            selectedDay={selectedDay}
+            onPrevMonth={handlePrevMonth}
+            onNextMonth={handleNextMonth}
+            onSelectDay={setSelectedDay}
+          />
+        ) : (
+          <DailyDetailScreen
+            key={`${year}-${month}-${selectedDay}`}
+            year={year}
+            month={month}
+            day={selectedDay}
+            onPrevDay={handlePrevDay}
+            onNextDay={handleNextDay}
+          />
+        )}
+      </ErrorBoundary>
       <SettingsModal
         visible={settingsVisible}
         onClose={() => setSettingsVisible(false)}
@@ -183,6 +209,8 @@ function AppContent() {
           style={[styles.todayFab, { backgroundColor: colors.primary }]}
           onPress={handleGoToday}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="回到今天"
         >
           <Text style={styles.todayText}>今天</Text>
         </TouchableOpacity>

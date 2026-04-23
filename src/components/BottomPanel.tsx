@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
-import { Typography } from '../constants/typography';
-import { Fonts } from '../constants/typography';
+import { Typography, Fonts } from '../constants/typography';
 import { ClashInfo } from './ClashInfo';
 import { DayData } from '../utils/lunar';
 

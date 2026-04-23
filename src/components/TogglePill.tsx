@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
-import { Typography } from '../constants/typography';
-import { Fonts } from '../constants/typography';
+import { Typography, Fonts } from '../constants/typography';
 
 interface TogglePillProps {
   activeTab: 'daily' | 'calendar';
@@ -18,6 +17,9 @@ export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
         style={[styles.tab, activeTab === 'daily' && { backgroundColor: colors.primary }]}
         onPress={() => onToggle('daily')}
         activeOpacity={0.6}
+        accessibilityRole="tab"
+        accessibilityLabel="日詳"
+        accessibilityState={{ selected: activeTab === 'daily' }}
       >
         <Text style={[styles.tabText, { color: colors.muted }, activeTab === 'daily' && { color: colors.white }]}>
           日詳
@@ -27,6 +29,9 @@ export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
         style={[styles.tab, activeTab === 'calendar' && { backgroundColor: colors.primary }]}
         onPress={() => onToggle('calendar')}
         activeOpacity={0.6}
+        accessibilityRole="tab"
+        accessibilityLabel="月曆"
+        accessibilityState={{ selected: activeTab === 'calendar' }}
       >
         <Text style={[styles.tabText, { color: colors.muted }, activeTab === 'calendar' && { color: colors.white }]}>
           月曆

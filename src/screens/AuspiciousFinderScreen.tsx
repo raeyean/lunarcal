@@ -65,7 +65,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
         useNativeDriver: true,
       }).start(() => setModalVisible(false));
     }
-  }, [visible]);
+  }, [visible, slideAnim]);
 
   const handleZodiacSelect = useCallback((animal: string) => {
     setZodiacState(animal);

@@ -39,7 +39,7 @@ export function EventDetailModal({ visible, name, description, onClose }: EventD
         useNativeDriver: true,
       }).start(() => setModalVisible(false));
     }
-  }, [visible]);
+  }, [visible, slideAnim]);
 
   return (
     <Modal visible={modalVisible} animationType="none" transparent>

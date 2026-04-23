@@ -75,12 +75,16 @@ export function getUpcomingLunarDates(): LunarDate[] {
   return results;
 }
 
-export async function requestNotificationPermissions(): Promise<boolean> {
-  const { status: existing } = await Notifications.getPermissionsAsync();
-  if (existing === 'granted') return true;
+export type PermissionResult = 'granted' | 'denied' | 'blocked';
+
+export async function requestNotificationPermissions(): Promise<PermissionResult> {
+  const { status: existing, canAskAgain } = await Notifications.getPermissionsAsync();
+  if (existing === 'granted') return 'granted';
+  // System has permanently blocked — must open Settings
+  if (!canAskAgain) return 'blocked';
 
   const { status } = await Notifications.requestPermissionsAsync();
-  return status === 'granted';
+  return status === 'granted' ? 'granted' : 'denied';
 }
 
 export async function scheduleAllLunarNotifications(): Promise<void> {
@@ -90,8 +94,8 @@ export async function scheduleAllLunarNotifications(): Promise<void> {
 
   if (!settings.enabled) return;
 
-  const hasPermission = await requestNotificationPermissions();
-  if (!hasPermission) return;
+  const result = await requestNotificationPermissions();
+  if (result !== 'granted') return;
 
   const dates = getUpcomingLunarDates();
 
