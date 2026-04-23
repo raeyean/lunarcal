@@ -9,6 +9,8 @@ import {
   StyleSheet,
   Platform,
   Animated,
+  Alert,
+  Linking,
 } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/ThemeContext';
@@ -18,7 +20,7 @@ import {
   getNotificationSettings,
   saveNotificationSettings,
 } from '../utils/notificationSettings';
-import { scheduleAllLunarNotifications, requestNotificationPermissions } from '../utils/lunarNotifications';
+import { scheduleAllLunarNotifications, requestNotificationPermissions, PermissionResult } from '../utils/lunarNotifications';
 
 interface SettingsModalProps {
   visible: boolean;
@@ -55,12 +57,23 @@ export function SettingsModal({ visible, onClose, isDark, toggleTheme }: Setting
         useNativeDriver: true,
       }).start(() => setModalVisible(false));
     }
-  }, [visible]);
+  }, [visible, slideAnim]);
 
   const handleToggle = useCallback(async (value: boolean) => {
     if (value) {
-      const granted = await requestNotificationPermissions();
-      if (!granted) return;
+      const result: PermissionResult = await requestNotificationPermissions();
+      if (result === 'blocked') {
+        Alert.alert(
+          '需要通知權限',
+          '請前往系統設定，允許「LunarCal」傳送通知。',
+          [
+            { text: '取消', style: 'cancel' },
+            { text: '前往設定', onPress: () => Linking.openSettings() },
+          ],
+        );
+        return;
+      }
+      if (result === 'denied') return;
     }
     const updated = { ...settings, enabled: value };
     setSettings(updated);

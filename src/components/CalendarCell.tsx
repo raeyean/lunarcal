@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
-import { Typography } from '../constants/typography';
-import { Fonts } from '../constants/typography';
+import { Typography, Fonts } from '../constants/typography';
 
 interface CalendarCellProps {
   day: number;
@@ -26,6 +25,9 @@ export function CalendarCell({ day, lunarText, isActive, isJieqi, isFestival, is
       style={[styles.container, isActive && { backgroundColor: colors.primary, borderRadius: 12 }]}
       onPress={onPress}
       activeOpacity={0.6}
+      accessibilityRole="button"
+      accessibilityLabel={`${day}日，農曆${lunarText}${isActive ? '，已選取' : ''}`}
+      accessibilityState={{ selected: isActive }}
     >
       <Text style={[
         styles.dayNumber,
