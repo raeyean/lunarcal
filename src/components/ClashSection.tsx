@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Badge } from './Badge';
+import { Chevron } from './Chevron';
 import type { GlossaryTermId } from './GlossarySheet';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
@@ -67,7 +68,9 @@ export function ClashSection({ animal, emoji, description, direction, element, t
         accessibilityState={{ expanded }}
       >
         <Text style={[styles.sectionTitle, { color: colors.foreground }]}>相冲生肖</Text>
-        <Text style={[styles.chevron, { color: colors.subtleText }]}>{expanded ? '▴' : '▾'}</Text>
+        <View style={styles.chevron}>
+          <Chevron expanded={expanded} size={14} color={colors.subtleText} />
+        </View>
       </Pressable>
       {expanded ? (
         <>
@@ -103,12 +106,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    minHeight: 44,
   },
   sectionTitle: {
     ...Typography.sectionTitle,
   },
   chevron: {
-    fontSize: 14,
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   summary: {
     ...Typography.body,

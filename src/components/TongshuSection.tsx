@@ -12,6 +12,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Badge } from './Badge';
+import { Chevron } from './Chevron';
+import { HelpIcon } from './HelpIcon';
 import { IconButton } from './IconButton';
 import type { TongshuData } from '../utils/lunar';
 import type { GlossaryTermId } from './GlossarySheet';
@@ -92,29 +94,28 @@ function CollapsibleCard({ cardKey, title, summary, termId, onOpenGlossary, chil
 
   return (
     <View style={[styles.card, { backgroundColor: colors.surface }]}>
-      <View style={styles.cardHeader}>
-        <Pressable
-          onPress={toggle}
-          style={styles.cardHeaderTap}
-          accessibilityRole="button"
-          accessibilityLabel={`${title}, ${expanded ? '已展開' : '已收起'}`}
-          accessibilityState={{ expanded }}
-        >
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>{title}</Text>
-          <Text style={[styles.chevron, { color: colors.subtleText }]}>{expanded ? '▴' : '▾'}</Text>
-        </Pressable>
+      <Pressable
+        onPress={toggle}
+        style={styles.cardHeader}
+        accessibilityRole="button"
+        accessibilityLabel={`${title}, ${expanded ? '已展開' : '已收起'}`}
+        accessibilityState={{ expanded }}
+      >
+        <Text style={[styles.sectionTitle, { color: colors.foreground }]}>{title}</Text>
         {termId && onOpenGlossary ? (
           <IconButton
             onPress={() => onOpenGlossary(termId)}
             accessibilityLabel={`${title} 說明`}
             variant="ghost"
-            style={styles.glossaryButton}
-            hitSlop={{ top: 8, bottom: 8, left: 0, right: 8 }}
           >
-            <Text style={[styles.glossaryGlyph, { color: colors.subtleText }]}>?</Text>
+            <HelpIcon size={16} color={colors.subtleText} />
           </IconButton>
         ) : null}
-      </View>
+        <View style={styles.headerSpacer} />
+        <View style={styles.chevron}>
+          <Chevron expanded={expanded} size={14} color={colors.subtleText} />
+        </View>
+      </Pressable>
       {expanded ? (
         <View style={styles.cardBody}>{children}</View>
       ) : (
@@ -231,15 +232,10 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    minHeight: 44,
   },
-  cardHeaderTap: {
+  headerSpacer: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.xs,
-    paddingRight: Spacing.md,
   },
   cardBody: {
     gap: Spacing.md,
@@ -248,19 +244,10 @@ const styles = StyleSheet.create({
     ...Typography.sectionTitle,
   },
   chevron: {
-    fontSize: 20,
-    lineHeight: 22,
-    paddingHorizontal: Spacing.xs,
-  },
-  glossaryButton: {
-    minWidth: 32,
-    minHeight: 32,
-    padding: Spacing.xs,
-    marginLeft: Spacing.sm,
-  },
-  glossaryGlyph: {
-    fontSize: 16,
-    fontWeight: '600',
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   summary: {
     ...Typography.body,

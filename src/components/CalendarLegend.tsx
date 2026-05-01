@@ -5,6 +5,7 @@ import { Typography } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { IconButton } from './IconButton';
+import { HelpIcon } from './HelpIcon';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -44,7 +45,7 @@ export function CalendarLegend({ expanded, onToggle }: CalendarLegendProps) {
           accessibilityHint="點擊查看日曆顏色說明"
           variant="ghost"
         >
-          <Text style={[styles.questionGlyph, { color: colors.muted }]}>?</Text>
+          <HelpIcon size={16} color={colors.muted} />
         </IconButton>
       </View>
     );
@@ -100,10 +101,6 @@ const styles = StyleSheet.create({
   },
   legendLabel: {
     ...Typography.badgeText,
-  },
-  questionGlyph: {
-    fontSize: 16,
-    fontWeight: '600',
   },
   collapseButton: {
     marginLeft: 'auto',

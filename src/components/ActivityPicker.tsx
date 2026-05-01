@@ -6,6 +6,7 @@ import { Fonts } from '../constants/typography';
 import { ACTIVITY_CATEGORIES, ALL_ACTIVITIES } from '../constants/activities';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { Chevron } from './Chevron';
 
 interface ActivityPickerProps {
   selected: string | null;
@@ -36,9 +37,7 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
               <Text style={[styles.categoryLabel, { color: colors.foreground }]}>
                 {category.label}
               </Text>
-              <Text style={[styles.arrow, { color: colors.muted }]}>
-                {isExpanded ? '▾' : '▸'}
-              </Text>
+              <Chevron expanded={isExpanded} size={14} color={colors.muted} />
             </TouchableOpacity>
             {isExpanded && (
               <View style={styles.chipGrid}>
@@ -85,9 +84,7 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
         <Text style={[styles.categoryLabel, { color: colors.muted }]}>
           顯示全部
         </Text>
-        <Text style={[styles.arrow, { color: colors.muted }]}>
-          {expandedKey === 'all' ? '▾' : '▸'}
-        </Text>
+        <Chevron expanded={expandedKey === 'all'} size={14} color={colors.muted} />
       </TouchableOpacity>
       {expandedKey === 'all' && (
         <View style={styles.chipGrid}>
@@ -141,9 +138,6 @@ const styles = StyleSheet.create({
   categoryLabel: {
     fontFamily: Fonts.outfitSemiBold,
     fontSize: 17,
-  },
-  arrow: {
-    fontSize: 14,
   },
   chipGrid: {
     flexDirection: 'row',

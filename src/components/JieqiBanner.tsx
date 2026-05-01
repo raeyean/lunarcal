@@ -6,6 +6,7 @@ import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { InfoBadge } from './InfoBadge';
 import { IconButton } from './IconButton';
+import { HelpIcon } from './HelpIcon';
 import type { GlossaryTermId } from './GlossarySheet';
 
 interface JieqiBannerProps {
@@ -43,7 +44,7 @@ export function JieqiBanner({ text, onPress, onOpenGlossary }: JieqiBannerProps)
         style={styles.helpButton}
         hitSlop={{ top: 8, bottom: 8, left: 0, right: 8 }}
       >
-        <Text style={[styles.helpGlyph, { color: colors.primary }]}>?</Text>
+        <HelpIcon size={16} color={colors.primary} />
       </IconButton>
     </View>
   );
@@ -81,9 +82,5 @@ const styles = StyleSheet.create({
     minWidth: 36,
     minHeight: 36,
     marginLeft: Spacing.xs,
-  },
-  helpGlyph: {
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
