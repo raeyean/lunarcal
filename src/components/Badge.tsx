@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 interface BadgeProps {
   label: string;
@@ -19,9 +21,9 @@ export function Badge({ label }: BadgeProps) {
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 8,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
+    borderRadius: Radius.sm,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },

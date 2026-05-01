@@ -3,13 +3,15 @@ import {
   Modal,
   View,
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   StyleSheet,
   Animated,
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
+import { IconButton } from './IconButton';
 
 interface EventDetailModalProps {
   visible: boolean;
@@ -48,6 +50,7 @@ export function EventDetailModal({ visible, name, description, onClose }: EventD
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
         <Animated.View
+          accessibilityViewIsModal={true}
           style={[
             styles.sheet,
             { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] },
@@ -55,9 +58,9 @@ export function EventDetailModal({ visible, name, description, onClose }: EventD
         >
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.foreground }]}>{name}</Text>
-            <TouchableOpacity onPress={onClose}>
+            <IconButton onPress={onClose} accessibilityLabel="關閉" variant="ghost">
               <Text style={[styles.closeButton, { color: colors.primary }]}>關閉</Text>
-            </TouchableOpacity>
+            </IconButton>
           </View>
           <Text style={[styles.description, { color: colors.subtleText }]}>
             {description}
@@ -78,17 +81,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: 20,
+    borderTopLeftRadius: Radius.xl,
+    borderTopRightRadius: Radius.xl,
+    paddingTop: Spacing.xl,
     paddingBottom: 40,
-    paddingHorizontal: 24,
+    paddingHorizontal: Spacing.xl,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: Spacing.lg,
   },
   title: {
     fontFamily: Fonts.outfitBold,

@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 interface TogglePillProps {
   activeTab: 'daily' | 'calendar';
@@ -44,8 +46,8 @@ export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    borderRadius: 24,
-    padding: 4,
+    borderRadius: Radius.xl,
+    padding: Spacing.xs,
     maxWidth: 240,
     width: '60%',
     height: 40,
@@ -54,7 +56,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
+    borderRadius: Radius.xl,
   },
   tabText: {
     ...Typography.toggleActive,

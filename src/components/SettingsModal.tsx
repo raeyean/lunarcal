@@ -3,7 +3,6 @@ import {
   Modal,
   View,
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   Switch,
   StyleSheet,
@@ -14,13 +13,16 @@ import {
 } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/ThemeContext';
-import { Fonts } from '../constants/typography';
+import { Fonts, Typography } from '../constants/typography';
 import {
   NotificationSettings,
   getNotificationSettings,
   saveNotificationSettings,
 } from '../utils/notificationSettings';
 import { scheduleAllLunarNotifications, requestNotificationPermissions, PermissionResult } from '../utils/lunarNotifications';
+import { IconButton } from './IconButton';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 interface SettingsModalProps {
   visible: boolean;
@@ -107,10 +109,16 @@ export function SettingsModal({ visible, onClose, isDark, toggleTheme }: Setting
         <Animated.View style={[styles.sheet, { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] }]}>
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.foreground }]}>設定</Text>
-            <TouchableOpacity onPress={onClose}>
+            <IconButton
+              onPress={onClose}
+              accessibilityLabel="關閉設定"
+              variant="ghost"
+            >
               <Text style={[styles.closeButton, { color: colors.primary }]}>完成</Text>
-            </TouchableOpacity>
+            </IconButton>
           </View>
+
+          <Text style={[styles.sectionHeader, { color: colors.muted }]}>外觀</Text>
 
           <View style={[styles.row, { borderBottomColor: colors.divider }]}>
             <Text style={[styles.rowTitle, { color: colors.foreground }]}>深色模式</Text>
@@ -118,8 +126,13 @@ export function SettingsModal({ visible, onClose, isDark, toggleTheme }: Setting
               value={isDark}
               onValueChange={toggleTheme}
               trackColor={{ true: colors.primary }}
+              accessibilityLabel="深色模式"
+              accessibilityRole="switch"
+              accessibilityState={{ checked: isDark }}
             />
           </View>
+
+          <Text style={[styles.sectionHeader, { color: colors.muted }]}>通知</Text>
 
           <View style={[styles.row, { borderBottomColor: colors.divider }]}>
             <View style={styles.rowLabel}>
@@ -132,6 +145,9 @@ export function SettingsModal({ visible, onClose, isDark, toggleTheme }: Setting
               value={settings.enabled}
               onValueChange={handleToggle}
               trackColor={{ true: colors.primary }}
+              accessibilityLabel="初一十五提醒"
+              accessibilityRole="switch"
+              accessibilityState={{ checked: settings.enabled }}
             />
           </View>
 
@@ -148,9 +164,13 @@ export function SettingsModal({ visible, onClose, isDark, toggleTheme }: Setting
                 />
               ) : (
                 <>
-                  <TouchableOpacity onPress={() => setShowTimePicker(true)}>
+                  <IconButton
+                    onPress={() => setShowTimePicker(true)}
+                    accessibilityLabel={`提醒時間 ${timeDisplay}`}
+                    variant="ghost"
+                  >
                     <Text style={[styles.timeText, { color: colors.primary }]}>{timeDisplay}</Text>
-                  </TouchableOpacity>
+                  </IconButton>
                   {showTimePicker && (
                     <DateTimePicker
                       value={pickerDate}
@@ -179,17 +199,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: 20,
+    borderTopLeftRadius: Radius.xl,
+    borderTopRightRadius: Radius.xl,
+    paddingTop: Spacing.xl,
     paddingBottom: 40,
-    paddingHorizontal: 24,
+    paddingHorizontal: Spacing.xl,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: Spacing.xl,
   },
   title: {
     fontFamily: Fonts.outfitBold,
@@ -199,16 +219,22 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.outfitSemiBold,
     fontSize: 16,
   },
+  sectionHeader: {
+    ...Typography.sectionTitle,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
+    textTransform: 'uppercase',
+  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: Spacing.lg,
     borderBottomWidth: 1,
   },
   rowLabel: {
     flex: 1,
-    marginRight: 16,
+    marginRight: Spacing.lg,
   },
   rowTitle: {
     fontFamily: Fonts.outfitSemiBold,

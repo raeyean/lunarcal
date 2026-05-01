@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
+import { Spacing } from '../constants/spacing';
 
 const DAYS = ['日', '一', '二', '三', '四', '五', '六'];
 
@@ -21,9 +22,9 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 4,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.xs,
   },
   dayText: {
     ...Typography.weekDay,

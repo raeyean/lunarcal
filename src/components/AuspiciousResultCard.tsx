@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { AuspiciousResult } from '../utils/auspiciousScan';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 const WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -17,11 +19,17 @@ export function AuspiciousResultCard({ result, matchedActivity, onPress }: Auspi
   const { colors } = useTheme();
   const luckColor = result.tianShenType === '吉' ? colors.success : colors.muted;
 
+  const yiTop = result.yi.slice(0, 6);
+  const a11yLabel = `${MONTH_NAMES[result.date.month]} ${result.date.day}, ${WEEKDAY_NAMES[result.weekDay]}, 農曆 ${result.lunarDate}, ${result.tianShenType} ${result.tianShen}, 宜: ${yiTop.join('、')}`;
+
   return (
     <TouchableOpacity
       style={[styles.container, { backgroundColor: colors.surface }]}
       onPress={onPress}
       activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={a11yLabel}
+      accessibilityHint="點擊查看當日詳情"
     >
       <View style={styles.topRow}>
         <View>
@@ -42,8 +50,12 @@ export function AuspiciousResultCard({ result, matchedActivity, onPress }: Auspi
         </View>
       </View>
 
+      <Text style={[styles.luck, { color: luckColor }]}>
+        {result.tianShenType} · {result.tianShen}
+      </Text>
+
       <View style={styles.chipRow}>
-        {result.yi.slice(0, 6).map((item, idx) => {
+        {yiTop.map((item, idx) => {
           const isMatch = item === matchedActivity;
           return (
             <View
@@ -70,19 +82,15 @@ export function AuspiciousResultCard({ result, matchedActivity, onPress }: Auspi
           );
         })}
       </View>
-
-      <Text style={[styles.luck, { color: luckColor }]}>
-        {result.tianShenType} · {result.tianShen}
-      </Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 12,
-    padding: 14,
-    gap: 10,
+    borderRadius: Radius.md,
+    padding: Spacing.lg,
+    gap: Spacing.md,
   },
   topRow: {
     flexDirection: 'row',
@@ -114,15 +122,15 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   yiChip: {
-    borderRadius: 10,
+    borderRadius: Radius.md,
     paddingVertical: 2,
-    paddingHorizontal: 8,
+    paddingHorizontal: Spacing.sm,
   },
   yiChipText: {
     fontSize: 10,
   },
   luck: {
     fontFamily: Fonts.inter,
-    fontSize: 10,
+    fontSize: 11,
   },
 });

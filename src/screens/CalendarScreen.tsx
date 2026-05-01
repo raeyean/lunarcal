@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
 import { MonthHeader } from '../components/MonthHeader';
 import { WeekHeader } from '../components/WeekHeader';
 import { CalendarGrid } from '../components/CalendarGrid';
 import { BottomPanel } from '../components/BottomPanel';
+import { CalendarLegend } from '../components/CalendarLegend';
 import { useTheme } from '../context/ThemeContext';
 import { getMonthDays, getChineseMonthName, getEnglishMonthName, getDayData } from '../utils/lunar';
 import { Solar } from 'lunar-javascript';
@@ -26,6 +27,7 @@ export function CalendarScreen({
   onPrevMonth, onNextMonth, onSelectDay,
 }: CalendarScreenProps) {
   const { colors } = useTheme();
+  const [legendExpanded, setLegendExpanded] = useState(false);
   const { panHandlers, animatedStyle, triggerPrev, triggerNext, screenWidth } = useSwipeGesture({
     onSwipeLeft: onNextMonth,
     onSwipeRight: onPrevMonth,
@@ -59,6 +61,8 @@ export function CalendarScreen({
           daysInMonth={daysInMonth}
           firstWeekDay={firstWeekDay}
           onSelectDay={isCenter ? onSelectDay : noopDay}
+          year={y}
+          month={m}
         />
       </View>
     );
@@ -73,6 +77,7 @@ export function CalendarScreen({
           {renderMonthPanel(nextYear, nextMonth, 1, false)}
         </Animated.View>
       </View>
+      <CalendarLegend expanded={legendExpanded} onToggle={() => setLegendExpanded(v => !v)} />
       <View style={[styles.divider, { backgroundColor: colors.divider }]} />
       <BottomPanel dayData={selectedDayData} />
     </View>

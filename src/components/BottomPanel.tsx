@@ -4,6 +4,8 @@ import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { ClashInfo } from './ClashInfo';
 import { DayData } from '../utils/lunar';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 interface BottomPanelProps {
   dayData: DayData;
@@ -56,9 +58,9 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    paddingHorizontal: 24,
-    gap: 12,
+    padding: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
+    gap: Spacing.md,
   },
   dateRow: {
     flexDirection: 'row',
@@ -81,12 +83,12 @@ const styles = StyleSheet.create({
   },
   yiJiRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.md,
   },
   yiJiCol: {
     flex: 1,
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: Radius.md,
+    padding: Spacing.md,
     gap: 6,
   },
   yiJiLabel: {

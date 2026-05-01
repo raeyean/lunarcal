@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 interface ClashInfoProps {
   emoji: string;
@@ -23,9 +25,9 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: Spacing.md,
     gap: 6,
   },
   emoji: { fontSize: 14 },

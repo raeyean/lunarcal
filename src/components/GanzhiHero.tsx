@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 interface GanzhiHeroProps {
   yearGanzhi: string;
@@ -37,9 +39,9 @@ export function GanzhiHero({ yearGanzhi, monthGanzhi, dayGanzhi, lunarDateString
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 16,
-    padding: 24,
-    gap: 8,
+    borderRadius: Radius.lg,
+    padding: Spacing.xl,
+    gap: Spacing.sm,
   },
   label: {
     fontFamily: Fonts.interMedium,
@@ -49,7 +51,7 @@ const styles = StyleSheet.create({
   pillarsRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: 16,
+    gap: Spacing.lg,
   },
   pillar: {
     gap: 2,

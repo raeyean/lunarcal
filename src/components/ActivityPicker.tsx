@@ -4,6 +4,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { ACTIVITY_CATEGORIES, ALL_ACTIVITIES } from '../constants/activities';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 interface ActivityPickerProps {
   selected: string | null;
@@ -19,7 +21,7 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
       {ACTIVITY_CATEGORIES.map(category => {
         const isExpanded = expandedKey === category.key;
         return (
@@ -27,6 +29,9 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
             <TouchableOpacity
               style={[styles.categoryRow, { borderBottomColor: colors.divider }]}
               onPress={() => toggleCategory(category.key)}
+              accessibilityRole="button"
+              accessibilityLabel={category.label}
+              accessibilityState={{ expanded: isExpanded }}
             >
               <Text style={[styles.categoryLabel, { color: colors.foreground }]}>
                 {category.label}
@@ -45,11 +50,14 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
                       style={[
                         styles.chip,
                         {
-                          backgroundColor: isSelected ? colors.primary : colors.surface,
+                          backgroundColor: isSelected ? colors.primary : colors.background,
                         },
                       ]}
                       onPress={() => onSelect(activity)}
                       activeOpacity={0.6}
+                      accessibilityRole="button"
+                      accessibilityLabel={activity}
+                      accessibilityState={{ selected: isSelected }}
                     >
                       <Text style={[
                         styles.chipText,
@@ -68,8 +76,11 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
 
       {/* Show all */}
       <TouchableOpacity
-        style={[styles.categoryRow, { borderBottomColor: colors.divider }]}
+        style={[styles.categoryRow, styles.categoryRowLast]}
         onPress={() => toggleCategory('all')}
+        accessibilityRole="button"
+        accessibilityLabel="顯示全部"
+        accessibilityState={{ expanded: expandedKey === 'all' }}
       >
         <Text style={[styles.categoryLabel, { color: colors.muted }]}>
           顯示全部
@@ -88,10 +99,13 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
                 style={[
                   styles.chip,
                   {
-                    backgroundColor: isSelected ? colors.primary : colors.surface,
+                    backgroundColor: isSelected ? colors.primary : colors.background,
                   },
                 ]}
                 onPress={() => onSelect(activity)}
+                accessibilityRole="button"
+                accessibilityLabel={activity}
+                accessibilityState={{ selected: isSelected }}
               >
                 <Text style={[
                   styles.chipText,
@@ -110,18 +124,23 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
 
 const styles = StyleSheet.create({
   container: {
-    gap: 0,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.xs,
   },
   categoryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 14,
+    paddingVertical: Spacing.lg,
     borderBottomWidth: 1,
+  },
+  categoryRowLast: {
+    borderBottomWidth: 0,
   },
   categoryLabel: {
     fontFamily: Fonts.outfitSemiBold,
-    fontSize: 15,
+    fontSize: 17,
   },
   arrow: {
     fontSize: 14,
@@ -129,13 +148,13 @@ const styles = StyleSheet.create({
   chipGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    paddingVertical: 12,
+    gap: Spacing.sm,
+    paddingVertical: Spacing.md,
   },
   chip: {
-    borderRadius: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
   },
   chipText: {
     fontFamily: Fonts.interMedium,

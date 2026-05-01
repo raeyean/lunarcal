@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { CalendarCell } from './CalendarCell';
 import { DayData } from '../utils/lunar';
+import { Spacing } from '../constants/spacing';
 
 interface CalendarGridProps {
   weeks: DayData[][];
@@ -9,6 +10,8 @@ interface CalendarGridProps {
   daysInMonth: number;
   firstWeekDay: number;
   onSelectDay: (day: number) => void;
+  year: number;
+  month: number;
 }
 
 export function CalendarGrid({
@@ -17,7 +20,14 @@ export function CalendarGrid({
   daysInMonth,
   firstWeekDay,
   onSelectDay,
+  year,
+  month,
 }: CalendarGridProps) {
+  const today = new Date();
+  const isTodayMonth =
+    today.getFullYear() === year && today.getMonth() + 1 === month;
+  const todayDay = isTodayMonth ? today.getDate() : 0;
+
   return (
     <View style={styles.container}>
       {weeks.map((week, weekIdx) => (
@@ -44,6 +54,12 @@ export function CalendarGrid({
             const isFestival = !!dayData.festivalShort;
             const lunarText = dayData.jieqi || dayData.festivalShort || dayData.lunar.dayCn;
             const isJieqi = !!dayData.jieqi;
+            const isLunarFirst = dayData.lunar.dayCn === '初一';
+            const isToday = day === todayDay;
+            const a11ySuffix =
+              (dayData.jieqi ? ` ${dayData.jieqi}` : '') +
+              (dayData.festivalShort ? ` ${dayData.festivalShort}` : '');
+            const accessibilityLabel = `${month}月${day}日 農曆${dayData.lunar.monthCn}月${dayData.lunar.dayCn}${a11ySuffix}`;
 
             return (
               <CalendarCell
@@ -54,6 +70,9 @@ export function CalendarGrid({
                 isJieqi={isJieqi}
                 isFestival={isFestival && !isJieqi}
                 isEmpty={false}
+                isToday={isToday}
+                isLunarFirst={isLunarFirst}
+                accessibilityLabel={accessibilityLabel}
                 onPress={() => onSelectDay(day)}
               />
             );
@@ -66,7 +85,7 @@ export function CalendarGrid({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.lg,
     gap: 2,
   },
   weekRow: {

@@ -17,8 +17,11 @@ import { Fonts } from '../constants/typography';
 import { ActivityPicker } from '../components/ActivityPicker';
 import { ZodiacPicker } from '../components/ZodiacPicker';
 import { AuspiciousResultCard } from '../components/AuspiciousResultCard';
+import { IconButton } from '../components/IconButton';
 import { scanChunk, AuspiciousResult } from '../utils/auspiciousScan';
 import { getZodiac, setZodiac } from '../utils/zodiacStorage';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 const RANGE_OPTIONS = [30, 60, 90, 180];
 const SEPARATOR_STYLE = { height: 8 };
@@ -150,68 +153,92 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
         { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] },
       ]}>
         {/* Header */}
-        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-          <TouchableOpacity onPress={handleClose} style={styles.closeButton} activeOpacity={0.6}>
+        <View style={[styles.header, { paddingTop: insets.top + Spacing.md }]}>
+          <IconButton
+            onPress={handleClose}
+            accessibilityLabel="關閉"
+            variant="ghost"
+          >
             <Text style={[styles.closeIcon, { color: colors.muted }]}>{'✕'}</Text>
-          </TouchableOpacity>
+          </IconButton>
           <Text style={[styles.title, { color: colors.foreground }]}>擇吉日</Text>
-          <View style={styles.closeButton} />
+          <View style={styles.headerSpacer} />
         </View>
 
         {!searched ? (
-          <ScrollView style={styles.formScroll} contentContainerStyle={styles.formContent}>
-            {/* Activity Picker */}
-            <Text style={[styles.sectionLabel, { color: colors.muted }]}>選擇活動</Text>
-            <ActivityPicker selected={activity} onSelect={setActivity} />
-
-            {/* Zodiac Picker */}
-            <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: 24 }]}>你的生肖</Text>
-            <ZodiacPicker selected={zodiac} onSelect={handleZodiacSelect} />
-
-            {/* Range Selector */}
-            <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: 24 }]}>搜索範圍</Text>
-            <View style={styles.rangeRow}>
-              {RANGE_OPTIONS.map(option => {
-                const isSelected = range === option;
-                return (
-                  <TouchableOpacity
-                    key={option}
-                    style={[
-                      styles.rangeChip,
-                      {
-                        backgroundColor: isSelected ? colors.primary : colors.surface,
-                      },
-                    ]}
-                    onPress={() => setRange(option)}
-                  >
-                    <Text style={[
-                      styles.rangeText,
-                      { color: isSelected ? '#FFFFFF' : colors.foreground },
-                    ]}>
-                      {option} 天
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
-            {/* Search Button */}
-            <TouchableOpacity
-              style={[
-                styles.searchButton,
-                { backgroundColor: activity ? colors.primary : colors.badgeBg },
-              ]}
-              onPress={handleSearch}
-              disabled={!activity}
+          <View style={styles.formContainer}>
+            <ScrollView
+              style={styles.formScroll}
+              contentContainerStyle={[styles.formContent, { paddingBottom: 80 + insets.bottom }]}
             >
-              <Text style={[
-                styles.searchButtonText,
-                { color: activity ? '#FFFFFF' : colors.muted },
-              ]}>
-                搜索吉日
-              </Text>
-            </TouchableOpacity>
-          </ScrollView>
+              {/* Activity Picker */}
+              <Text style={[styles.sectionLabel, { color: colors.muted }]}>選擇活動</Text>
+              <ActivityPicker selected={activity} onSelect={setActivity} />
+
+              {/* Zodiac Picker */}
+              <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: Spacing.xl }]}>你的生肖</Text>
+              <ZodiacPicker selected={zodiac} onSelect={handleZodiacSelect} />
+
+              {/* Range Selector */}
+              <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: Spacing.xl }]}>搜索範圍</Text>
+              <View style={styles.rangeRow}>
+                {RANGE_OPTIONS.map(option => {
+                  const isSelected = range === option;
+                  return (
+                    <TouchableOpacity
+                      key={option}
+                      style={[
+                        styles.rangeChip,
+                        {
+                          backgroundColor: isSelected ? colors.primary : colors.surface,
+                        },
+                      ]}
+                      onPress={() => setRange(option)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${option}天範圍`}
+                      accessibilityState={{ selected: isSelected }}
+                    >
+                      <Text style={[
+                        styles.rangeText,
+                        { color: isSelected ? '#FFFFFF' : colors.foreground },
+                      ]}>
+                        {option} 天
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </ScrollView>
+
+            {/* Sticky Search CTA */}
+            <View style={[
+              styles.stickyFooter,
+              {
+                backgroundColor: colors.background,
+                borderTopColor: colors.divider,
+                paddingBottom: insets.bottom + Spacing.md,
+              },
+            ]}>
+              <TouchableOpacity
+                style={[
+                  styles.searchButton,
+                  { backgroundColor: activity ? colors.primary : colors.badgeBg },
+                ]}
+                onPress={handleSearch}
+                disabled={!activity}
+                accessibilityRole="button"
+                accessibilityLabel="搜索吉日"
+                accessibilityState={{ disabled: !activity }}
+              >
+                <Text style={[
+                  styles.searchButtonText,
+                  { color: activity ? '#FFFFFF' : colors.muted },
+                ]}>
+                  搜索吉日
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         ) : (
           <View style={styles.resultsContainer}>
             {/* Filter summary */}
@@ -227,9 +254,13 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
               <View style={[styles.filterChip, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.filterChipText, { color: colors.muted }]}>{range} 天</Text>
               </View>
-              <TouchableOpacity onPress={() => { setSearched(false); setResults([]); setHasMore(false); }}>
-                <Text style={[styles.modifyText, { color: colors.primary }]}>修改</Text>
-              </TouchableOpacity>
+              <IconButton
+                onPress={() => { setSearched(false); setResults([]); setHasMore(false); }}
+                accessibilityLabel="修改搜尋條件"
+                variant="ghost"
+              >
+                <Text style={[styles.modifyText, { color: colors.primary }]}>✎ 修改</Text>
+              </IconButton>
             </View>
 
             {results.length === 0 && !loading ? (
@@ -279,18 +310,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
   },
-  closeButton: {
+  headerSpacer: {
     width: 44,
     height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   closeIcon: {
     fontSize: 18,
     fontWeight: '600',
+  },
+  formContainer: {
+    flex: 1,
+  },
+  stickyFooter: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   title: {
     fontFamily: Fonts.outfitBold,
@@ -300,7 +341,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   formContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: Spacing.xl,
     paddingBottom: 40,
   },
   sectionLabel: {
@@ -308,16 +349,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    marginBottom: 12,
+    marginBottom: Spacing.md,
   },
   rangeRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: Spacing.sm,
   },
   rangeChip: {
     flex: 1,
-    borderRadius: 12,
-    paddingVertical: 10,
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.md,
     alignItems: 'center',
   },
   rangeText: {
@@ -325,9 +366,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   searchButton: {
-    marginTop: 32,
-    borderRadius: 16,
-    paddingVertical: 16,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.lg,
     alignItems: 'center',
   },
   searchButtonText: {
@@ -340,15 +380,15 @@ const styles = StyleSheet.create({
   filterSummary: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 24,
-    paddingBottom: 12,
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.xl,
+    paddingBottom: Spacing.md,
     flexWrap: 'wrap',
   },
   filterChip: {
-    borderRadius: 16,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
   },
   filterChipText: {
     fontFamily: Fonts.interMedium,
@@ -361,10 +401,10 @@ const styles = StyleSheet.create({
   resultCount: {
     fontFamily: Fonts.inter,
     fontSize: 12,
-    marginBottom: 12,
+    marginBottom: Spacing.md,
   },
   resultsList: {
-    paddingHorizontal: 24,
+    paddingHorizontal: Spacing.xl,
     paddingBottom: 40,
   },
   emptyState: {
@@ -376,7 +416,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontFamily: Fonts.outfitBold,
     fontSize: 18,
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   emptySubtitle: {
     fontFamily: Fonts.inter,
@@ -386,8 +426,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: 'center',
-    paddingVertical: 16,
-    gap: 8,
+    paddingVertical: Spacing.lg,
+    gap: Spacing.sm,
   },
   footerText: {
     fontFamily: Fonts.inter,

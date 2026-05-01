@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, AppState, AppStateStatus } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, AppState, AppStateStatus } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -28,6 +28,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TodayWidget } from './src/components/TodayWidget';
 import { AuspiciousFinderScreen } from './src/screens/AuspiciousFinderScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { IconButton } from './src/components/IconButton';
+import { Spacing } from './src/constants/spacing';
+import { Radius } from './src/constants/radius';
 
 function AppContent() {
   const { colors, isDark, toggleTheme } = useTheme();
@@ -148,23 +151,23 @@ function AppContent() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <View style={styles.toggleWrapper}>
-        <TouchableOpacity
+        <IconButton
           onPress={() => setSettingsVisible(true)}
-          style={styles.themeButton}
-          accessibilityRole="button"
           accessibilityLabel="設定"
+          variant="ghost"
+          style={styles.themeButton}
         >
           <Text style={[styles.themeIcon, { color: colors.muted }]}>{'⚙'}</Text>
-        </TouchableOpacity>
+        </IconButton>
         <TogglePill activeTab={activeTab} onToggle={handleToggle} />
-        <TouchableOpacity
+        <IconButton
           onPress={() => setFinderVisible(true)}
-          style={styles.finderButton}
-          accessibilityRole="button"
           accessibilityLabel="擇吉日曆"
+          variant="ghost"
+          style={styles.finderButton}
         >
           <Text style={[styles.themeIcon, { color: colors.muted }]}>{'🧭'}</Text>
-        </TouchableOpacity>
+        </IconButton>
       </View>
       <ErrorBoundary>
         {activeTab === 'calendar' ? (
@@ -205,15 +208,14 @@ function AppContent() {
         onSelectDate={handleFinderSelectDate}
       />
       {!isToday && (
-        <TouchableOpacity
-          style={[styles.todayFab, { backgroundColor: colors.primary }]}
+        <IconButton
           onPress={handleGoToday}
-          activeOpacity={0.8}
-          accessibilityRole="button"
           accessibilityLabel="回到今天"
+          variant="primary"
+          style={styles.todayFab}
         >
           <Text style={styles.todayText}>今天</Text>
-        </TouchableOpacity>
+        </IconButton>
       )}
     </SafeAreaView>
   );
@@ -257,9 +259,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 24,
-    gap: 12,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xl,
+    gap: Spacing.md,
   },
   loadingContainer: {
     flex: 1,
@@ -270,10 +272,6 @@ const styles = StyleSheet.create({
   themeButton: {
     position: 'absolute',
     left: 24,
-    minWidth: 44,
-    minHeight: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   themeIcon: {
     fontSize: 20,
@@ -282,9 +280,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 32,
     right: 24,
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    borderRadius: Radius.xl,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xl,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -299,9 +297,5 @@ const styles = StyleSheet.create({
   finderButton: {
     position: 'absolute',
     right: 24,
-    minWidth: 44,
-    minHeight: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });

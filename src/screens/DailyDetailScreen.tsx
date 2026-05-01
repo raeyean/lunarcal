@@ -8,10 +8,12 @@ import { ClashSection } from '../components/ClashSection';
 import { TongshuSection } from '../components/TongshuSection';
 import { MonthHeader } from '../components/MonthHeader';
 import { EventDetailModal } from '../components/EventDetailModal';
+import { GlossarySheet, GlossaryTermId } from '../components/GlossarySheet';
 import { useTheme } from '../context/ThemeContext';
 import { getDayData, getChineseDayName, getEnglishDayName } from '../utils/lunar';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { getEventDescription, extractEventName } from '../data/eventDescriptions';
+import { Spacing } from '../constants/spacing';
 
 interface DailyDetailScreenProps {
   year: number;
@@ -30,6 +32,11 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
     onSwipeRight: onPrevDay,
   });
   const [eventModal, setEventModal] = useState<{ name: string; description: string } | null>(null);
+  const [glossaryTerm, setGlossaryTerm] = useState<GlossaryTermId | null>(null);
+
+  const handleOpenGlossary = useCallback((term: GlossaryTermId) => {
+    setGlossaryTerm(term);
+  }, []);
 
   const handleEventPress = useCallback((text: string) => {
     const name = extractEventName(text);
@@ -73,7 +80,7 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
             dayGanzhi={ganzhi.day}
             lunarDateString={lunarDateStr}
           />
-          <JieqiBanner text={jieqiText} onPress={handleEventPress} />
+          <JieqiBanner text={jieqiText} onPress={handleEventPress} onOpenGlossary={handleOpenGlossary} />
           <FestivalBanner festivals={festivals} onPressFestival={handleEventPress} />
           <View style={styles.yiJiRow}>
             <YiJiCard type="yi" items={yi} />
@@ -86,8 +93,9 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
             direction={clash.direction}
             element={clash.element}
             taishen={clash.taishen}
+            onOpenGlossary={handleOpenGlossary}
           />
-          <TongshuSection data={tongshu} />
+          <TongshuSection data={tongshu} onOpenGlossary={handleOpenGlossary} />
         </ScrollView>
       </View>
     );
@@ -106,6 +114,11 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
         description={eventModal?.description ?? ''}
         onClose={() => setEventModal(null)}
       />
+      <GlossarySheet
+        visible={glossaryTerm !== null}
+        termId={glossaryTerm}
+        onClose={() => setGlossaryTerm(null)}
+      />
     </View>
   );
 }
@@ -123,12 +136,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentInner: {
-    padding: 24,
-    paddingTop: 16,
-    gap: 20,
+    padding: Spacing.xl,
+    paddingTop: Spacing.lg,
+    gap: Spacing.xl,
   },
   yiJiRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.md,
   },
 });
