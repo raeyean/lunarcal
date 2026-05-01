@@ -148,7 +148,7 @@ function AppContent() {
   }, []);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView edges={['top', 'left', 'right']} style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <View style={styles.toggleWrapper}>
         <IconButton
@@ -237,7 +237,7 @@ export default function App() {
   if (!fontsLoaded) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#f04324" />
+        <ActivityIndicator size="large" color="#a02617" />
       </View>
     );
   }

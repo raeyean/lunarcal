@@ -44,7 +44,7 @@ export function EventDetailModal({ visible, name, description, onClose }: EventD
   }, [visible, slideAnim]);
 
   return (
-    <Modal visible={modalVisible} animationType="none" transparent>
+    <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent>
       <View style={styles.container}>
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.overlay} />
@@ -53,7 +53,10 @@ export function EventDetailModal({ visible, name, description, onClose }: EventD
           accessibilityViewIsModal={true}
           style={[
             styles.sheet,
-            { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] },
+            {
+              backgroundColor: colors.background,
+              transform: [{ translateY: slideAnim }],
+            },
           ]}
         >
           <View style={styles.header}>
@@ -84,7 +87,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: Radius.xl,
     borderTopRightRadius: Radius.xl,
     paddingTop: Spacing.xl,
-    paddingBottom: 40,
+    paddingBottom: Spacing.md,
     paddingHorizontal: Spacing.xl,
   },
   header: {

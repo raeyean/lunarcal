@@ -43,6 +43,9 @@ declare module 'lunar-javascript' {
     getDayPositionXiDesc(): string;
     getDayPositionCaiDesc(): string;
     getDayPositionFuDesc(): string;
+    getDayPositionYangGuiDesc(): string;
+    getDayPositionYinGuiDesc(): string;
+    getTimeGanZhi?(hour: number): string;
     getDayLu(): string;
     getYueXiang(): string;
     getLiuYao(): string;
