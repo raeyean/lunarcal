@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { SymbolView } from 'expo-symbols';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 
@@ -16,7 +17,14 @@ export function InfoBadge({ label, tint, style }: InfoBadgeProps) {
   return (
     <View style={[styles.container, style]} accessible={false}>
       {label ? <Text style={[styles.label, { color }]}>{label}</Text> : null}
-      <Text style={[styles.chevron, { color }]}>›</Text>
+      <SymbolView
+        name="chevron.right"
+        size={14}
+        tintColor={color}
+        weight="semibold"
+        resizeMode="scaleAspectFit"
+        fallback={<Text style={[styles.chevronFallback, { color }]}>›</Text>}
+      />
     </View>
   );
 }
@@ -25,13 +33,13 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
+    gap: 4,
   },
   label: {
     ...Typography.badgeText,
   },
-  chevron: {
-    fontSize: 18,
-    lineHeight: 22,
+  chevronFallback: {
+    fontSize: 16,
+    lineHeight: 16,
   },
 });
