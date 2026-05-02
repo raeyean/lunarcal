@@ -1,19 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { View, ScrollView, Animated, StyleSheet } from 'react-native';
-import { GanzhiHero } from '../components/GanzhiHero';
-import { JieqiBanner } from '../components/JieqiBanner';
-import { FestivalBanner } from '../components/FestivalBanner';
-import { YiJiCard } from '../components/YiJiCard';
-import { ClashSection } from '../components/ClashSection';
-import { TongshuSection } from '../components/TongshuSection';
 import { MonthHeader } from '../components/MonthHeader';
-import { EventDetailModal } from '../components/EventDetailModal';
-import { GlossarySheet, GlossaryTermId } from '../components/GlossarySheet';
+import { EditorialDaily } from '../components/EditorialDaily';
 import { useTheme } from '../context/ThemeContext';
 import { getDayData, getChineseDayName, getEnglishDayName } from '../utils/lunar';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
-import { getEventDescription, extractEventName } from '../data/eventDescriptions';
-import { Spacing } from '../constants/spacing';
 
 interface DailyDetailScreenProps {
   year: number;
@@ -31,36 +22,12 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
     onSwipeLeft: onNextDay,
     onSwipeRight: onPrevDay,
   });
-  const [eventModal, setEventModal] = useState<{ name: string; description: string } | null>(null);
-  const [glossaryTerm, setGlossaryTerm] = useState<GlossaryTermId | null>(null);
-
-  const handleOpenGlossary = useCallback((term: GlossaryTermId) => {
-    setGlossaryTerm(term);
-  }, []);
-
-  const handleEventPress = useCallback((text: string) => {
-    const name = extractEventName(text);
-    const description = getEventDescription(text);
-    if (description) {
-      setEventModal({ name, description });
-    }
-  }, []);
 
   const prevDate = new Date(year, month - 1, day - 1);
   const nextDate = new Date(year, month - 1, day + 1);
 
   const renderDayPanel = (y: number, m: number, d: number, isCenter: boolean) => {
     const dayData = getDayData(y, m, d);
-    const { lunar, ganzhi, yi, ji, clash, tongshu, jieqi, nextJieqi, festivals } = dayData;
-    const lunarDateStr = `農曆 ${lunar.monthCn}月${lunar.dayCn} · ${ganzhi.year}年${ganzhi.month}月${ganzhi.day}日`;
-
-    let jieqiText = '';
-    if (jieqi) {
-      jieqiText = jieqi;
-    } else if (nextJieqi) {
-      jieqiText = `${nextJieqi.name}將至 — ${nextJieqi.date}`;
-    }
-
     return (
       <View key={`${y}-${m}-${d}`} style={{ width: screenWidth }}>
         <MonthHeader
@@ -71,31 +38,10 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
         />
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={styles.contentInner}
+          contentContainerStyle={styles.scrollInner}
           showsVerticalScrollIndicator={false}
         >
-          <GanzhiHero
-            yearGanzhi={ganzhi.year}
-            monthGanzhi={ganzhi.month}
-            dayGanzhi={ganzhi.day}
-            lunarDateString={lunarDateStr}
-          />
-          <JieqiBanner text={jieqiText} onPress={handleEventPress} onOpenGlossary={handleOpenGlossary} />
-          <FestivalBanner festivals={festivals} onPressFestival={handleEventPress} />
-          <View style={styles.yiJiRow}>
-            <YiJiCard type="yi" items={yi} />
-            <YiJiCard type="ji" items={ji} />
-          </View>
-          <ClashSection
-            animal={clash.animal}
-            emoji={clash.emoji}
-            description={clash.description}
-            direction={clash.direction}
-            element={clash.element}
-            taishen={clash.taishen}
-            onOpenGlossary={handleOpenGlossary}
-          />
-          <TongshuSection data={tongshu} onOpenGlossary={handleOpenGlossary} />
+          <EditorialDaily day={dayData} />
         </ScrollView>
       </View>
     );
@@ -108,17 +54,6 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
         {renderDayPanel(year, month, day, true)}
         {renderDayPanel(nextDate.getFullYear(), nextDate.getMonth() + 1, nextDate.getDate(), false)}
       </Animated.View>
-      <EventDetailModal
-        visible={eventModal !== null}
-        name={eventModal?.name ?? ''}
-        description={eventModal?.description ?? ''}
-        onClose={() => setEventModal(null)}
-      />
-      <GlossarySheet
-        visible={glossaryTerm !== null}
-        termId={glossaryTerm}
-        onClose={() => setGlossaryTerm(null)}
-      />
     </View>
   );
 }
@@ -135,13 +70,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  contentInner: {
-    padding: Spacing.xl,
-    paddingTop: Spacing.lg,
-    gap: Spacing.xl,
-  },
-  yiJiRow: {
-    flexDirection: 'row',
-    gap: Spacing.md,
+  scrollInner: {
+    paddingBottom: 35,
   },
 });

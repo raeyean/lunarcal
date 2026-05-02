@@ -101,7 +101,7 @@ export function SettingsModal({ visible, onClose, isDark, toggleTheme }: Setting
   pickerDate.setHours(settings.hour, settings.minute, 0, 0);
 
   return (
-    <Modal visible={modalVisible} animationType="none" transparent>
+    <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent>
       <View style={styles.container}>
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.overlay} />
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: Radius.xl,
     borderTopRightRadius: Radius.xl,
     paddingTop: Spacing.xl,
-    paddingBottom: 40,
+    paddingBottom: Spacing.md,
     paddingHorizontal: Spacing.xl,
   },
   header: {

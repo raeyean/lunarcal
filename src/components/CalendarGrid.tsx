@@ -72,6 +72,7 @@ export function CalendarGrid({
                 isEmpty={false}
                 isToday={isToday}
                 isLunarFirst={isLunarFirst}
+                dayData={dayData}
                 accessibilityLabel={accessibilityLabel}
                 onPress={() => onSelectDay(day)}
               />

@@ -64,7 +64,6 @@ export function MonthHeader({ titleCn, titleEn, onPrev, onNext }: MonthHeaderPro
       </IconButton>
       <View style={styles.titleGroup}>
         <Text style={[styles.titleCn, { color: colors.foreground }]}>{titleCn}</Text>
-        <Text style={[styles.titleEn, { color: colors.muted }]}>{titleEn}</Text>
       </View>
       <IconButton
         onPress={onNext}

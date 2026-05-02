@@ -5,6 +5,7 @@ import { WeekHeader } from '../components/WeekHeader';
 import { CalendarGrid } from '../components/CalendarGrid';
 import { BottomPanel } from '../components/BottomPanel';
 import { CalendarLegend } from '../components/CalendarLegend';
+import { DeityStrip } from '../components/DeityStrip';
 import { useTheme } from '../context/ThemeContext';
 import { getMonthDays, getChineseMonthName, getEnglishMonthName, getDayData } from '../utils/lunar';
 import { Solar } from 'lunar-javascript';
@@ -46,6 +47,18 @@ export function CalendarScreen({
     const firstWeekDay = firstDay.getWeek();
     const daysInMonth = new Date(y, m, 0).getDate();
 
+    // Flatten + collect deity days that fall in the *displayed* month only.
+    // getMonthDays pads first/last week with duplicates of day-1, so dedupe by day.
+    const seenDays = new Set<number>();
+    const deityDays = weeks
+      .flat()
+      .filter(d => {
+        if (d.solar.month !== m || d.solar.year !== y || !d.deity) return false;
+        if (seenDays.has(d.solar.day)) return false;
+        seenDays.add(d.solar.day);
+        return true;
+      });
+
     return (
       <View key={`${y}-${m}`} style={{ width: screenWidth }}>
         <MonthHeader
@@ -63,6 +76,10 @@ export function CalendarScreen({
           onSelectDay={isCenter ? onSelectDay : noopDay}
           year={y}
           month={m}
+        />
+        <DeityStrip
+          days={deityDays}
+          onSelect={isCenter ? onSelectDay : undefined}
         />
       </View>
     );
