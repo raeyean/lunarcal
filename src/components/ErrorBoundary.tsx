@@ -1,5 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Appearance, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { LightColors, DarkColors } from '../constants/colors';
+import { Typography } from '../constants/typography';
+import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 interface Props {
   children: React.ReactNode;
@@ -11,6 +15,8 @@ interface State {
   error: Error | null;
 }
 
+// ErrorBoundary cannot use the useTheme hook (class component, may render
+// before ThemeProvider in worst-case crashes). Resolve theme via Appearance.
 export class ErrorBoundary extends React.Component<Props, State> {
   state: State = { hasError: false, error: null };
 
@@ -25,17 +31,26 @@ export class ErrorBoundary extends React.Component<Props, State> {
   render() {
     if (!this.state.hasError) return this.props.children;
 
+    const isDark = Appearance.getColorScheme() === 'dark';
+    const palette = isDark ? DarkColors : LightColors;
+
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: palette.background }]}>
         <Text style={styles.emoji}>⚠️</Text>
-        <Text style={styles.title}>
+        <Text style={[styles.title, { color: palette.foreground }]}>
           {this.props.fallbackMessage ?? '發生錯誤'}
         </Text>
-        <Text style={styles.detail} numberOfLines={3}>
+        <Text style={[styles.detail, { color: palette.subtleText }]} numberOfLines={3}>
           {this.state.error?.message}
         </Text>
-        <TouchableOpacity style={styles.button} onPress={this.handleReset} activeOpacity={0.7}>
-          <Text style={styles.buttonText}>重試</Text>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: palette.primary }]}
+          onPress={this.handleReset}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="重試"
+        >
+          <Text style={[styles.buttonText, { color: palette.onPrimary }]}>重試</Text>
         </TouchableOpacity>
       </View>
     );
@@ -47,35 +62,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
-    backgroundColor: '#FFFFFF',
+    padding: Spacing.xxl,
   },
   emoji: {
     fontSize: 40,
-    marginBottom: 16,
+    marginBottom: Spacing.lg,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000000',
-    marginBottom: 8,
+    ...Typography.cardTitle,
+    marginBottom: Spacing.sm,
     textAlign: 'center',
   },
   detail: {
-    fontSize: 13,
-    color: '#78788A',
+    ...Typography.bodyMedium,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: Spacing.xl,
   },
   button: {
-    backgroundColor: '#a02617',
-    paddingVertical: 10,
-    paddingHorizontal: 28,
-    borderRadius: 20,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: Radius.xl,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   buttonText: {
-    color: '#FFFFFF',
+    ...Typography.toggleActive,
     fontSize: 15,
-    fontWeight: '600',
   },
 });

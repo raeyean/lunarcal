@@ -2,6 +2,7 @@ import React from 'react';
 import { Insets, Pressable, StyleSheet, ViewStyle } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Spacing } from '../constants/spacing';
+import { Radius } from '../constants/radius';
 
 interface IconButtonProps {
   children: React.ReactNode;
@@ -29,7 +30,7 @@ export function IconButton({
   const { colors } = useTheme();
 
   const backgroundColors: Record<NonNullable<IconButtonProps['variant']>, string> = {
-    default: colors.muted + '20',
+    default: colors.mutedSoft,
     primary: colors.primary,
     ghost: 'transparent',
   };
@@ -62,6 +63,6 @@ const styles = StyleSheet.create({
     padding: Spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
+    borderRadius: Radius.sm,
   },
 });
