@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { Radius } from '../constants/radius';
+import { Spacing } from '../constants/spacing';
 import { Moon } from './Moon';
 import { deityColor } from '../constants/colors';
 import type { DayData } from '../utils/lunar';
@@ -46,9 +47,9 @@ export function CalendarCell({
     containerExtra.push({ backgroundColor: colors.primary, borderRadius: Radius.md });
   } else {
     if (isFestival) {
-      containerExtra.push({ backgroundColor: colors.festival + '20', borderRadius: Radius.md });
+      containerExtra.push({ backgroundColor: colors.festivalLight, borderRadius: Radius.md });
     } else if (isJieqi) {
-      containerExtra.push({ backgroundColor: colors.primary + '15', borderRadius: Radius.md });
+      containerExtra.push({ backgroundColor: colors.primarySoft, borderRadius: Radius.md });
     }
     if (isToday) {
       containerExtra.push({
@@ -90,14 +91,14 @@ export function CalendarCell({
       <Text style={[
         styles.dayNumber,
         { color: colors.foreground },
-        isActive && { ...Typography.calendarDayActive, color: colors.white },
+        isActive && { ...Typography.calendarDayActive, color: colors.onPrimary },
       ]}>
         {day}
       </Text>
       <Text style={[
         styles.lunarText,
         { color: colors.muted },
-        isActive && { color: colors.white },
+        isActive && { color: colors.onPrimary },
         isJieqi && !isActive && { color: colors.primary, fontFamily: Fonts.interMedium },
         isFestival && !isActive && { color: colors.festival, fontFamily: Fonts.interMedium },
         deity && !isJieqi && !isFestival && !isActive && deityHue
@@ -120,10 +121,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     maxWidth: 72,
-    height: 56,
+    minHeight: 56,
+    paddingVertical: Spacing.xs,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
+    gap: Spacing.xxs,
     position: 'relative',
   },
   dayNumber: {

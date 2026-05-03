@@ -5,12 +5,17 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#f6f3ec",
+      "dark": {
+        "image": "./assets/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#0e0d0b"
+      }
     },
     "ios": {
       "supportsTablet": true,
@@ -37,7 +42,7 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#f04324"
+          "color": "#a02617"
         }
       ]
     ],

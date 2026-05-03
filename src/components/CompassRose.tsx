@@ -23,7 +23,7 @@ export function CompassRose({ directions, size = 200 }: CompassRoseProps) {
   const { colors } = useTheme();
   const cx = size / 2, cy = size / 2, r = size * 0.39;
   const items = Object.entries(directions);
-  const markerColors = [colors.primary, colors.accent, colors.deityShen, colors.deityDao, '#3d4f6b'];
+  const markerColors = [colors.primary, colors.accent, colors.deityShen, colors.deityDao, colors.info];
 
   return (
     <View style={{ alignItems: 'center', paddingVertical: 4 }}>
@@ -71,7 +71,7 @@ export function CompassRose({ directions, size = 200 }: CompassRoseProps) {
                 x={x}
                 y={y + 4}
                 fontSize={11}
-                fill="#fff"
+                fill={colors.onPrimary}
                 textAnchor="middle"
                 fontFamily={Fonts.outfitBold}
               >

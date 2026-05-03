@@ -1,5 +1,11 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, AppState, AppStateStatus } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, AppState, AppStateStatus, useColorScheme } from 'react-native';
+
+// Cap accessibility text scaling so layouts don't break, while still respecting the OS setting.
+// Applied via Text.defaultProps so every <Text> inherits it without per-call boilerplate.
+const TextAny = Text as unknown as { defaultProps?: { maxFontSizeMultiplier?: number } };
+TextAny.defaultProps = TextAny.defaultProps || {};
+TextAny.defaultProps.maxFontSizeMultiplier = 1.3;
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -214,7 +220,7 @@ function AppContent() {
           variant="primary"
           style={styles.todayFab}
         >
-          <Text style={styles.todayText}>今天</Text>
+          <Text style={[styles.todayText, { color: colors.onPrimary }]}>今天</Text>
         </IconButton>
       )}
     </SafeAreaView>
@@ -222,6 +228,8 @@ function AppContent() {
 }
 
 export default function App() {
+  const systemScheme = useColorScheme();
+  const isDark = systemScheme === 'dark';
   const [fontsLoaded] = useFonts({
     Outfit_400Regular,
     Outfit_500Medium,
@@ -236,8 +244,8 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#a02617" />
+      <View style={[styles.loadingContainer, { backgroundColor: isDark ? '#0e0d0b' : '#f6f3ec' }]}>
+        <ActivityIndicator size="large" color={isDark ? '#d4634d' : '#a02617'} />
       </View>
     );
   }
@@ -267,7 +275,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
   },
   themeButton: {
     position: 'absolute',
@@ -292,7 +299,6 @@ const styles = StyleSheet.create({
   todayText: {
     fontFamily: 'Outfit_700Bold',
     fontSize: 14,
-    color: '#FFFFFF',
   },
   finderButton: {
     position: 'absolute',

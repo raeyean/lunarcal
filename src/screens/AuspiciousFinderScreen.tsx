@@ -200,7 +200,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
                     >
                       <Text style={[
                         styles.rangeText,
-                        { color: isSelected ? '#FFFFFF' : colors.foreground },
+                        { color: isSelected ? colors.onPrimary : colors.foreground },
                       ]}>
                         {option} 天
                       </Text>
@@ -223,6 +223,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
                 style={[
                   styles.searchButton,
                   { backgroundColor: activity ? colors.primary : colors.badgeBg },
+                  !activity && { opacity: 0.5 },
                 ]}
                 onPress={handleSearch}
                 disabled={!activity}
@@ -232,7 +233,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
               >
                 <Text style={[
                   styles.searchButtonText,
-                  { color: activity ? '#FFFFFF' : colors.muted },
+                  { color: activity ? colors.onPrimary : colors.muted },
                 ]}>
                   搜索吉日
                 </Text>
