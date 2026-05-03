@@ -27,12 +27,10 @@ import { Radius } from '../constants/radius';
 interface SettingsModalProps {
   visible: boolean;
   onClose: () => void;
-  isDark: boolean;
-  toggleTheme: () => void;
 }
 
-export function SettingsModal({ visible, onClose, isDark, toggleTheme }: SettingsModalProps) {
-  const { colors } = useTheme();
+export function SettingsModal({ visible, onClose }: SettingsModalProps) {
+  const { colors, isDark, toggleTheme } = useTheme();
   const [settings, setSettings] = useState<NotificationSettings>({
     enabled: false,
     hour: 20,
@@ -104,7 +102,7 @@ export function SettingsModal({ visible, onClose, isDark, toggleTheme }: Setting
     <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent>
       <View style={styles.container}>
         <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.overlay} />
+          <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
         </TouchableWithoutFeedback>
         <Animated.View style={[styles.sheet, { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] }]}>
           <View style={styles.header}>
@@ -196,7 +194,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
     borderTopLeftRadius: Radius.xl,

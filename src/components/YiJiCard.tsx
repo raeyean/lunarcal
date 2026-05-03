@@ -24,7 +24,7 @@ interface YiJiCardProps {
 
 const COLLAPSED_LIMIT = 6;
 
-export function YiJiCard({ type, items }: YiJiCardProps) {
+function YiJiCardInner({ type, items }: YiJiCardProps) {
   const { colors } = useTheme();
   const [expanded, setExpanded] = useState(false);
   const isYi = type === 'yi';
@@ -58,6 +58,8 @@ export function YiJiCard({ type, items }: YiJiCardProps) {
     </View>
   );
 }
+
+export const YiJiCard = React.memo(YiJiCardInner);
 
 const styles = StyleSheet.create({
   container: {

@@ -20,10 +20,10 @@ interface CalendarCellProps {
   /** Full day-data — drives deity dot + 朔/望 mini moon. */
   dayData?: DayData;
   accessibilityLabel?: string;
-  onPress: () => void;
+  onSelectDay?: (day: number) => void;
 }
 
-export function CalendarCell({
+function CalendarCellInner({
   day,
   lunarText,
   isActive,
@@ -34,9 +34,12 @@ export function CalendarCell({
   isLunarFirst,
   dayData,
   accessibilityLabel,
-  onPress,
+  onSelectDay,
 }: CalendarCellProps) {
   const { colors, isDark } = useTheme();
+  const handlePress = React.useCallback(() => {
+    onSelectDay?.(day);
+  }, [onSelectDay, day]);
 
   if (isEmpty) {
     return <View style={styles.container} />;
@@ -70,7 +73,7 @@ export function CalendarCell({
   return (
     <TouchableOpacity
       style={[styles.container, ...containerExtra]}
-      onPress={onPress}
+      onPress={handlePress}
       activeOpacity={0.6}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? `${day}日，農曆${lunarText}${isActive ? '，已選取' : ''}`}
@@ -116,6 +119,8 @@ export function CalendarCell({
     </TouchableOpacity>
   );
 }
+
+export const CalendarCell = React.memo(CalendarCellInner);
 
 const styles = StyleSheet.create({
   container: {

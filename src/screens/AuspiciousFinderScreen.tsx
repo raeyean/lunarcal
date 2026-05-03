@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   },
   formContent: {
     paddingHorizontal: Spacing.xl,
-    paddingBottom: 40,
+    paddingBottom: Spacing.xxxl,
   },
   sectionLabel: {
     fontFamily: Fonts.outfitSemiBold,
@@ -406,13 +406,13 @@ const styles = StyleSheet.create({
   },
   resultsList: {
     paddingHorizontal: Spacing.xl,
-    paddingBottom: 40,
+    paddingBottom: Spacing.xxxl,
   },
   emptyState: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: Spacing.xxxl,
   },
   emptyTitle: {
     fontFamily: Fonts.outfitBold,

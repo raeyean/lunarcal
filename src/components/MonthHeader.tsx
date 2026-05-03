@@ -9,14 +9,13 @@ import { IconButton } from './IconButton';
 
 interface MonthHeaderProps {
   titleCn: string;
-  titleEn: string;
   onPrev: () => void;
   onNext: () => void;
 }
 
 const SWIPE_HINT_KEY = 'calendarSwipeHintShown';
 
-export function MonthHeader({ titleCn, titleEn, onPrev, onNext }: MonthHeaderProps) {
+export function MonthHeader({ titleCn, onPrev, onNext }: MonthHeaderProps) {
   const { colors } = useTheme();
   const [hintVisible, setHintVisible] = useState(false);
   const hintOpacity = useRef(new Animated.Value(0)).current;
@@ -107,9 +106,6 @@ const styles = StyleSheet.create({
   },
   titleCn: {
     ...Typography.screenHeader,
-  },
-  titleEn: {
-    ...Typography.monthEnglish,
   },
   arrow: {
     fontSize: 28,

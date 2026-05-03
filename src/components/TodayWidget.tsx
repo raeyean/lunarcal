@@ -102,12 +102,12 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
 
   const subCardYiBg = `${colors.primary}${isDark ? '1F' : '14'}`;
   const subCardYiBorder = `${colors.primary}${isDark ? '40' : '33'}`;
-  const subCardJiBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)';
-  const subCardJiBorder = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)';
+  const subCardJiBg = colors.subtleSurface;
+  const subCardJiBorder = colors.subtleBorder;
 
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <View style={[styles.backdrop, { backgroundColor: isDark ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.5)' }]}>
+      <View style={[styles.backdrop, { backgroundColor: colors.overlay }]}>
         <TouchableWithoutFeedback onPress={onDismiss}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
@@ -118,7 +118,7 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
           style={[styles.cardWrapper, { transform: [{ translateY }], opacity: animatedOpacity }]}
           {...panResponder.panHandlers}
         >
-          <LinearGradient colors={gradientColors} style={[styles.card, { borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)' }]}>
+          <LinearGradient colors={gradientColors} style={[styles.card, { borderColor: colors.subtleBorder }]}>
             <DragHandle />
             <Text style={[styles.label, { color: colors.muted }]}>今日一覽</Text>
 

@@ -39,7 +39,7 @@ import { Spacing } from './src/constants/spacing';
 import { Radius } from './src/constants/radius';
 
 function AppContent() {
-  const { colors, isDark, toggleTheme } = useTheme();
+  const { colors, isDark } = useTheme();
 
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -200,8 +200,6 @@ function AppContent() {
       <SettingsModal
         visible={settingsVisible}
         onClose={() => setSettingsVisible(false)}
-        isDark={isDark}
-        toggleTheme={toggleTheme}
       />
       <TodayWidget
         visible={showWidget}
