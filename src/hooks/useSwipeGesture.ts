@@ -55,16 +55,9 @@ export function useSwipeGesture({ onSwipeLeft, onSwipeRight }: SwipeConfig) {
   const panResponder = useMemo(
     () =>
       PanResponder.create({
-        onMoveShouldSetPanResponderCapture: (
-          _,
-          { dx, dy }: PanResponderGestureState,
-        ) => {
-          return (
-            !isAnimating.current &&
-            Math.abs(dx) > Math.abs(dy) &&
-            Math.abs(dx) > 10
-          );
-        },
+        // Bubble phase only — let horizontally-scrollable children
+        // (e.g. DeityStrip) claim the gesture first. Parent still
+        // claims pans on non-scrollable areas (calendar grid, headers).
         onMoveShouldSetPanResponder: (
           _,
           { dx, dy }: PanResponderGestureState,
