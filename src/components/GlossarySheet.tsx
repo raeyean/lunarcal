@@ -20,6 +20,8 @@ export type GlossaryTermId =
   | 'jieqi'
   | 'jiShen'
   | 'yiJi'
+  | 'yi'
+  | 'ji'
   | 'fangwei'
   | 'xiuSong';
 
@@ -58,6 +60,16 @@ const GLOSSARY: Record<GlossaryTermId, GlossaryEntry> = {
     title: '宜忌',
     description:
       '宜忌 — 根據黃曆判斷當日適合（宜）與不宜（忌）進行的活動。',
+  },
+  yi: {
+    title: '宜',
+    description:
+      '宜 — 黃曆中當日推薦進行的事項。古人依據天干地支、值日星神、節氣等綜合推算，列出當日順利吉祥之事，例如祭祀、嫁娶、出行、開市、動土等，提醒擇吉日行事，可順勢而為。',
+  },
+  ji: {
+    title: '忌',
+    description:
+      '忌 — 黃曆中當日不宜進行的事項。傳統擇日學認為某些行為在特定日子易遇阻滯或不順，例如安葬、入宅、開市、嫁娶等，建議避開以免招致沖煞，宜延後或另擇吉日。',
   },
   fangwei: {
     title: '方位',
