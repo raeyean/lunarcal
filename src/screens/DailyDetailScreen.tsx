@@ -3,8 +3,9 @@ import { View, ScrollView, Animated, StyleSheet } from 'react-native';
 import { MonthHeader } from '../components/MonthHeader';
 import { EditorialDaily } from '../components/EditorialDaily';
 import { useTheme } from '../context/ThemeContext';
-import { getDayData, getChineseDayName, getEnglishDayName } from '../utils/lunar';
+import { getDayData, getChineseDayName } from '../utils/lunar';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
+import { getPrevDay, getNextDay } from '../utils/dateHelpers';
 
 interface DailyDetailScreenProps {
   year: number;
@@ -23,8 +24,8 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
     onSwipeRight: onPrevDay,
   });
 
-  const prevDate = new Date(year, month - 1, day - 1);
-  const nextDate = new Date(year, month - 1, day + 1);
+  const prev = getPrevDay(year, month, day);
+  const next = getNextDay(year, month, day);
 
   const renderDayPanel = (y: number, m: number, d: number, isCenter: boolean) => {
     const dayData = getDayData(y, m, d);
@@ -32,7 +33,6 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
       <View key={`${y}-${m}-${d}`} style={{ width: screenWidth }}>
         <MonthHeader
           titleCn={getChineseDayName(y, m, d)}
-          titleEn={getEnglishDayName(y, m, d)}
           onPrev={isCenter ? triggerPrev : noop}
           onNext={isCenter ? triggerNext : noop}
         />
@@ -50,9 +50,9 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Animated.View style={[styles.panelRow, animatedStyle, { width: screenWidth * 3 }]} {...panHandlers}>
-        {renderDayPanel(prevDate.getFullYear(), prevDate.getMonth() + 1, prevDate.getDate(), false)}
+        {renderDayPanel(prev.year, prev.month, prev.day, false)}
         {renderDayPanel(year, month, day, true)}
-        {renderDayPanel(nextDate.getFullYear(), nextDate.getMonth() + 1, nextDate.getDate(), false)}
+        {renderDayPanel(next.year, next.month, next.day, false)}
       </Animated.View>
     </View>
   );

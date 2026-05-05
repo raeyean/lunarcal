@@ -45,7 +45,6 @@ export function CalendarGrid({
                   isActive={false}
                   isJieqi={false}
                   isEmpty={true}
-                  onPress={() => {}}
                 />
               );
             }
@@ -74,7 +73,7 @@ export function CalendarGrid({
                 isLunarFirst={isLunarFirst}
                 dayData={dayData}
                 accessibilityLabel={accessibilityLabel}
-                onPress={() => onSelectDay(day)}
+                onSelectDay={onSelectDay}
               />
             );
           })}

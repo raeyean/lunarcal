@@ -18,6 +18,8 @@ export const LightColors = {
   bottomPanelBg: '#fffdf6',
   chip: '#f0ead8',
   overlay: 'rgba(26,24,22,0.45)',  // modal scrim — theme-aware
+  subtleSurface: 'rgba(0,0,0,0.03)',
+  subtleBorder: 'rgba(0,0,0,0.06)',
 
   // ink scale
   foreground: '#1a1816',
@@ -76,6 +78,8 @@ export const DarkColors: ThemeColors = {
   bottomPanelBg: '#16140f',
   chip: '#1f1b14',
   overlay: 'rgba(0,0,0,0.6)',
+  subtleSurface: 'rgba(255,255,255,0.06)',
+  subtleBorder: 'rgba(255,255,255,0.1)',
 
   foreground: '#f0e9d9',
   jiDark: '#f0e9d9',

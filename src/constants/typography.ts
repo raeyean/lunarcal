@@ -104,12 +104,6 @@ export const Typography = {
     fontSize: 13,
     lineHeight: 18,
   } as TextStyle,
-  monthEnglish: {
-    fontFamily: Fonts.inter,
-    fontSize: 12,
-    lineHeight: 16,
-  } as TextStyle,
-
   // Caption tier
   subtitle: {
     fontFamily: Fonts.inter,

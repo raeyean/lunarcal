@@ -7,9 +7,10 @@ import { BottomPanel } from '../components/BottomPanel';
 import { CalendarLegend } from '../components/CalendarLegend';
 import { DeityStrip } from '../components/DeityStrip';
 import { useTheme } from '../context/ThemeContext';
-import { getMonthDays, getChineseMonthName, getEnglishMonthName, getDayData } from '../utils/lunar';
+import { getMonthDays, getChineseMonthName, getDayData } from '../utils/lunar';
 import { Solar } from 'lunar-javascript';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
+import { getPrevMonth, getNextMonth } from '../utils/dateHelpers';
 
 interface CalendarScreenProps {
   year: number;
@@ -34,10 +35,8 @@ export function CalendarScreen({
     onSwipeRight: onPrevMonth,
   });
 
-  const prevYear = month === 1 ? year - 1 : year;
-  const prevMonth = month === 1 ? 12 : month - 1;
-  const nextYear = month === 12 ? year + 1 : year;
-  const nextMonth = month === 12 ? 1 : month + 1;
+  const { year: prevYear, month: prevMonth } = getPrevMonth(year, month);
+  const { year: nextYear, month: nextMonth } = getNextMonth(year, month);
 
   const selectedDayData = getDayData(year, month, selectedDay, month);
 
@@ -63,7 +62,6 @@ export function CalendarScreen({
       <View key={`${y}-${m}`} style={{ width: screenWidth }}>
         <MonthHeader
           titleCn={getChineseMonthName(y, m)}
-          titleEn={getEnglishMonthName(y, m)}
           onPrev={isCenter ? triggerPrev : noop}
           onNext={isCenter ? triggerNext : noop}
         />

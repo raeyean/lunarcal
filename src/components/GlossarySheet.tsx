@@ -106,7 +106,7 @@ export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) 
     <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent>
       <View style={styles.container}>
         <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.overlay} />
+          <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
         </TouchableWithoutFeedback>
         <Animated.View
           style={[
@@ -148,7 +148,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
     borderTopLeftRadius: Radius.xl,

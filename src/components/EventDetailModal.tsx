@@ -47,7 +47,7 @@ export function EventDetailModal({ visible, name, description, onClose }: EventD
     <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent>
       <View style={styles.container}>
         <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.overlay} />
+          <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
         </TouchableWithoutFeedback>
         <Animated.View
           accessibilityViewIsModal={true}
@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
     borderTopLeftRadius: Radius.xl,

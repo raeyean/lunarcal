@@ -6,6 +6,7 @@ export const Spacing = {
   lg: 16,
   xl: 24,
   xxl: 32,
+  xxxl: 40,
 } as const;
 
 export type SpacingKey = keyof typeof Spacing;

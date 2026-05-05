@@ -32,7 +32,7 @@ export function ShichenSheet({ visible, shichen, onClose }: ShichenSheetProps) {
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop} />
+        <View style={[styles.backdrop, { backgroundColor: colors.overlay }]} />
       </TouchableWithoutFeedback>
       <View style={styles.sheetWrap} pointerEvents="box-none">
         <View style={[styles.sheet, { backgroundColor: colors.surface, borderColor: colors.line }]}>
@@ -71,7 +71,6 @@ export function ShichenSheet({ visible, shichen, onClose }: ShichenSheetProps) {
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheetWrap: {
     ...StyleSheet.absoluteFillObject,

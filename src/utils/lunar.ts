@@ -148,17 +148,6 @@ function moonPhase(year: number, month: number, day: number): number {
   return phaseDays / synodic;
 }
 
-export function moonPhaseName(t: number): string {
-  if (t < 0.03 || t > 0.97) return '朔';
-  if (t < 0.22) return '蛾眉月';
-  if (t < 0.28) return '上弦';
-  if (t < 0.47) return '盈凸月';
-  if (t < 0.53) return '望';
-  if (t < 0.72) return '虧凸月';
-  if (t < 0.78) return '下弦';
-  return '殘月';
-}
-
 function buildShichen(dayGanzhi: string, seed: number): ShichenSlot[] {
   const stemIdx = TIANGAN.indexOf(dayGanzhi[0] ?? '');
   const startStem = stemIdx >= 0 ? SHICHEN_START_STEM[stemIdx % 10] : 0;
@@ -375,12 +364,6 @@ export function getChineseMonthName(year: number, month: number): string {
   return `${yearStr}年 ${monthNames[month]}`;
 }
 
-export function getEnglishMonthName(year: number, month: number): string {
-  const months = ['', 'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'];
-  return `${months[month]} ${year}`;
-}
-
 function numToChinese(num: number): string {
   const digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
   if (num <= 10) return digits[num];
@@ -398,8 +381,3 @@ export function getChineseDayName(year: number, month: number, day: number): str
   return `${months[month]}月${numToChinese(day)}日 ${weekDays[solar.getWeek()]}`;
 }
 
-export function getEnglishDayName(year: number, month: number, day: number): string {
-  const months = ['', 'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'];
-  return `${months[month]} ${day}, ${year}`;
-}
