@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Animated,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
@@ -91,6 +92,7 @@ interface GlossarySheetProps {
 
 export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const slideAnim = useRef(new Animated.Value(300)).current;
   const [modalVisible, setModalVisible] = React.useState(false);
 
@@ -125,6 +127,7 @@ export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) 
             styles.sheet,
             {
               backgroundColor: colors.background,
+              paddingBottom: Spacing.xl + insets.bottom,
               transform: [{ translateY: slideAnim }],
             },
           ]}
@@ -165,7 +168,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: Radius.xl,
     borderTopRightRadius: Radius.xl,
     paddingTop: Spacing.lg,
-    paddingBottom: Spacing.md,
     paddingHorizontal: Spacing.xl,
   },
   header: {
