@@ -3,9 +3,11 @@ import {
   Modal,
   View,
   Text,
+  ScrollView,
   TouchableWithoutFeedback,
   StyleSheet,
   Animated,
+  Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
@@ -13,6 +15,7 @@ import { Typography, Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { IconButton } from './IconButton';
+import { ACTIVITY_MEANINGS } from '../data/activityMeanings';
 
 export type GlossaryTermId =
   | 'tianGanDiZhi'
@@ -26,9 +29,16 @@ export type GlossaryTermId =
   | 'fangwei'
   | 'xiuSong';
 
+interface GlossaryItem {
+  name: string;
+  meaning: string;
+}
+
 interface GlossaryEntry {
   title: string;
   description: string;
+  itemsHeading?: string;
+  items?: GlossaryItem[];
 }
 
 const GLOSSARY: Record<GlossaryTermId, GlossaryEntry> = {
@@ -65,12 +75,16 @@ const GLOSSARY: Record<GlossaryTermId, GlossaryEntry> = {
   yi: {
     title: '宜',
     description:
-      '宜 — 黃曆中當日推薦進行的事項。古人依據天干地支、值日星神、節氣等綜合推算，列出當日順利吉祥之事，例如祭祀、嫁娶、出行、開市、動土等，提醒擇吉日行事，可順勢而為。',
+      '宜 — 黃曆中當日推薦進行的事項。古人依據天干地支、值日星神、節氣等綜合推算，列出當日順利吉祥之事，提醒擇吉日行事，可順勢而為。',
+    itemsHeading: '常見項目說明',
+    items: ACTIVITY_MEANINGS,
   },
   ji: {
     title: '忌',
     description:
-      '忌 — 黃曆中當日不宜進行的事項。傳統擇日學認為某些行為在特定日子易遇阻滯或不順，例如安葬、入宅、開市、嫁娶等，建議避開以免招致沖煞，宜延後或另擇吉日。',
+      '忌 — 黃曆中當日不宜進行的事項。傳統擇日學認為某些行為在特定日子易遇阻滯或不順，建議避開以免招致沖煞，宜延後或另擇吉日。',
+    itemsHeading: '常見項目說明',
+    items: ACTIVITY_MEANINGS,
   },
   fangwei: {
     title: '方位',
@@ -89,6 +103,8 @@ interface GlossarySheetProps {
   termId: GlossaryTermId | null;
   onClose: () => void;
 }
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) {
   const { colors } = useTheme();
@@ -127,7 +143,7 @@ export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) 
             styles.sheet,
             {
               backgroundColor: colors.background,
-              paddingBottom: Spacing.xl + insets.bottom,
+              maxHeight: SCREEN_HEIGHT * 0.8,
               transform: [{ translateY: slideAnim }],
             },
           ]}
@@ -146,9 +162,43 @@ export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) 
             </IconButton>
           </View>
           {entry ? (
-            <Text style={[styles.description, { color: colors.subtleText }]}>
-              {entry.description}
-            </Text>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={{ paddingBottom: Spacing.xl + insets.bottom }}
+              showsVerticalScrollIndicator={false}
+            >
+              <Text style={[styles.description, { color: colors.subtleText }]}>
+                {entry.description}
+              </Text>
+              {entry.items && entry.items.length > 0 ? (
+                <View style={styles.itemsBlock}>
+                  {entry.itemsHeading ? (
+                    <Text style={[styles.itemsHeading, { color: colors.foreground }]}>
+                      {entry.itemsHeading}
+                    </Text>
+                  ) : null}
+                  {entry.items.map((item, idx) => (
+                    <View
+                      key={item.name}
+                      style={[
+                        styles.itemRow,
+                        idx < entry.items!.length - 1 && {
+                          borderBottomColor: colors.lineSoft,
+                          borderBottomWidth: StyleSheet.hairlineWidth,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.itemName, { color: colors.primary }]}>
+                        {item.name}
+                      </Text>
+                      <Text style={[styles.itemMeaning, { color: colors.subtleText }]}>
+                        {item.meaning}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
+            </ScrollView>
           ) : null}
         </Animated.View>
       </View>
@@ -187,9 +237,35 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.outfitSemiBold,
     fontSize: 16,
   },
+  scroll: {
+    flexGrow: 0,
+  },
   description: {
     fontFamily: Fonts.inter,
     fontSize: 15,
     lineHeight: 24,
+  },
+  itemsBlock: {
+    marginTop: Spacing.lg,
+  },
+  itemsHeading: {
+    fontFamily: Fonts.outfitSemiBold,
+    fontSize: 13,
+    letterSpacing: 1.2,
+    marginBottom: Spacing.sm,
+    textTransform: 'uppercase',
+  },
+  itemRow: {
+    paddingVertical: Spacing.sm + 2,
+  },
+  itemName: {
+    fontFamily: Fonts.outfitBold,
+    fontSize: 15,
+    marginBottom: 2,
+  },
+  itemMeaning: {
+    fontFamily: Fonts.inter,
+    fontSize: 13,
+    lineHeight: 20,
   },
 });
