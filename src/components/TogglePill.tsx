@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
@@ -13,32 +13,44 @@ interface TogglePillProps {
 export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
   const { colors } = useTheme();
 
+  const renderTab = (tab: 'daily' | 'calendar', label: string) => {
+    const isActive = activeTab === tab;
+    return (
+      <Pressable
+        style={({ pressed }) => [
+          styles.tab,
+          isActive && {
+            backgroundColor: colors.primary,
+            shadowColor: colors.primary,
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+            shadowOffset: { width: 0, height: 2 },
+            elevation: 2,
+          },
+          pressed && { opacity: 0.85 },
+        ]}
+        onPress={() => onToggle(tab)}
+        accessibilityRole="tab"
+        accessibilityLabel={label}
+        accessibilityState={{ selected: isActive }}
+      >
+        <Text
+          style={[
+            styles.tabText,
+            { color: isActive ? colors.white : colors.muted },
+            isActive && styles.tabTextActive,
+          ]}
+        >
+          {label}
+        </Text>
+      </Pressable>
+    );
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.surface }]}>
-      <TouchableOpacity
-        style={[styles.tab, activeTab === 'daily' && { backgroundColor: colors.primary }]}
-        onPress={() => onToggle('daily')}
-        activeOpacity={0.6}
-        accessibilityRole="tab"
-        accessibilityLabel="日詳"
-        accessibilityState={{ selected: activeTab === 'daily' }}
-      >
-        <Text style={[styles.tabText, { color: colors.muted }, activeTab === 'daily' && { color: colors.white }]}>
-          日詳
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.tab, activeTab === 'calendar' && { backgroundColor: colors.primary }]}
-        onPress={() => onToggle('calendar')}
-        activeOpacity={0.6}
-        accessibilityRole="tab"
-        accessibilityLabel="月曆"
-        accessibilityState={{ selected: activeTab === 'calendar' }}
-      >
-        <Text style={[styles.tabText, { color: colors.muted }, activeTab === 'calendar' && { color: colors.white }]}>
-          月曆
-        </Text>
-      </TouchableOpacity>
+      {renderTab('daily', '日詳')}
+      {renderTab('calendar', '月曆')}
     </View>
   );
 }
@@ -61,5 +73,8 @@ const styles = StyleSheet.create({
   tabText: {
     ...Typography.toggleActive,
     fontFamily: Fonts.outfitMedium,
+  },
+  tabTextActive: {
+    fontFamily: Fonts.outfitBold,
   },
 });
