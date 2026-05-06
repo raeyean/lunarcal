@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { ClashInfo } from './ClashInfo';
 import { HelpIcon } from './HelpIcon';
 import { GlossarySheet, type GlossaryTermId } from './GlossarySheet';
+import { meaningsFor } from '../data/activityMeanings';
 import { DayData } from '../utils/lunar';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
@@ -17,6 +18,12 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
   const { colors } = useTheme();
   const [glossaryTerm, setGlossaryTerm] = useState<GlossaryTermId | null>(null);
   const { lunar, ganzhi, yi, ji, clash, festivals } = dayData;
+
+  const glossaryItems = useMemo(() => {
+    if (glossaryTerm === 'yi') return meaningsFor(yi);
+    if (glossaryTerm === 'ji') return meaningsFor(ji);
+    return undefined;
+  }, [glossaryTerm, yi, ji]);
 
   const dateStr = `${lunar.monthCn}月${lunar.dayCn} ${ganzhi.year}年 ${ganzhi.month}月 ${ganzhi.day}日`;
   const festivalStr = festivals.length > 0 ? festivals[0] : null;
@@ -78,6 +85,7 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
       <GlossarySheet
         visible={glossaryTerm !== null}
         termId={glossaryTerm}
+        items={glossaryItems}
         onClose={() => setGlossaryTerm(null)}
       />
     </View>

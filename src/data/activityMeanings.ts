@@ -1,5 +1,10 @@
 /** Brief explanations for activity terms used in 黃曆 宜/忌 listings. */
-export const ACTIVITY_MEANINGS: { name: string; meaning: string }[] = [
+export interface ActivityMeaning {
+  name: string;
+  meaning: string;
+}
+
+export const ACTIVITY_MEANINGS: ActivityMeaning[] = [
   { name: '祭祀', meaning: '祭拜祖先、神明，獻供祈安。' },
   { name: '祈福', meaning: '請僧道設醮，向神明祈求福祿平安。' },
   { name: '求嗣', meaning: '向神明祈求子嗣。' },
@@ -60,3 +65,21 @@ export const ACTIVITY_MEANINGS: { name: string; meaning: string }[] = [
   { name: '平治道塗', meaning: '修整、鋪平道路。' },
   { name: '蓋屋', meaning: '搭建房屋、蓋頂封簷。' },
 ];
+
+const MEANING_LOOKUP: Record<string, string> = ACTIVITY_MEANINGS.reduce(
+  (acc, item) => {
+    acc[item.name] = item.meaning;
+    return acc;
+  },
+  {} as Record<string, string>,
+);
+
+/** Build a meanings list from a list of activity names (e.g. day.yi). Items
+ *  without a known meaning fall through with an em-dash placeholder so the
+ *  user still sees the term they tapped. */
+export function meaningsFor(names: readonly string[]): ActivityMeaning[] {
+  return names.map(name => ({
+    name,
+    meaning: MEANING_LOOKUP[name] ?? '—',
+  }));
+}

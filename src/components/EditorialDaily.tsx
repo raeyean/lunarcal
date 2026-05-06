@@ -10,6 +10,7 @@ import { CompassRose } from './CompassRose';
 import { HelpIcon } from './HelpIcon';
 import { ShichenSheet } from './ShichenSheet';
 import { GlossarySheet, type GlossaryTermId } from './GlossarySheet';
+import { meaningsFor } from '../data/activityMeanings';
 import { findUpcomingDeity, type DayData } from '../utils/lunar';
 
 interface EditorialDailyProps {
@@ -29,6 +30,12 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
   const jiItems = day.ji.slice(0, 4);
 
   const upcoming = useMemo(() => (day.deity ? null : findUpcomingDeity(dateObj, 60)), [day.deity, day.solar.year, day.solar.month, day.solar.day]);
+
+  const glossaryItems = useMemo(() => {
+    if (glossaryTerm === 'yi') return meaningsFor(day.yi);
+    if (glossaryTerm === 'ji') return meaningsFor(day.ji);
+    return undefined;
+  }, [glossaryTerm, day.yi, day.ji]);
 
   return (
     <View style={{ backgroundColor: colors.background }}>
@@ -215,6 +222,7 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
       <GlossarySheet
         visible={glossaryTerm !== null}
         termId={glossaryTerm}
+        items={glossaryItems}
         onClose={() => setGlossaryTerm(null)}
       />
     </View>

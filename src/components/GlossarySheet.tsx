@@ -15,7 +15,7 @@ import { Typography, Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { IconButton } from './IconButton';
-import { ACTIVITY_MEANINGS } from '../data/activityMeanings';
+import type { ActivityMeaning } from '../data/activityMeanings';
 
 export type GlossaryTermId =
   | 'tianGanDiZhi'
@@ -29,16 +29,11 @@ export type GlossaryTermId =
   | 'fangwei'
   | 'xiuSong';
 
-interface GlossaryItem {
-  name: string;
-  meaning: string;
-}
-
 interface GlossaryEntry {
   title: string;
   description: string;
   itemsHeading?: string;
-  items?: GlossaryItem[];
+  items?: ActivityMeaning[];
 }
 
 const GLOSSARY: Record<GlossaryTermId, GlossaryEntry> = {
@@ -76,15 +71,13 @@ const GLOSSARY: Record<GlossaryTermId, GlossaryEntry> = {
     title: '宜',
     description:
       '宜 — 黃曆中當日推薦進行的事項。古人依據天干地支、值日星神、節氣等綜合推算，列出當日順利吉祥之事，提醒擇吉日行事，可順勢而為。',
-    itemsHeading: '常見項目說明',
-    items: ACTIVITY_MEANINGS,
+    itemsHeading: '今日宜事釋義',
   },
   ji: {
     title: '忌',
     description:
       '忌 — 黃曆中當日不宜進行的事項。傳統擇日學認為某些行為在特定日子易遇阻滯或不順，建議避開以免招致沖煞，宜延後或另擇吉日。',
-    itemsHeading: '常見項目說明',
-    items: ACTIVITY_MEANINGS,
+    itemsHeading: '今日忌事釋義',
   },
   fangwei: {
     title: '方位',
@@ -101,12 +94,14 @@ const GLOSSARY: Record<GlossaryTermId, GlossaryEntry> = {
 interface GlossarySheetProps {
   visible: boolean;
   termId: GlossaryTermId | null;
+  /** Override the items list — e.g. only the day's actual 宜/忌 entries. */
+  items?: ActivityMeaning[];
   onClose: () => void;
 }
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) {
+export function GlossarySheet({ visible, termId, items, onClose }: GlossarySheetProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const slideAnim = useRef(new Animated.Value(300)).current;
@@ -131,6 +126,7 @@ export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) 
   }, [visible]);
 
   const entry = termId ? GLOSSARY[termId] : null;
+  const displayItems = items ?? entry?.items;
 
   return (
     <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent>
@@ -170,19 +166,19 @@ export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) 
               <Text style={[styles.description, { color: colors.subtleText }]}>
                 {entry.description}
               </Text>
-              {entry.items && entry.items.length > 0 ? (
+              {displayItems && displayItems.length > 0 ? (
                 <View style={styles.itemsBlock}>
                   {entry.itemsHeading ? (
                     <Text style={[styles.itemsHeading, { color: colors.foreground }]}>
                       {entry.itemsHeading}
                     </Text>
                   ) : null}
-                  {entry.items.map((item, idx) => (
+                  {displayItems.map((item, idx) => (
                     <View
                       key={item.name}
                       style={[
                         styles.itemRow,
-                        idx < entry.items!.length - 1 && {
+                        idx < displayItems.length - 1 && {
                           borderBottomColor: colors.lineSoft,
                           borderBottomWidth: StyleSheet.hairlineWidth,
                         },
