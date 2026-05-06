@@ -10,6 +10,11 @@ import {
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 50;
 const VELOCITY_THRESHOLD = 0.3;
+// Move threshold for *claiming* the gesture. Higher than the activation
+// threshold so a small horizontal drift on a sibling (e.g. tapping a card on
+// the DeityStrip below) can't accidentally hand the gesture to the parent
+// month-swipe.
+const CLAIM_THRESHOLD = 24;
 const BASE_OFFSET = -SCREEN_WIDTH;
 
 interface SwipeConfig {
@@ -64,8 +69,8 @@ export function useSwipeGesture({ onSwipeLeft, onSwipeRight }: SwipeConfig) {
         ) => {
           return (
             !isAnimating.current &&
-            Math.abs(dx) > Math.abs(dy) &&
-            Math.abs(dx) > 10
+            Math.abs(dx) > Math.abs(dy) * 1.5 &&
+            Math.abs(dx) > CLAIM_THRESHOLD
           );
         },
         onPanResponderMove: (_, { dx }: PanResponderGestureState) => {
