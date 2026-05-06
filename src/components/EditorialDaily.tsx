@@ -168,7 +168,16 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
       {/* 方位 */}
       <View style={styles.section}>
         <View style={styles.sectionHead}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>方位</Text>
+          <TouchableOpacity
+            style={styles.titleWithIcon}
+            onPress={() => setGlossaryTerm('fangwei')}
+            accessibilityRole="button"
+            accessibilityLabel="查看「方位」的說明"
+            activeOpacity={0.6}
+          >
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>方位</Text>
+            <HelpIcon size={15} color={colors.muted} />
+          </TouchableOpacity>
         </View>
         <CompassRose directions={day.directions} />
       </View>
