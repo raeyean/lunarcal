@@ -74,12 +74,14 @@ const MEANING_LOOKUP: Record<string, string> = ACTIVITY_MEANINGS.reduce(
   {} as Record<string, string>,
 );
 
-/** Build a meanings list from a list of activity names (e.g. day.yi). Items
- *  without a known meaning fall through with an em-dash placeholder so the
- *  user still sees the term they tapped. */
+/** Build a meanings list from a list of activity names (e.g. day.yi).
+ *  Activities without a known meaning are filtered out so the popup only
+ *  shows entries the user can actually learn from. */
 export function meaningsFor(names: readonly string[]): ActivityMeaning[] {
-  return names.map(name => ({
-    name,
-    meaning: MEANING_LOOKUP[name] ?? '—',
-  }));
+  const result: ActivityMeaning[] = [];
+  for (const name of names) {
+    const meaning = MEANING_LOOKUP[name];
+    if (meaning) result.push({ name, meaning });
+  }
+  return result;
 }
