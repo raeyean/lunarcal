@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   },
   yijiHead: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     gap: 8,
     marginBottom: 10,
   },
