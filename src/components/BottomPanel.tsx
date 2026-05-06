@@ -19,11 +19,15 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
   const [glossaryTerm, setGlossaryTerm] = useState<GlossaryTermId | null>(null);
   const { lunar, ganzhi, yi, ji, clash, festivals } = dayData;
 
+  // Visible subsets — keep popup explanations in sync with what's displayed.
+  const visibleYi = yi.slice(0, 6);
+  const visibleJi = ji.slice(0, 6);
+
   const glossaryItems = useMemo(() => {
-    if (glossaryTerm === 'yi') return meaningsFor(yi);
-    if (glossaryTerm === 'ji') return meaningsFor(ji);
+    if (glossaryTerm === 'yi') return meaningsFor(visibleYi);
+    if (glossaryTerm === 'ji') return meaningsFor(visibleJi);
     return undefined;
-  }, [glossaryTerm, yi, ji]);
+  }, [glossaryTerm, visibleYi, visibleJi]);
 
   const dateStr = `${lunar.monthCn}月${lunar.dayCn} ${ganzhi.year}年 ${ganzhi.month}月 ${ganzhi.day}日`;
   const festivalStr = festivals.length > 0 ? festivals[0] : null;

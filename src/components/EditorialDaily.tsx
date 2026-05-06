@@ -32,10 +32,10 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
   const upcoming = useMemo(() => (day.deity ? null : findUpcomingDeity(dateObj, 60)), [day.deity, day.solar.year, day.solar.month, day.solar.day]);
 
   const glossaryItems = useMemo(() => {
-    if (glossaryTerm === 'yi') return meaningsFor(day.yi);
-    if (glossaryTerm === 'ji') return meaningsFor(day.ji);
+    if (glossaryTerm === 'yi') return meaningsFor(yiItems);
+    if (glossaryTerm === 'ji') return meaningsFor(jiItems);
     return undefined;
-  }, [glossaryTerm, day.yi, day.ji]);
+  }, [glossaryTerm, yiItems, jiItems]);
 
   return (
     <View style={{ backgroundColor: colors.background }}>
