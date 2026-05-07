@@ -9,6 +9,8 @@ import { DeityCard, UpcomingDeity } from './DeityCard';
 import { CompassRose } from './CompassRose';
 import { HelpIcon } from './HelpIcon';
 import { ShichenSheet } from './ShichenSheet';
+import { GlossarySheet, type GlossaryTermId } from './GlossarySheet';
+import { meaningsFor } from '../data/activityMeanings';
 import { findUpcomingDeity, type DayData } from '../utils/lunar';
 
 interface EditorialDailyProps {
@@ -21,12 +23,19 @@ const WK = ['日', '一', '二', '三', '四', '五', '六'];
 export function EditorialDaily({ day }: EditorialDailyProps) {
   const { colors, isDark } = useTheme();
   const [shichenOpen, setShichenOpen] = useState(false);
+  const [glossaryTerm, setGlossaryTerm] = useState<GlossaryTermId | null>(null);
   const dateObj = new Date(day.solar.year, day.solar.month - 1, day.solar.day);
   const dateStr = `${day.solar.year}.${String(day.solar.month).padStart(2, '0')}.${String(day.solar.day).padStart(2, '0')}`;
   const yiItems = day.yi.slice(0, 6);
   const jiItems = day.ji.slice(0, 4);
 
   const upcoming = useMemo(() => (day.deity ? null : findUpcomingDeity(dateObj, 60)), [day.deity, day.solar.year, day.solar.month, day.solar.day]);
+
+  const glossaryItems = useMemo(() => {
+    if (glossaryTerm === 'yi') return meaningsFor(yiItems);
+    if (glossaryTerm === 'ji') return meaningsFor(jiItems);
+    return undefined;
+  }, [glossaryTerm, yiItems, jiItems]);
 
   return (
     <View style={{ backgroundColor: colors.background }}>
@@ -58,9 +67,17 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
       {/* 宜 / 忌 split */}
       <View style={[styles.yijiRow, { borderBottomColor: colors.line }]}>
         <View style={[styles.yijiCol, { borderRightColor: colors.line }]}>
-          <View style={styles.yijiHead}>
+          <TouchableOpacity
+            style={styles.yijiHead}
+            onPress={() => setGlossaryTerm('yi')}
+            accessibilityRole="button"
+            accessibilityLabel="查看「宜」的說明"
+            activeOpacity={0.6}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <Text style={[styles.yijiBig, { color: colors.primary }]}>宜</Text>
-          </View>
+            <HelpIcon size={14} color={colors.muted} />
+          </TouchableOpacity>
           <View style={styles.yijiList}>
             {yiItems.map((it, i) => (
               <Text key={`${it}-${i}`} style={[styles.yijiItem, { color: colors.foreground }]}>
@@ -70,9 +87,17 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
           </View>
         </View>
         <View style={styles.yijiColRight}>
-          <View style={styles.yijiHead}>
+          <TouchableOpacity
+            style={styles.yijiHead}
+            onPress={() => setGlossaryTerm('ji')}
+            accessibilityRole="button"
+            accessibilityLabel="查看「忌」的說明"
+            activeOpacity={0.6}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <Text style={[styles.yijiBig, { color: colors.ji }]}>忌</Text>
-          </View>
+            <HelpIcon size={14} color={colors.muted} />
+          </TouchableOpacity>
           <View style={styles.yijiList}>
             {jiItems.map((it, i) => (
               <Text key={`${it}-${i}`} style={[styles.yijiItem, { color: colors.foreground }]}>
@@ -150,7 +175,16 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
       {/* 方位 */}
       <View style={styles.section}>
         <View style={styles.sectionHead}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>方位</Text>
+          <TouchableOpacity
+            style={styles.titleWithIcon}
+            onPress={() => setGlossaryTerm('fangwei')}
+            accessibilityRole="button"
+            accessibilityLabel="查看「方位」的說明"
+            activeOpacity={0.6}
+          >
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>方位</Text>
+            <HelpIcon size={15} color={colors.muted} />
+          </TouchableOpacity>
         </View>
         <CompassRose directions={day.directions} />
       </View>
@@ -183,6 +217,13 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
         visible={shichenOpen}
         shichen={day.shichen}
         onClose={() => setShichenOpen(false)}
+      />
+
+      <GlossarySheet
+        visible={glossaryTerm !== null}
+        termId={glossaryTerm}
+        items={glossaryItems}
+        onClose={() => setGlossaryTerm(null)}
       />
     </View>
   );
@@ -250,7 +291,7 @@ const styles = StyleSheet.create({
   },
   yijiHead: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     gap: 8,
     marginBottom: 10,
   },

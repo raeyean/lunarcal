@@ -3,15 +3,19 @@ import {
   Modal,
   View,
   Text,
+  ScrollView,
   TouchableWithoutFeedback,
   StyleSheet,
   Animated,
+  Dimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { IconButton } from './IconButton';
+import type { ActivityMeaning } from '../data/activityMeanings';
 
 export type GlossaryTermId =
   | 'tianGanDiZhi'
@@ -20,12 +24,16 @@ export type GlossaryTermId =
   | 'jieqi'
   | 'jiShen'
   | 'yiJi'
+  | 'yi'
+  | 'ji'
   | 'fangwei'
   | 'xiuSong';
 
 interface GlossaryEntry {
   title: string;
   description: string;
+  itemsHeading?: string;
+  items?: ActivityMeaning[];
 }
 
 const GLOSSARY: Record<GlossaryTermId, GlossaryEntry> = {
@@ -59,6 +67,18 @@ const GLOSSARY: Record<GlossaryTermId, GlossaryEntry> = {
     description:
       '宜忌 — 根據黃曆判斷當日適合（宜）與不宜（忌）進行的活動。',
   },
+  yi: {
+    title: '宜',
+    description:
+      '宜 — 黃曆中當日推薦進行的事項。古人依據天干地支、值日星神、節氣等綜合推算，列出當日順利吉祥之事，提醒擇吉日行事，可順勢而為。',
+    itemsHeading: '今日宜事釋義',
+  },
+  ji: {
+    title: '忌',
+    description:
+      '忌 — 黃曆中當日不宜進行的事項。傳統擇日學認為某些行為在特定日子易遇阻滯或不順，建議避開以免招致沖煞，宜延後或另擇吉日。',
+    itemsHeading: '今日忌事釋義',
+  },
   fangwei: {
     title: '方位',
     description:
@@ -74,11 +94,16 @@ const GLOSSARY: Record<GlossaryTermId, GlossaryEntry> = {
 interface GlossarySheetProps {
   visible: boolean;
   termId: GlossaryTermId | null;
+  /** Override the items list — e.g. only the day's actual 宜/忌 entries. */
+  items?: ActivityMeaning[];
   onClose: () => void;
 }
 
-export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) {
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
+export function GlossarySheet({ visible, termId, items, onClose }: GlossarySheetProps) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const slideAnim = useRef(new Animated.Value(300)).current;
   const [modalVisible, setModalVisible] = React.useState(false);
 
@@ -101,6 +126,7 @@ export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) 
   }, [visible]);
 
   const entry = termId ? GLOSSARY[termId] : null;
+  const displayItems = items ?? entry?.items;
 
   return (
     <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent>
@@ -113,6 +139,7 @@ export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) 
             styles.sheet,
             {
               backgroundColor: colors.background,
+              maxHeight: SCREEN_HEIGHT * 0.8,
               transform: [{ translateY: slideAnim }],
             },
           ]}
@@ -131,9 +158,43 @@ export function GlossarySheet({ visible, termId, onClose }: GlossarySheetProps) 
             </IconButton>
           </View>
           {entry ? (
-            <Text style={[styles.description, { color: colors.subtleText }]}>
-              {entry.description}
-            </Text>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={{ paddingBottom: Spacing.xl + insets.bottom }}
+              showsVerticalScrollIndicator={false}
+            >
+              <Text style={[styles.description, { color: colors.subtleText }]}>
+                {entry.description}
+              </Text>
+              {displayItems && displayItems.length > 0 ? (
+                <View style={styles.itemsBlock}>
+                  {entry.itemsHeading ? (
+                    <Text style={[styles.itemsHeading, { color: colors.foreground }]}>
+                      {entry.itemsHeading}
+                    </Text>
+                  ) : null}
+                  {displayItems.map((item, idx) => (
+                    <View
+                      key={item.name}
+                      style={[
+                        styles.itemRow,
+                        idx < displayItems.length - 1 && {
+                          borderBottomColor: colors.lineSoft,
+                          borderBottomWidth: StyleSheet.hairlineWidth,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.itemName, { color: colors.primary }]}>
+                        {item.name}
+                      </Text>
+                      <Text style={[styles.itemMeaning, { color: colors.subtleText }]}>
+                        {item.meaning}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
+            </ScrollView>
           ) : null}
         </Animated.View>
       </View>
@@ -153,7 +214,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: Radius.xl,
     borderTopRightRadius: Radius.xl,
     paddingTop: Spacing.lg,
-    paddingBottom: Spacing.md,
     paddingHorizontal: Spacing.xl,
   },
   header: {
@@ -173,9 +233,35 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.outfitSemiBold,
     fontSize: 16,
   },
+  scroll: {
+    flexGrow: 0,
+  },
   description: {
     fontFamily: Fonts.inter,
     fontSize: 15,
     lineHeight: 24,
+  },
+  itemsBlock: {
+    marginTop: Spacing.lg,
+  },
+  itemsHeading: {
+    fontFamily: Fonts.outfitSemiBold,
+    fontSize: 13,
+    letterSpacing: 1.2,
+    marginBottom: Spacing.sm,
+    textTransform: 'uppercase',
+  },
+  itemRow: {
+    paddingVertical: Spacing.sm + 2,
+  },
+  itemName: {
+    fontFamily: Fonts.outfitBold,
+    fontSize: 15,
+    marginBottom: 2,
+  },
+  itemMeaning: {
+    fontFamily: Fonts.inter,
+    fontSize: 13,
+    lineHeight: 20,
   },
 });

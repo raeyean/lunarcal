@@ -24,6 +24,11 @@ export function DeityStrip({ days, onSelect }: DeityStripProps) {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.row}
+        directionalLockEnabled
+        alwaysBounceHorizontal
+        decelerationRate="fast"
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
       >
         {days.map(d => {
           if (!d.deity) return null;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { SymbolView } from 'expo-symbols';
+import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 
@@ -10,6 +10,8 @@ interface InfoBadgeProps {
   style?: ViewStyle;
 }
 
+const ARROW_SIZE = 14;
+
 export function InfoBadge({ label, tint, style }: InfoBadgeProps) {
   const { colors } = useTheme();
   const color = tint ?? colors.muted;
@@ -17,14 +19,16 @@ export function InfoBadge({ label, tint, style }: InfoBadgeProps) {
   return (
     <View style={[styles.container, style]} accessible={false}>
       {label ? <Text style={[styles.label, { color }]}>{label}</Text> : null}
-      <SymbolView
-        name="chevron.right"
-        size={14}
-        tintColor={color}
-        weight="semibold"
-        resizeMode="scaleAspectFit"
-        fallback={<Text style={[styles.chevronFallback, { color }]}>›</Text>}
-      />
+      <Svg width={ARROW_SIZE} height={ARROW_SIZE} viewBox="0 0 24 24">
+        <Path
+          d="M9 5l7 7-7 7"
+          stroke={color}
+          strokeWidth={2.25}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </Svg>
     </View>
   );
 }
@@ -37,9 +41,5 @@ const styles = StyleSheet.create({
   },
   label: {
     ...Typography.badgeText,
-  },
-  chevronFallback: {
-    fontSize: 16,
-    lineHeight: 16,
   },
 });

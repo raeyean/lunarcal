@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
 import { MonthHeader } from '../components/MonthHeader';
 import { WeekHeader } from '../components/WeekHeader';
@@ -40,23 +40,27 @@ export function CalendarScreen({
 
   const selectedDayData = getDayData(year, month, selectedDay, month);
 
+  // Deity days for the *current* month — rendered outside the swipe area so
+  // the strip's horizontal ScrollView owns its own gestures without fighting
+  // the parent month-swipe PanResponder.
+  const currentDeityDays = useMemo(() => {
+    const weeks = getMonthDays(year, month);
+    const seen = new Set<number>();
+    return weeks
+      .flat()
+      .filter(d => {
+        if (d.solar.month !== month || d.solar.year !== year || !d.deity) return false;
+        if (seen.has(d.solar.day)) return false;
+        seen.add(d.solar.day);
+        return true;
+      });
+  }, [year, month]);
+
   const renderMonthPanel = (y: number, m: number, sd: number, isCenter: boolean) => {
     const weeks = getMonthDays(y, m);
     const firstDay = Solar.fromYmd(y, m, 1);
     const firstWeekDay = firstDay.getWeek();
     const daysInMonth = new Date(y, m, 0).getDate();
-
-    // Flatten + collect deity days that fall in the *displayed* month only.
-    // getMonthDays pads first/last week with duplicates of day-1, so dedupe by day.
-    const seenDays = new Set<number>();
-    const deityDays = weeks
-      .flat()
-      .filter(d => {
-        if (d.solar.month !== m || d.solar.year !== y || !d.deity) return false;
-        if (seenDays.has(d.solar.day)) return false;
-        seenDays.add(d.solar.day);
-        return true;
-      });
 
     return (
       <View key={`${y}-${m}`} style={{ width: screenWidth }}>
@@ -75,10 +79,6 @@ export function CalendarScreen({
           year={y}
           month={m}
         />
-        <DeityStrip
-          days={deityDays}
-          onSelect={isCenter ? onSelectDay : undefined}
-        />
       </View>
     );
   };
@@ -92,6 +92,7 @@ export function CalendarScreen({
           {renderMonthPanel(nextYear, nextMonth, 1, false)}
         </Animated.View>
       </View>
+      <DeityStrip days={currentDeityDays} onSelect={onSelectDay} />
       <CalendarLegend expanded={legendExpanded} onToggle={() => setLegendExpanded(v => !v)} />
       <View style={[styles.divider, { backgroundColor: colors.divider }]} />
       <BottomPanel dayData={selectedDayData} />

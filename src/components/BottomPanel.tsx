@@ -1,8 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { ClashInfo } from './ClashInfo';
+import { HelpIcon } from './HelpIcon';
+import { GlossarySheet, type GlossaryTermId } from './GlossarySheet';
+import { meaningsFor } from '../data/activityMeanings';
 import { DayData } from '../utils/lunar';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
@@ -13,7 +16,18 @@ interface BottomPanelProps {
 
 export function BottomPanel({ dayData }: BottomPanelProps) {
   const { colors } = useTheme();
+  const [glossaryTerm, setGlossaryTerm] = useState<GlossaryTermId | null>(null);
   const { lunar, ganzhi, yi, ji, clash, festivals } = dayData;
+
+  // Visible subsets — keep popup explanations in sync with what's displayed.
+  const visibleYi = yi.slice(0, 6);
+  const visibleJi = ji.slice(0, 6);
+
+  const glossaryItems = useMemo(() => {
+    if (glossaryTerm === 'yi') return meaningsFor(visibleYi);
+    if (glossaryTerm === 'ji') return meaningsFor(visibleJi);
+    return undefined;
+  }, [glossaryTerm, visibleYi, visibleJi]);
 
   const dateStr = `${lunar.monthCn}月${lunar.dayCn} ${ganzhi.year}年 ${ganzhi.month}月 ${ganzhi.day}日`;
   const festivalStr = festivals.length > 0 ? festivals[0] : null;
@@ -41,16 +55,43 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
       </View>
       <View style={styles.yiJiRow}>
         <View style={[styles.yiJiCol, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.yiJiLabel, { color: colors.primary }]}>宜</Text>
+          <TouchableOpacity
+            style={styles.yiJiHead}
+            onPress={() => setGlossaryTerm('yi')}
+            accessibilityRole="button"
+            accessibilityLabel="查看「宜」的說明"
+            activeOpacity={0.6}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={[styles.yiJiLabel, { color: colors.primary }]}>宜</Text>
+            <HelpIcon size={13} color={colors.muted} />
+          </TouchableOpacity>
           {yiStr1 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{yiStr1}</Text> : null}
           {yiStr2 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{yiStr2}</Text> : null}
         </View>
         <View style={[styles.yiJiCol, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.yiJiLabel, { color: colors.jiDark }]}>忌</Text>
+          <TouchableOpacity
+            style={styles.yiJiHead}
+            onPress={() => setGlossaryTerm('ji')}
+            accessibilityRole="button"
+            accessibilityLabel="查看「忌」的說明"
+            activeOpacity={0.6}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={[styles.yiJiLabel, { color: colors.jiDark }]}>忌</Text>
+            <HelpIcon size={13} color={colors.muted} />
+          </TouchableOpacity>
           {jiStr1 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{jiStr1}</Text> : null}
           {jiStr2 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{jiStr2}</Text> : null}
         </View>
       </View>
+
+      <GlossarySheet
+        visible={glossaryTerm !== null}
+        termId={glossaryTerm}
+        items={glossaryItems}
+        onClose={() => setGlossaryTerm(null)}
+      />
     </View>
   );
 }
@@ -89,6 +130,11 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: Radius.md,
     padding: Spacing.md,
+    gap: 6,
+  },
+  yiJiHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
   },
   yiJiLabel: {
