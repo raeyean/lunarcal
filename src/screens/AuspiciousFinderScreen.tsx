@@ -44,6 +44,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const nextStartDate = useRef<Date>(new Date());
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -85,14 +86,22 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
 
     setLoading(true);
     setSearched(true);
+    setSearchError(null);
 
     // Use setTimeout to let the UI update before scanning
     setTimeout(() => {
-      const result = scanChunk(activity, zodiac, today, 30, maxDate);
-      setResults(result.results);
-      setHasMore(result.hasMore);
-      nextStartDate.current = result.nextStartDate;
-      setLoading(false);
+      try {
+        const result = scanChunk(activity, zodiac, today, 30, maxDate);
+        setResults(result.results);
+        setHasMore(result.hasMore);
+        nextStartDate.current = result.nextStartDate;
+      } catch {
+        setSearchError('搜索失敗，請稍後再試');
+        setResults([]);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
     }, 50);
   }, [activity, zodiac, range]);
 
@@ -105,11 +114,17 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
 
     setLoading(true);
     setTimeout(() => {
-      const result = scanChunk(activity, zodiac, nextStartDate.current, 30, maxDate);
-      setResults(prev => [...prev, ...result.results]);
-      setHasMore(result.hasMore);
-      nextStartDate.current = result.nextStartDate;
-      setLoading(false);
+      try {
+        const result = scanChunk(activity, zodiac, nextStartDate.current, 30, maxDate);
+        setResults(prev => [...prev, ...result.results]);
+        setHasMore(result.hasMore);
+        nextStartDate.current = result.nextStartDate;
+      } catch {
+        setSearchError('載入失敗，請稍後再試');
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
     }, 50);
   }, [activity, zodiac, range, loading, hasMore]);
 
@@ -123,6 +138,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
     setResults([]);
     setSearched(false);
     setHasMore(false);
+    setSearchError(null);
     setActivity(null);
     onClose();
   }, [onClose]);
@@ -256,7 +272,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
                 <Text style={[styles.filterChipText, { color: colors.muted }]}>{range} 天</Text>
               </View>
               <IconButton
-                onPress={() => { setSearched(false); setResults([]); setHasMore(false); }}
+                onPress={() => { setSearched(false); setResults([]); setHasMore(false); setSearchError(null); }}
                 accessibilityLabel="修改搜尋條件"
                 variant="ghost"
               >
@@ -264,7 +280,26 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
               </IconButton>
             </View>
 
-            {results.length === 0 && !loading ? (
+            {searchError && !loading ? (
+              <View style={styles.emptyState}>
+                <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
+                  搜索失敗
+                </Text>
+                <Text style={[styles.emptySubtitle, { color: colors.muted }]}>
+                  {searchError}
+                </Text>
+                <TouchableOpacity
+                  style={[styles.retryButton, { backgroundColor: colors.primary }]}
+                  onPress={handleSearch}
+                  accessibilityRole="button"
+                  accessibilityLabel="重試"
+                >
+                  <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>
+                    重試
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : results.length === 0 && !loading ? (
               <View style={styles.emptyState}>
                 <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
                   找不到吉日
@@ -361,6 +396,8 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     paddingVertical: Spacing.md,
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
   },
   rangeText: {
     fontFamily: Fonts.outfitSemiBold,
@@ -424,6 +461,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
+  },
+  retryButton: {
+    marginTop: Spacing.lg,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xxl,
+    borderRadius: Radius.lg,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  retryButtonText: {
+    fontFamily: Fonts.outfitBold,
+    fontSize: 14,
   },
   footer: {
     alignItems: 'center',

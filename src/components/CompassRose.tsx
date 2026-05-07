@@ -25,8 +25,17 @@ export function CompassRose({ directions, size = 200 }: CompassRoseProps) {
   const items = Object.entries(directions);
   const markerColors = [colors.primary, colors.accent, colors.deityShen, colors.deityDao, colors.info];
 
+  const a11yLabel = items.length
+    ? `方位羅盤：${items.map(([name, dir]) => `${name}在${dir}`).join('；')}`
+    : '方位羅盤';
+
   return (
-    <View style={{ alignItems: 'center', paddingVertical: 4 }}>
+    <View
+      style={{ alignItems: 'center', paddingVertical: 4 }}
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel={a11yLabel}
+    >
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <Circle cx={cx} cy={cy} r={r} fill="none" stroke={colors.line} strokeWidth={1} />
         <Circle cx={cx} cy={cy} r={r * 0.66} fill="none" stroke={colors.lineSoft} strokeWidth={0.5} />

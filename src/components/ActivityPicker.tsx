@@ -147,8 +147,10 @@ const styles = StyleSheet.create({
   },
   chip: {
     borderRadius: Radius.lg,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   chipText: {
     fontFamily: Fonts.interMedium,

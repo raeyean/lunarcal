@@ -4,15 +4,29 @@ import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 
-const DAYS = ['日', '一', '二', '三', '四', '五', '六'];
+const DAYS: { short: string; full: string }[] = [
+  { short: '日', full: '星期日' },
+  { short: '一', full: '星期一' },
+  { short: '二', full: '星期二' },
+  { short: '三', full: '星期三' },
+  { short: '四', full: '星期四' },
+  { short: '五', full: '星期五' },
+  { short: '六', full: '星期六' },
+];
 
 export function WeekHeader() {
   const { colors } = useTheme();
 
   return (
-    <View style={styles.container}>
-      {DAYS.map((day) => (
-        <Text key={day} style={[styles.dayText, { color: colors.muted }]}>{day}</Text>
+    <View style={styles.container} accessibilityRole="header">
+      {DAYS.map(({ short, full }) => (
+        <Text
+          key={short}
+          style={[styles.dayText, { color: colors.muted }]}
+          accessibilityLabel={full}
+        >
+          {short}
+        </Text>
       ))}
     </View>
   );

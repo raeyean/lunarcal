@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MonthHeader } from '../components/MonthHeader';
 import { WeekHeader } from '../components/WeekHeader';
 import { CalendarGrid } from '../components/CalendarGrid';
@@ -11,6 +12,8 @@ import { getMonthDays, getChineseMonthName, getDayData } from '../utils/lunar';
 import { Solar } from 'lunar-javascript';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { getPrevMonth, getNextMonth } from '../utils/dateHelpers';
+
+const LEGEND_EXPANDED_KEY = 'lunarcal_legend_expanded';
 
 interface CalendarScreenProps {
   year: number;
@@ -30,6 +33,21 @@ export function CalendarScreen({
 }: CalendarScreenProps) {
   const { colors } = useTheme();
   const [legendExpanded, setLegendExpanded] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem(LEGEND_EXPANDED_KEY).then(val => {
+      if (val === 'true') setLegendExpanded(true);
+    });
+  }, []);
+
+  const toggleLegend = () => {
+    setLegendExpanded(v => {
+      const next = !v;
+      AsyncStorage.setItem(LEGEND_EXPANDED_KEY, next ? 'true' : 'false');
+      return next;
+    });
+  };
+
   const { panHandlers, animatedStyle, triggerPrev, triggerNext, screenWidth } = useSwipeGesture({
     onSwipeLeft: onNextMonth,
     onSwipeRight: onPrevMonth,
@@ -93,7 +111,7 @@ export function CalendarScreen({
         </Animated.View>
       </View>
       <DeityStrip days={currentDeityDays} onSelect={onSelectDay} />
-      <CalendarLegend expanded={legendExpanded} onToggle={() => setLegendExpanded(v => !v)} />
+      <CalendarLegend expanded={legendExpanded} onToggle={toggleLegend} />
       <View style={[styles.divider, { backgroundColor: colors.divider }]} />
       <BottomPanel dayData={selectedDayData} />
     </View>
