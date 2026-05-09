@@ -6,7 +6,7 @@ import { View, Text, StyleSheet, ActivityIndicator, AppState, AppStateStatus, us
 const TextAny = Text as unknown as { defaultProps?: { maxFontSizeMultiplier?: number } };
 TextAny.defaultProps = TextAny.defaultProps || {};
 TextAny.defaultProps.maxFontSizeMultiplier = 1.3;
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import {
   useFonts,
@@ -37,9 +37,12 @@ import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { IconButton } from './src/components/IconButton';
 import { Spacing } from './src/constants/spacing';
 import { Radius } from './src/constants/radius';
+import { LightColors, DarkColors } from './src/constants/colors';
+import { Fonts } from './src/constants/typography';
 
 function AppContent() {
   const { colors, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -216,7 +219,7 @@ function AppContent() {
           onPress={handleGoToday}
           accessibilityLabel="回到今天"
           variant="primary"
-          style={styles.todayFab}
+          style={[styles.todayFab, { bottom: insets.bottom + Spacing.md }]}
         >
           <Text style={[styles.todayText, { color: colors.onPrimary }]}>今天</Text>
         </IconButton>
@@ -241,9 +244,10 @@ export default function App() {
   });
 
   if (!fontsLoaded) {
+    const palette = isDark ? DarkColors : LightColors;
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: isDark ? '#0e0d0b' : '#f6f3ec' }]}>
-        <ActivityIndicator size="large" color={isDark ? '#d4634d' : '#a02617'} />
+      <View style={[styles.loadingContainer, { backgroundColor: palette.background }]}>
+        <ActivityIndicator size="large" color={palette.primary} />
       </View>
     );
   }
@@ -283,7 +287,6 @@ const styles = StyleSheet.create({
   },
   todayFab: {
     position: 'absolute',
-    bottom: 32,
     right: 24,
     borderRadius: Radius.xl,
     paddingVertical: Spacing.md,
@@ -295,7 +298,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   todayText: {
-    fontFamily: 'Outfit_700Bold',
+    fontFamily: Fonts.outfitBold,
     fontSize: 14,
   },
   finderButton: {

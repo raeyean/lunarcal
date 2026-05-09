@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Modal,
   View,
@@ -6,11 +6,15 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
   StyleSheet,
+  Animated,
+  Dimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
-import { Fonts } from '../constants/typography';
+import { Typography, Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { IconButton } from './IconButton';
 import type { ShichenSlot } from '../utils/lunar';
 
 interface ShichenSheetProps {
@@ -20,9 +24,31 @@ interface ShichenSheetProps {
 }
 
 const EXPLAIN = '十二時辰將一晝夜分為十二段，每段兩小時，由地支命名。古人據干支與當日值神判斷吉、凶、中三等，作擇時參考。';
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export function ShichenSheet({ visible, shichen, onClose }: ShichenSheetProps) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const slideAnim = useRef(new Animated.Value(300)).current;
+  const [modalVisible, setModalVisible] = React.useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      setModalVisible(true);
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        useNativeDriver: true,
+        tension: 65,
+        friction: 11,
+      }).start();
+    } else {
+      Animated.timing(slideAnim, {
+        toValue: 300,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => setModalVisible(false));
+    }
+  }, [visible]);
 
   const luckColor = (luck: ShichenSlot['luck']): string =>
     luck === '吉' ? colors.primary : luck === '凶' ? colors.ji : colors.muted;
@@ -30,23 +56,48 @@ export function ShichenSheet({ visible, shichen, onClose }: ShichenSheetProps) {
     luck === '吉' ? colors.primaryLight : luck === '凶' ? colors.badgeBg : colors.surface;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={[styles.backdrop, { backgroundColor: colors.overlay }]} />
-      </TouchableWithoutFeedback>
-      <View style={styles.sheetWrap} pointerEvents="box-none">
-        <View style={[styles.sheet, { backgroundColor: colors.surface, borderColor: colors.line }]}>
-          <View style={styles.handle}>
-            <View style={[styles.handleBar, { backgroundColor: colors.line }]} />
+    <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent>
+      <View style={styles.container}>
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
+        </TouchableWithoutFeedback>
+        <Animated.View
+          style={[
+            styles.sheet,
+            {
+              backgroundColor: colors.background,
+              maxHeight: SCREEN_HEIGHT * 0.8,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          <View style={styles.header}>
+            <Text style={[styles.title, { color: colors.foreground }]}>十二時辰</Text>
+            <IconButton
+              onPress={onClose}
+              accessibilityLabel="關閉"
+              variant="ghost"
+              style={styles.closeButton}
+            >
+              <Text style={[styles.closeGlyph, { color: colors.primary }]}>✕</Text>
+            </IconButton>
           </View>
-          <Text style={[styles.title, { color: colors.foreground }]}>十二時辰</Text>
-          <Text style={[styles.explain, { color: colors.subtleText }]}>{EXPLAIN}</Text>
-
-          <ScrollView style={{ maxHeight: 460 }} showsVerticalScrollIndicator={false}>
-            {shichen.map(s => (
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={{ paddingBottom: Spacing.xl + insets.bottom }}
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={[styles.explain, { color: colors.subtleText }]}>{EXPLAIN}</Text>
+            {shichen.map((s, idx) => (
               <View
                 key={s.name}
-                style={[styles.row, { borderBottomColor: colors.lineSoft }]}
+                style={[
+                  styles.row,
+                  idx < shichen.length - 1 && {
+                    borderBottomColor: colors.lineSoft,
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                  },
+                ]}
               >
                 <View style={styles.rowLeft}>
                   <Text style={[styles.shichenName, { color: colors.foreground }]}>{s.name}</Text>
@@ -62,55 +113,56 @@ export function ShichenSheet({ visible, shichen, onClose }: ShichenSheetProps) {
               </View>
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  sheetWrap: {
-    ...StyleSheet.absoluteFillObject,
+  container: {
+    flex: 1,
     justifyContent: 'flex-end',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
   },
   sheet: {
     borderTopLeftRadius: Radius.xl,
     borderTopRightRadius: Radius.xl,
+    paddingTop: Spacing.lg,
     paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.sm,
-    paddingBottom: Spacing.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderLeftWidth: StyleSheet.hairlineWidth,
-    borderRightWidth: StyleSheet.hairlineWidth,
   },
-  handle: {
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: Spacing.md,
-  },
-  handleBar: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
+    marginBottom: Spacing.md,
   },
   title: {
-    fontFamily: Fonts.outfitExtraBold,
-    fontSize: 22,
-    marginBottom: Spacing.sm,
+    ...Typography.cardTitle,
+  },
+  closeButton: {
+    minWidth: 44,
+    minHeight: 44,
+  },
+  closeGlyph: {
+    fontFamily: Fonts.outfitSemiBold,
+    fontSize: 16,
+  },
+  scroll: {
+    flexGrow: 0,
   },
   explain: {
-    fontFamily: Fonts.interMedium,
-    fontSize: 12,
-    lineHeight: 20,
+    fontFamily: Fonts.inter,
+    fontSize: 15,
+    lineHeight: 24,
     marginBottom: Spacing.lg,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
     gap: Spacing.md,
   },
   rowLeft: {
@@ -139,11 +191,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   luckChip: {
-    minWidth: 36,
+    minWidth: 44,
+    minHeight: 32,
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.xs,
     borderRadius: Radius.sm,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   luckText: {
     fontFamily: Fonts.outfitBold,

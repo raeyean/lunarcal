@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, ScrollView, Animated, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MonthHeader } from '../components/MonthHeader';
 import { EditorialDaily } from '../components/EditorialDaily';
 import { useTheme } from '../context/ThemeContext';
 import { getDayData, getChineseDayName } from '../utils/lunar';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { getPrevDay, getNextDay } from '../utils/dateHelpers';
+import { Spacing } from '../constants/spacing';
 
 interface DailyDetailScreenProps {
   year: number;
@@ -19,6 +21,7 @@ const noop = () => {};
 
 export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: DailyDetailScreenProps) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const { panHandlers, animatedStyle, triggerPrev, triggerNext, screenWidth } = useSwipeGesture({
     onSwipeLeft: onNextDay,
     onSwipeRight: onPrevDay,
@@ -38,8 +41,7 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
         />
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={styles.scrollInner}
-          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xxl }}
         >
           <EditorialDaily day={dayData} />
         </ScrollView>
@@ -69,8 +71,5 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-  },
-  scrollInner: {
-    paddingBottom: 35,
   },
 });
