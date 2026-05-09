@@ -27,7 +27,7 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
   const dateObj = new Date(day.solar.year, day.solar.month - 1, day.solar.day);
   const dateStr = `${day.solar.year}.${String(day.solar.month).padStart(2, '0')}.${String(day.solar.day).padStart(2, '0')}`;
   const yiItems = day.yi.slice(0, 6);
-  const jiItems = day.ji.slice(0, 4);
+  const jiItems = day.ji.slice(0, 6);
 
   const upcoming = useMemo(() => (day.deity ? null : findUpcomingDeity(dateObj, 60)), [day.deity, day.solar.year, day.solar.month, day.solar.day]);
 
