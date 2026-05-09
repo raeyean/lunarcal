@@ -187,7 +187,7 @@ export function GlossarySheet({ visible, termId, items, onClose }: GlossarySheet
                       <Text
                         style={[
                           styles.itemName,
-                          { color: termId === 'ji' ? colors.success : colors.primary },
+                          { color: termId === 'ji' ? colors.ji : colors.primary },
                         ]}
                       >
                         {item.name}

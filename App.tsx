@@ -74,7 +74,11 @@ function AppContent() {
 
   useEffect(() => {
     async function initNotifications() {
-      await scheduleAllLunarNotifications();
+      try {
+        await scheduleAllLunarNotifications();
+      } catch {
+        // notifications unavailable; app continues without them
+      }
       try {
         await BackgroundFetch.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK, {
           minimumInterval: 60 * 60 * 24, // once per day
@@ -91,7 +95,7 @@ function AppContent() {
     // was killed by the OS (common on Android with battery optimisation).
     const subscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
       if (appState.current.match(/inactive|background/) && nextState === 'active') {
-        scheduleAllLunarNotifications();
+        scheduleAllLunarNotifications().catch(() => {});
       }
       appState.current = nextState;
     });
@@ -231,7 +235,7 @@ function AppContent() {
 export default function App() {
   const systemScheme = useColorScheme();
   const isDark = systemScheme === 'dark';
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Outfit_400Regular,
     Outfit_500Medium,
     Outfit_600SemiBold,
@@ -243,7 +247,7 @@ export default function App() {
     Inter_600SemiBold,
   });
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !fontError) {
     const palette = isDark ? DarkColors : LightColors;
     return (
       <View style={[styles.loadingContainer, { backgroundColor: palette.background }]}>
