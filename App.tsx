@@ -7,6 +7,8 @@ const TextAny = Text as unknown as { defaultProps?: { maxFontSizeMultiplier?: nu
 TextAny.defaultProps = TextAny.defaultProps || {};
 TextAny.defaultProps.maxFontSizeMultiplier = 1.3;
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './src/api/queryClient';
 import { StatusBar } from 'expo-status-bar';
 import {
   useFonts,
@@ -30,6 +32,7 @@ import * as BackgroundFetch from 'expo-background-fetch';
 import { scheduleAllLunarNotifications } from './src/utils/lunarNotifications';
 import { BACKGROUND_NOTIFICATION_TASK } from './src/constants/tasks';
 import { SettingsModal } from './src/components/SettingsModal';
+import { DeityListModal } from './src/components/DeityListModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TodayWidget } from './src/components/TodayWidget';
 import { AuspiciousFinderScreen } from './src/screens/AuspiciousFinderScreen';
@@ -52,6 +55,7 @@ function AppContent() {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [showWidget, setShowWidget] = useState(false);
   const [finderVisible, setFinderVisible] = useState(false);
+  const [deityListVisible, setDeityListVisible] = useState(false);
 
   useEffect(() => {
     AsyncStorage.getItem('todayWidgetDismissedDate').then(val => {
@@ -207,6 +211,11 @@ function AppContent() {
       <SettingsModal
         visible={settingsVisible}
         onClose={() => setSettingsVisible(false)}
+        onOpenDeityList={() => setDeityListVisible(true)}
+      />
+      <DeityListModal
+        visible={deityListVisible}
+        onClose={() => setDeityListVisible(false)}
       />
       <TodayWidget
         visible={showWidget}
@@ -257,11 +266,13 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <AppContent />
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </QueryClientProvider>
   );
 }
 

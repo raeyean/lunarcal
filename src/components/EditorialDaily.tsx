@@ -84,6 +84,11 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
                 {it}
               </Text>
             ))}
+            {day.yi.length > 6 && (
+              <Text style={[styles.yijiItem, { color: colors.muted }]}>
+                +{day.yi.length - 6} 更多
+              </Text>
+            )}
           </View>
         </View>
         <View style={styles.yijiColRight}>
@@ -104,6 +109,11 @@ export function EditorialDaily({ day }: EditorialDailyProps) {
                 {it}
               </Text>
             ))}
+            {day.ji.length > 6 && (
+              <Text style={[styles.yijiItem, { color: colors.muted }]}>
+                +{day.ji.length - 6} 更多
+              </Text>
+            )}
           </View>
         </View>
       </View>

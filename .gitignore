@@ -7,6 +7,10 @@ node_modules/
 .expo/
 dist/
 web-build/
+
+# Build outputs
+packages/*/dist/
+apps/*/lib/
 expo-env.d.ts
 
 # Native
@@ -42,3 +46,4 @@ yarn-error.*
 
 # brainstorming session artifacts
 .superpowers/
+.claude/
