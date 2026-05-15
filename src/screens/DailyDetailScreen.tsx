@@ -3,6 +3,7 @@ import { View, ScrollView, Animated, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MonthHeader } from '../components/MonthHeader';
 import { EditorialDaily } from '../components/EditorialDaily';
+import { ApiDemoCard } from '../components/ApiDemoCard';
 import { useTheme } from '../context/ThemeContext';
 import { getDayData, getChineseDayName } from '../utils/lunar';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
@@ -44,6 +45,15 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
           contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xxl }}
         >
           <EditorialDaily day={dayData} />
+          {__DEV__ && isCenter && (
+            <ApiDemoCard
+              year={y}
+              month={m}
+              day={d}
+              lunarMonth={dayData.lunar.monthNum}
+              lunarDay={dayData.lunar.dayNum}
+            />
+          )}
         </ScrollView>
       </View>
     );

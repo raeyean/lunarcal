@@ -93,8 +93,8 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
   );
 
   const { ganzhi, lunar, yi, ji } = today;
-  const yiItems = yi.slice(0, 3);
-  const jiItems = ji.slice(0, 3);
+  const yiItems = yi.slice(0, 6);
+  const jiItems = ji.slice(0, 6);
 
   const gradientColors: [string, string] = isDark
     ? [`${colors.primary}40`, colors.background]
@@ -136,11 +136,11 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
                 {yiItems.map((item, idx) => (
                   <Text key={idx} style={[styles.subCardItem, { color: colors.foreground }]}>{item}</Text>
                 ))}
-                {yi.length > 3 && (
+                {yi.length > 6 && (
                   <MoreChip
-                    count={yi.length - 3}
+                    count={yi.length - 6}
                     onPress={() => {}}
-                    accessibilityLabel={`更多 ${yi.length - 3} 項宜`}
+                    accessibilityLabel={`更多 ${yi.length - 6} 項宜`}
                   />
                 )}
               </View>
@@ -149,11 +149,11 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
                 {jiItems.map((item, idx) => (
                   <Text key={idx} style={[styles.subCardItem, { color: colors.foreground }]}>{item}</Text>
                 ))}
-                {ji.length > 3 && (
+                {ji.length > 6 && (
                   <MoreChip
-                    count={ji.length - 3}
+                    count={ji.length - 6}
                     onPress={() => {}}
-                    accessibilityLabel={`更多 ${ji.length - 3} 項忌`}
+                    accessibilityLabel={`更多 ${ji.length - 6} 項忌`}
                   />
                 )}
               </View>

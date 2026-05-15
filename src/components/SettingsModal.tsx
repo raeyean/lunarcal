@@ -4,6 +4,7 @@ import {
   View,
   Text,
   TouchableWithoutFeedback,
+  TouchableOpacity,
   Switch,
   StyleSheet,
   Platform,
@@ -27,9 +28,10 @@ import { Radius } from '../constants/radius';
 interface SettingsModalProps {
   visible: boolean;
   onClose: () => void;
+  onOpenDeityList?: () => void;
 }
 
-export function SettingsModal({ visible, onClose }: SettingsModalProps) {
+export function SettingsModal({ visible, onClose, onOpenDeityList }: SettingsModalProps) {
   const { colors, isDark, toggleTheme } = useTheme();
   const [settings, setSettings] = useState<NotificationSettings>({
     enabled: false,
@@ -180,6 +182,30 @@ export function SettingsModal({ visible, onClose }: SettingsModalProps) {
                 </>
               )}
             </View>
+          )}
+
+          {onOpenDeityList && (
+            <>
+              <Text style={[styles.sectionHeader, { color: colors.muted }]}>資料</Text>
+              <TouchableOpacity
+                style={[styles.row, { borderBottomColor: colors.divider }]}
+                onPress={() => {
+                  onClose();
+                  // Open deity list after settings sheet finishes closing
+                  setTimeout(onOpenDeityList, 220);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="查看神誕日曆"
+              >
+                <View style={styles.rowLabel}>
+                  <Text style={[styles.rowTitle, { color: colors.foreground }]}>神誕日曆</Text>
+                  <Text style={[styles.rowSubtitle, { color: colors.muted }]}>
+                    瀏覽所有神誕、佛誕、菩薩誕、道誕
+                  </Text>
+                </View>
+                <Text style={[styles.timeText, { color: colors.primary }]}>›</Text>
+              </TouchableOpacity>
+            </>
           )}
         </Animated.View>
       </View>
