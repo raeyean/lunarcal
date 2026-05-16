@@ -46,6 +46,9 @@ export function DeityStrip({ days, onSelect }: DeityStripProps) {
               ]}
               activeOpacity={0.7}
               onPress={() => onSelect?.(d.solar.day)}
+              accessibilityRole="button"
+              accessibilityLabel={`${d.solar.month}月${d.solar.day}日 ${DEITY_LABEL[d.deity.kind]} ${d.deity.deity}`}
+              accessibilityHint="點擊查看當日詳情"
             >
               <View style={styles.cardHead}>
                 <Text style={[styles.dayNum, { color: colors.foreground }]}>{d.solar.day}</Text>

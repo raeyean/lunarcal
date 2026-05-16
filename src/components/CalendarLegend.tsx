@@ -57,7 +57,7 @@ export function CalendarLegend({ expanded, onToggle }: CalendarLegendProps) {
         {legendItems.map((item) => (
           <View key={item.label} style={styles.legendItem}>
             <View style={[styles.dot, { backgroundColor: item.color }]} />
-            <Text style={[styles.legendLabel, { color: colors.subtleText }]}>{item.label}</Text>
+            <Text style={[styles.legendLabel, { color: colors.subtleText }]} numberOfLines={1}>{item.label}</Text>
           </View>
         ))}
         <IconButton
@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
   },
   collapseButton: {
     marginLeft: 'auto',
-    minWidth: 32,
-    minHeight: 32,
+    minWidth: 44,
+    minHeight: 44,
   },
   collapseGlyph: {
     fontSize: 12,

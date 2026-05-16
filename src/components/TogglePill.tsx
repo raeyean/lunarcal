@@ -40,6 +40,9 @@ export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
             { color: isActive ? colors.white : colors.muted },
             isActive && styles.tabTextActive,
           ]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
         >
           {label}
         </Text>
@@ -62,10 +65,11 @@ const styles = StyleSheet.create({
     padding: Spacing.xs,
     maxWidth: 240,
     width: '60%',
-    height: 40,
+    minHeight: 44,
   },
   tab: {
     flex: 1,
+    minHeight: 36,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.xl,

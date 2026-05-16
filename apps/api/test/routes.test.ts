@@ -48,6 +48,26 @@ describe('GET /api/yiji/:y/:m/:d', () => {
     const { status } = await get('/api/yiji/abc/5/15');
     expect([400, 422]).toContain(status);
   });
+
+  it('returns 400 for impossible day-of-month (Feb 30)', async () => {
+    const { status } = await get('/api/yiji/2026/2/30');
+    expect(status).toBe(400);
+  });
+
+  it('returns 400 for impossible day-of-month (Apr 31)', async () => {
+    const { status } = await get('/api/yiji/2026/4/31');
+    expect(status).toBe(400);
+  });
+
+  it('accepts Feb 29 in a leap year', async () => {
+    const { status } = await get('/api/yiji/2028/2/29');
+    expect(status).toBe(200);
+  });
+
+  it('rejects Feb 29 in a non-leap year', async () => {
+    const { status } = await get('/api/yiji/2026/2/29');
+    expect(status).toBe(400);
+  });
 });
 
 describe('GET /api/directions/:y/:m/:d', () => {

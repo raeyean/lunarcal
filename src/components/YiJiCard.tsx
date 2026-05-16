@@ -46,7 +46,7 @@ function YiJiCardInner({ type, items }: YiJiCardProps) {
         <Text style={[styles.title, { color: accentColor }]}>{title}</Text>
       </View>
       {visibleItems.map((item, idx) => (
-        <Text key={idx} style={[styles.item, { color: colors.foreground }]}>{item}</Text>
+        <Text key={`${item}-${idx}`} style={[styles.item, { color: colors.foreground }]}>{item}</Text>
       ))}
       {remaining > 0 ? (
         <MoreChip

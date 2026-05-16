@@ -6,6 +6,7 @@ import { Typography } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { IconButton } from './IconButton';
+import { withOpacity } from '../constants/colorUtils';
 
 interface MonthHeaderProps {
   titleCn: string;
@@ -77,7 +78,7 @@ export function MonthHeader({ titleCn, onPrev, onNext }: MonthHeaderProps) {
             style={[
               styles.hintChip,
               {
-                backgroundColor: colors.muted + '20',
+                backgroundColor: withOpacity(colors.muted, 0.13),
                 opacity: hintOpacity,
               },
             ]}

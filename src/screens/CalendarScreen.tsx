@@ -35,15 +35,19 @@ export function CalendarScreen({
   const [legendExpanded, setLegendExpanded] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(LEGEND_EXPANDED_KEY).then(val => {
-      if (val === 'true') setLegendExpanded(true);
-    });
+    AsyncStorage.getItem(LEGEND_EXPANDED_KEY)
+      .then(val => {
+        if (val === 'true') setLegendExpanded(true);
+      })
+      .catch(err => console.warn('Failed to load legend state:', err));
   }, []);
 
   const toggleLegend = () => {
     setLegendExpanded(v => {
       const next = !v;
-      AsyncStorage.setItem(LEGEND_EXPANDED_KEY, next ? 'true' : 'false');
+      AsyncStorage.setItem(LEGEND_EXPANDED_KEY, next ? 'true' : 'false').catch(err =>
+        console.warn('Failed to save legend state:', err),
+      );
       return next;
     });
   };

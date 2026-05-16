@@ -36,7 +36,6 @@ export function HelpIcon({ size = 16, color }: HelpIconProps) {
           textAlign: 'center',
           includeFontPadding: false,
         }}
-        allowFontScaling={false}
       >
         ?
       </Text>

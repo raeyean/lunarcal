@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, type ViewStyle } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { Radius } from '../constants/radius';
@@ -45,7 +45,7 @@ function CalendarCellInner({
     return <View style={styles.container} />;
   }
 
-  const containerExtra = [] as any[];
+  const containerExtra: ViewStyle[] = [];
   if (isActive) {
     containerExtra.push({ backgroundColor: colors.primary, borderRadius: Radius.md });
   } else {

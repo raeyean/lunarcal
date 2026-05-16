@@ -110,7 +110,10 @@ export function SettingsModal({ visible, onClose, onOpenDeityList }: SettingsMod
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
         </TouchableWithoutFeedback>
-        <Animated.View style={[styles.sheet, { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] }]}>
+        <Animated.View
+          accessibilityViewIsModal
+          style={[styles.sheet, { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] }]}
+        >
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.foreground }]}>設定</Text>
             <IconButton

@@ -11,6 +11,7 @@ import {
   Modal,
   Animated,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
@@ -164,10 +165,13 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
 
   return (
     <Modal visible={modalVisible} animationType="none" transparent>
-      <Animated.View style={[
-        styles.container,
-        { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] },
-      ]}>
+      <Animated.View
+        accessibilityViewIsModal
+        style={[
+          styles.container,
+          { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] },
+        ]}
+      >
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top + Spacing.md }]}>
           <IconButton
@@ -175,7 +179,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
             accessibilityLabel="關閉"
             variant="ghost"
           >
-            <Text style={[styles.closeIcon, { color: colors.muted }]}>{'✕'}</Text>
+            <Ionicons name="close" size={22} color={colors.muted} />
           </IconButton>
           <Text style={[styles.title, { color: colors.foreground }]}>擇吉日</Text>
           <View style={styles.headerSpacer} />
@@ -232,7 +236,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
               {
                 backgroundColor: colors.background,
                 borderTopColor: colors.divider,
-                paddingBottom: insets.bottom + Spacing.md,
+                paddingBottom: Math.max(insets.bottom, Spacing.md) + Spacing.md,
               },
             ]}>
               <TouchableOpacity
@@ -352,10 +356,6 @@ const styles = StyleSheet.create({
   headerSpacer: {
     width: 44,
     height: 44,
-  },
-  closeIcon: {
-    fontSize: 18,
-    fontWeight: '600',
   },
   formContainer: {
     flex: 1,

@@ -8,6 +8,7 @@ import Svg, {
   RadialGradient,
   Stop,
 } from 'react-native-svg';
+import { LightColors, DarkColors } from '../constants/colors';
 
 interface MoonProps {
   /** 0 = 朔 new, 0.25 = 上弦 first quarter, 0.5 = 望 full, 0.75 = 下弦 last quarter. */
@@ -57,9 +58,10 @@ export function Moon({ phase = 0.5, size = 120, animated = false, theme = 'light
   const cx = R, cy = R;
   const ellipseRx = Math.abs(k) * R;
 
-  const lightColor = theme === 'dark' ? '#f4ecd8' : '#fffdf6';
-  const shadowColor = theme === 'dark' ? '#0c0e14' : '#1a1d2a';
-  const rim = theme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
+  const palette = theme === 'dark' ? DarkColors : LightColors;
+  const lightColor = palette.moonSurface;
+  const shadowColor = palette.moonShadow;
+  const rim = palette.moonRim;
 
   // Stable id suffix so multiple moons can coexist without colliding gradients.
   const id = useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -92,7 +94,7 @@ export function Moon({ phase = 0.5, size = 120, animated = false, theme = 'light
         >
           <Stop offset="0%" stopColor={lightColor} stopOpacity={1} />
           <Stop offset="55%" stopColor={lightColor} stopOpacity={0.94} />
-          <Stop offset="100%" stopColor={theme === 'dark' ? '#9a8e6a' : '#d8cda8'} stopOpacity={0.85} />
+          <Stop offset="100%" stopColor={palette.moonShadowSecondary} stopOpacity={0.85} />
         </RadialGradient>
         <RadialGradient id={`glow-${id}`} cx="50%" cy="50%" r="50%">
           <Stop offset="80%" stopColor={lightColor} stopOpacity={0} />
@@ -117,10 +119,10 @@ export function Moon({ phase = 0.5, size = 120, animated = false, theme = 'light
       {litPath ? <Path d={litPath} fill={`url(#light-${id})`} /> : null}
 
       <G opacity={0.18 * litFrac} clipPath={`url(#disc-${id})`}>
-        <Circle cx={cx - R * 0.25} cy={cy - R * 0.2} r={R * 0.18} fill="#5a4f38" />
-        <Circle cx={cx + R * 0.15} cy={cy - R * 0.35} r={R * 0.09} fill="#5a4f38" />
-        <Circle cx={cx + R * 0.3} cy={cy + R * 0.15} r={R * 0.13} fill="#5a4f38" />
-        <Circle cx={cx - R * 0.1} cy={cy + R * 0.3} r={R * 0.1} fill="#5a4f38" />
+        <Circle cx={cx - R * 0.25} cy={cy - R * 0.2} r={R * 0.18} fill={palette.moonCrater} />
+        <Circle cx={cx + R * 0.15} cy={cy - R * 0.35} r={R * 0.09} fill={palette.moonCrater} />
+        <Circle cx={cx + R * 0.3} cy={cy + R * 0.15} r={R * 0.13} fill={palette.moonCrater} />
+        <Circle cx={cx - R * 0.1} cy={cy + R * 0.3} r={R * 0.1} fill={palette.moonCrater} />
       </G>
 
       <Circle cx={cx} cy={cy} r={R - 0.5} fill="none" stroke={rim} strokeWidth={1} />

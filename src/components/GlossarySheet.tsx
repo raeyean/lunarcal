@@ -135,6 +135,7 @@ export function GlossarySheet({ visible, termId, items, onClose }: GlossarySheet
           <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
         </TouchableWithoutFeedback>
         <Animated.View
+          accessibilityViewIsModal
           style={[
             styles.sheet,
             {

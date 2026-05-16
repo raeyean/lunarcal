@@ -60,10 +60,15 @@ function AppContent() {
   const [pendingGlossary, setPendingGlossary] = useState<'yi' | 'ji' | null>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem('todayWidgetDismissedDate').then(val => {
-      const todayStr = new Date().toISOString().split('T')[0];
-      setShowWidget(val !== todayStr);
-    });
+    AsyncStorage.getItem('todayWidgetDismissedDate')
+      .then(val => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        setShowWidget(val !== todayStr);
+      })
+      .catch(err => {
+        console.warn('Failed to load widget dismiss state:', err);
+        setShowWidget(true);
+      });
   }, []);
 
   const handleWidgetDismiss = useCallback(() => {
@@ -72,7 +77,9 @@ function AppContent() {
 
   const handleWidgetDismissToday = useCallback(() => {
     const todayStr = new Date().toISOString().split('T')[0];
-    AsyncStorage.setItem('todayWidgetDismissedDate', todayStr);
+    AsyncStorage.setItem('todayWidgetDismissedDate', todayStr).catch(err =>
+      console.warn('Failed to save widget dismiss state:', err),
+    );
     setShowWidget(false);
   }, []);
 
@@ -101,7 +108,9 @@ function AppContent() {
     // was killed by the OS (common on Android with battery optimisation).
     const subscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
       if (appState.current.match(/inactive|background/) && nextState === 'active') {
-        scheduleAllLunarNotifications().catch(() => {});
+        scheduleAllLunarNotifications().catch(err =>
+          console.warn('Failed to reschedule notifications on resume:', err),
+        );
       }
       appState.current = nextState;
     });
@@ -166,6 +175,8 @@ function AppContent() {
     setActiveTab('daily');
   }, []);
 
+  const handleGlossaryOpened = useCallback(() => setPendingGlossary(null), []);
+
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
@@ -208,7 +219,7 @@ function AppContent() {
             onPrevDay={handlePrevDay}
             onNextDay={handleNextDay}
             openGlossaryTerm={pendingGlossary}
-            onGlossaryOpened={() => setPendingGlossary(null)}
+            onGlossaryOpened={handleGlossaryOpened}
           />
         )}
       </ErrorBoundary>
@@ -240,7 +251,7 @@ function AppContent() {
           onPress={handleGoToday}
           accessibilityLabel="回到今天"
           variant="primary"
-          style={[styles.todayFab, { bottom: insets.bottom + Spacing.md }]}
+          style={[styles.todayFab, { bottom: insets.bottom + Spacing.xl + Spacing.md }]}
         >
           <Text style={[styles.todayText, { color: colors.onPrimary }]}>今天</Text>
         </IconButton>

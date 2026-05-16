@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { withOpacity } from '../constants/colorUtils';
 
 interface MoreChipProps {
   count?: number;
@@ -25,11 +26,16 @@ export function MoreChip({ count, label, onPress, accessibilityLabel }: MoreChip
       accessibilityRole="button"
       style={({ pressed }) => [
         styles.container,
-        { backgroundColor: colors.muted + '20' },
+        { backgroundColor: withOpacity(colors.muted, 0.13) },
         pressed && { opacity: 0.6 },
       ]}
     >
-      <Text style={[styles.text, { color: colors.subtleText }]}>{displayLabel}</Text>
+      <Text
+        style={[styles.text, { color: colors.subtleText }]}
+        numberOfLines={1}
+      >
+        {displayLabel}
+      </Text>
     </Pressable>
   );
 }
@@ -39,6 +45,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.md,
+    minHeight: 44,
     alignSelf: 'flex-start',
     alignItems: 'center',
     justifyContent: 'center',

@@ -65,7 +65,9 @@ export function getUpcomingLunarDates(): LunarDate[] {
             label: `農曆${LUNAR_MONTH_NAMES[lunarMonth]}月${dayName}`,
           });
         }
-      } catch {
+      } catch (err) {
+        // lunar-javascript throws for invalid lunar dates (e.g. leap-month edge cases)
+        console.warn(`Skipping invalid lunar date ${lunarYear}/${lunarMonth}/${lunarDay}:`, err);
         continue;
       }
     }

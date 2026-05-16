@@ -9,12 +9,14 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDeityList } from '../api/hooks';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { deityColor, DEITY_LABEL, type DeityKind } from '../constants/colors';
+import { withOpacity } from '../constants/colorUtils';
 import { IconButton } from './IconButton';
 
 interface DeityListModalProps {
@@ -32,6 +34,7 @@ interface DeityRow {
 
 export function DeityListModal({ visible, onClose }: DeityListModalProps) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(1000)).current;
 
@@ -74,6 +77,7 @@ export function DeityListModal({ visible, onClose }: DeityListModalProps) {
           <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
         </TouchableWithoutFeedback>
         <Animated.View
+          accessibilityViewIsModal
           style={[
             styles.sheet,
             { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] },
@@ -115,7 +119,10 @@ export function DeityListModal({ visible, onClose }: DeityListModalProps) {
               renderItem={({ item }) => (
                 <DeityRowView item={item} colors={colors} />
               )}
-              contentContainerStyle={styles.listContent}
+              contentContainerStyle={[
+                styles.listContent,
+                { paddingBottom: insets.bottom + Spacing.xxl },
+              ]}
               ItemSeparatorComponent={() => (
                 <View style={[styles.divider, { backgroundColor: colors.divider }]} />
               )}
@@ -136,7 +143,7 @@ function DeityRowView({ item, colors }: DeityRowViewProps) {
   const accent = deityColor(item.kind, colors);
   return (
     <View style={styles.row}>
-      <View style={[styles.datePill, { backgroundColor: accent + '20' }]}>
+      <View style={[styles.datePill, { backgroundColor: withOpacity(accent, 0.13) }]}>
         <Text style={[Typography.bodyMedium, { color: accent }]}>
           {item.lunarMonth}.{item.lunarDay}
         </Text>
@@ -160,6 +167,7 @@ const styles = StyleSheet.create({
   overlay: { ...StyleSheet.absoluteFillObject },
   sheet: {
     height: '85%',
+    maxHeight: '85%',
     borderTopLeftRadius: Radius.xl,
     borderTopRightRadius: Radius.xl,
     paddingTop: Spacing.lg,

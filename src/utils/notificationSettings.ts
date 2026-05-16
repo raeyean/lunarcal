@@ -17,7 +17,13 @@ const DEFAULT_SETTINGS: NotificationSettings = {
 export async function getNotificationSettings(): Promise<NotificationSettings> {
   const raw = await AsyncStorage.getItem(STORAGE_KEY);
   if (!raw) return DEFAULT_SETTINGS;
-  return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+  try {
+    const parsed = JSON.parse(raw);
+    return { ...DEFAULT_SETTINGS, ...parsed };
+  } catch (err) {
+    console.warn('Failed to parse notification settings; using defaults:', err);
+    return DEFAULT_SETTINGS;
+  }
 }
 
 export async function saveNotificationSettings(settings: NotificationSettings): Promise<void> {

@@ -30,8 +30,8 @@ const byDateRoute = createRoute({
   description: 'Returns the deity for the given lunar month + day, or null if none.',
   request: {
     params: z.object({
-      lunarMonth: z.string().openapi({ example: '2' }),
-      lunarDay: z.string().openapi({ example: '19' }),
+      lunarMonth: z.coerce.number().int().openapi({ example: 2 }),
+      lunarDay: z.coerce.number().int().openapi({ example: 19 }),
     }),
   },
   responses: {
@@ -59,14 +59,12 @@ deity.openapi(listRoute, (c) => {
 
 deity.openapi(byDateRoute, (c) => {
   const { lunarMonth, lunarDay } = c.req.valid('param');
-  const lm = parseInt(lunarMonth, 10);
-  const ld = parseInt(lunarDay, 10);
 
-  if (isNaN(lm) || isNaN(ld) || lm < 1 || lm > 12 || ld < 1 || ld > 30) {
+  if (lunarMonth < 1 || lunarMonth > 12 || lunarDay < 1 || lunarDay > 30) {
     return c.json({ error: 'Invalid lunar date' }, 400);
   }
 
-  const day = getDeityDay(lm, ld);
+  const day = getDeityDay(lunarMonth, lunarDay);
   c.header('Cache-Control', 'public, max-age=604800, immutable');
   return c.json({ deity: day }, 200);
 });
