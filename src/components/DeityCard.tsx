@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { DEITY_LABEL, deityColor, type DeityKind } from '../constants/colors';
+import { withOpacity } from '../constants/colorUtils';
 import type { DeityDay } from '../data/deityDays';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
@@ -18,9 +19,9 @@ export function DeityCard({ deity, practices = '宜焚香 · 誦經 · 布施 ·
   const { colors } = useTheme();
   const c = deityColor(deity.kind, colors);
   return (
-    <View style={[styles.wrap, { backgroundColor: c + '1a', borderColor: c + '33' }]}>
+    <View style={[styles.wrap, { backgroundColor: withOpacity(c, 0.1), borderColor: withOpacity(c, 0.2) }]}>
       <View style={[styles.badge, { backgroundColor: c }]}>
-        <Text style={styles.glyph}>{deity.deity[0]}</Text>
+        <Text style={[styles.glyph, { color: colors.onPrimary }]}>{deity.deity[0]}</Text>
       </View>
       <View style={styles.body}>
         <Text style={[styles.kicker, { color: c }]}>
@@ -45,7 +46,7 @@ export function UpcomingDeity({ deity, daysAway, lunarLabel }: UpcomingDeityProp
   const { colors } = useTheme();
   const c = deityColor(deity.kind, colors);
   return (
-    <View style={[styles.upcomingWrap, { borderColor: c + '99' }]}>
+    <View style={[styles.upcomingWrap, { borderColor: withOpacity(c, 0.6) }]}>
       <View style={[styles.upcomingBadge, { borderColor: c }]}>
         <Text style={[styles.upcomingGlyph, { color: c }]}>{deity.deity[0]}</Text>
       </View>
@@ -77,7 +78,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   glyph: {
-    color: '#fff',
     fontSize: 22,
     fontFamily: Fonts.outfitExtraBold,
   },

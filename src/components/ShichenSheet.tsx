@@ -62,6 +62,7 @@ export function ShichenSheet({ visible, shichen, onClose }: ShichenSheetProps) {
           <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
         </TouchableWithoutFeedback>
         <Animated.View
+          accessibilityViewIsModal
           style={[
             styles.sheet,
             {

@@ -16,6 +16,7 @@ import { getDayData } from '../utils/lunar';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { withOpacity } from '../constants/colorUtils';
 import { DragHandle } from './DragHandle';
 import { MoreChip } from './MoreChip';
 
@@ -27,7 +28,7 @@ interface TodayWidgetProps {
 }
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const DISMISS_THRESHOLD = 150;
+const DISMISS_THRESHOLD = 200;
 
 export function TodayWidget({ visible, onDismiss, onDismissToday, onOpenGlossary }: TodayWidgetProps) {
   const { colors, isDark } = useTheme();
@@ -101,8 +102,8 @@ export function TodayWidget({ visible, onDismiss, onDismissToday, onOpenGlossary
     ? [colors.primaryLight, colors.surfaceElevated]
     : [colors.primaryLight, colors.background];
 
-  const subCardYiBg = isDark ? colors.primaryLight : `${colors.primary}14`;
-  const subCardYiBorder = `${colors.primary}${isDark ? '60' : '33'}`;
+  const subCardYiBg = isDark ? colors.primaryLight : withOpacity(colors.primary, 0.08);
+  const subCardYiBorder = withOpacity(colors.primary, isDark ? 0.38 : 0.2);
   const subCardJiBg = isDark ? colors.chip : colors.subtleSurface;
   const subCardJiBorder = isDark ? colors.divider : colors.subtleBorder;
 
@@ -114,6 +115,7 @@ export function TodayWidget({ visible, onDismiss, onDismissToday, onOpenGlossary
         </TouchableWithoutFeedback>
         <Animated.View
           accessible={true}
+          accessibilityViewIsModal
           accessibilityLabel="今日一覽"
           accessibilityHint="向下滑動關閉"
           style={[styles.cardWrapper, { transform: [{ translateY }], opacity: animatedOpacity }]}
@@ -135,12 +137,12 @@ export function TodayWidget({ visible, onDismiss, onDismissToday, onOpenGlossary
               <View style={[styles.subCard, { backgroundColor: subCardYiBg, borderColor: subCardYiBorder }]}>
                 <Text style={[styles.subCardTitle, { color: colors.primary }]}>宜</Text>
                 {yiItems.map((item, idx) => (
-                  <Text key={idx} style={[styles.subCardItem, { color: colors.foreground }]}>{item}</Text>
+                  <Text key={`${item}-${idx}`} style={[styles.subCardItem, { color: colors.foreground }]}>{item}</Text>
                 ))}
                 {yi.length > 6 && (
                   <MoreChip
                     count={yi.length - 6}
-                    onPress={() => { onDismiss(); onOpenGlossary?.('yi'); }}
+                    onPress={() => { onOpenGlossary?.('yi'); onDismiss(); }}
                     accessibilityLabel={`更多 ${yi.length - 6} 項宜`}
                   />
                 )}
@@ -148,12 +150,12 @@ export function TodayWidget({ visible, onDismiss, onDismissToday, onOpenGlossary
               <View style={[styles.subCard, { backgroundColor: subCardJiBg, borderColor: subCardJiBorder }]}>
                 <Text style={[styles.subCardTitle, { color: colors.jiDark }]}>忌</Text>
                 {jiItems.map((item, idx) => (
-                  <Text key={idx} style={[styles.subCardItem, { color: colors.foreground }]}>{item}</Text>
+                  <Text key={`${item}-${idx}`} style={[styles.subCardItem, { color: colors.foreground }]}>{item}</Text>
                 ))}
                 {ji.length > 6 && (
                   <MoreChip
                     count={ji.length - 6}
-                    onPress={() => { onDismiss(); onOpenGlossary?.('ji'); }}
+                    onPress={() => { onOpenGlossary?.('ji'); onDismiss(); }}
                     accessibilityLabel={`更多 ${ji.length - 6} 項忌`}
                   />
                 )}

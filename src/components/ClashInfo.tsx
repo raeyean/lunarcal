@@ -14,8 +14,12 @@ export function ClashInfo({ emoji, label }: ClashInfoProps) {
   const { colors } = useTheme();
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.surface }]}>
-      <Text style={styles.emoji}>{emoji}</Text>
+    <View
+      style={[styles.container, { backgroundColor: colors.surface }]}
+      accessible
+      accessibilityLabel={`${emoji} ${label}`}
+    >
+      <Text style={styles.emoji} accessibilityElementsHidden importantForAccessibility="no">{emoji}</Text>
       <Text style={[styles.label, { color: colors.subtleText }]}>{label}</Text>
     </View>
   );

@@ -32,7 +32,7 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
       setGlossaryTerm(openGlossaryTerm);
       onGlossaryOpened?.();
     }
-  }, [openGlossaryTerm]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [openGlossaryTerm, onGlossaryOpened]);
   const dateObj = new Date(day.solar.year, day.solar.month - 1, day.solar.day);
   const dateStr = `${day.solar.year}.${String(day.solar.month).padStart(2, '0')}.${String(day.solar.day).padStart(2, '0')}`;
   const yiItems = day.yi.slice(0, 6);
@@ -212,7 +212,7 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.foreground, marginBottom: 8 }]}>彭祖百忌</Text>
         {day.pengzu.map((line, i) => (
-          <Text key={i} style={[styles.pengzuLine, { color: colors.subtleText }]}>· {line}</Text>
+          <Text key={`${line}-${i}`} style={[styles.pengzuLine, { color: colors.subtleText }]}>· {line}</Text>
         ))}
       </View>
 

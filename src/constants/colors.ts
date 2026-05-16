@@ -62,6 +62,13 @@ export const LightColors = {
   deityPusa: '#a02617',         // 菩萨诞 — vermilion
   deityShen: '#3d6b4a',         // 神诞 — deep jade
   deityDao: '#6b3d6b',          // 道诞 — plum
+
+  // moon (SVG) tokens
+  moonSurface: '#fffdf6',
+  moonShadow: '#1a1d2a',
+  moonShadowSecondary: '#d8cda8',
+  moonRim: 'rgba(0,0,0,0.08)',
+  moonCrater: '#5a4f38',
 } as const;
 
 export const DarkColors: ThemeColors = {
@@ -116,6 +123,12 @@ export const DarkColors: ThemeColors = {
   deityPusa: '#d4634d',
   deityShen: '#86c79a',
   deityDao: '#b48ec0',
+
+  moonSurface: '#f4ecd8',
+  moonShadow: '#0c0e14',
+  moonShadowSecondary: '#9a8e6a',
+  moonRim: 'rgba(255,255,255,0.12)',
+  moonCrater: '#5a4f38',
 } as const;
 
 // Keep backwards-compatible export for any remaining static references

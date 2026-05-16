@@ -20,7 +20,7 @@ export function FestivalBanner({ festivals, onPressFestival }: FestivalBannerPro
     <View style={[styles.container, { backgroundColor: colors.festivalLight }]}>
       {festivals.map((name, i) => (
         <TouchableOpacity
-          key={i}
+          key={`${name}-${i}`}
           style={styles.row}
           onPress={() => onPressFestival?.(name)}
           activeOpacity={0.6}

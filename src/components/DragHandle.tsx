@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Radius } from '../constants/radius';
+import { withOpacity } from '../constants/colorUtils';
 
 interface DragHandleProps {
   style?: ViewStyle;
@@ -12,7 +13,7 @@ export function DragHandle({ style }: DragHandleProps) {
 
   return (
     <View style={[styles.wrapper, style]} accessible={false}>
-      <View style={[styles.handle, { backgroundColor: colors.muted + '80' }]} />
+      <View style={[styles.handle, { backgroundColor: withOpacity(colors.muted, 0.5) }]} />
     </View>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, type DimensionValue } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
@@ -23,7 +23,7 @@ interface ZodiacPickerProps {
 export function ZodiacPicker({ selected, onSelect, compact = false }: ZodiacPickerProps) {
   const { colors } = useTheme();
 
-  const cellWidth = compact ? '23%' : '23%';
+  const cellWidth: DimensionValue = '23%';
   const emojiSize = compact ? 20 : 24;
   const labelSize = compact ? 12 : 13;
 
@@ -36,14 +36,14 @@ export function ZodiacPicker({ selected, onSelect, compact = false }: ZodiacPick
             key={name}
             style={[
               styles.cell,
-              { width: cellWidth as any },
+              { width: cellWidth },
               { backgroundColor: isSelected ? colors.primaryLight : colors.surface },
               isSelected && { borderColor: colors.primary, borderWidth: 2 },
             ]}
             onPress={() => onSelect(name)}
             activeOpacity={0.6}
             accessibilityRole="button"
-            accessibilityLabel={`生肖 ${name}`}
+            accessibilityLabel={`生肖 ${emoji} ${name}`}
             accessibilityState={{ selected: isSelected }}
           >
             <Text style={[styles.emoji, { fontSize: emojiSize }]}>{emoji}</Text>

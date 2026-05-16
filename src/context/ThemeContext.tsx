@@ -22,16 +22,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mode, setModeState] = useState<ThemeMode>('system');
 
   useEffect(() => {
-    AsyncStorage.getItem(THEME_STORAGE_KEY).then(saved => {
-      if (saved === 'light' || saved === 'dark' || saved === 'system') {
-        setModeState(saved);
-      }
-    });
+    AsyncStorage.getItem(THEME_STORAGE_KEY)
+      .then(saved => {
+        if (saved === 'light' || saved === 'dark' || saved === 'system') {
+          setModeState(saved);
+        }
+      })
+      .catch(err => console.warn('Failed to load theme preference:', err));
   }, []);
 
   const setMode = useCallback((newMode: ThemeMode) => {
     setModeState(newMode);
-    AsyncStorage.setItem(THEME_STORAGE_KEY, newMode);
+    AsyncStorage.setItem(THEME_STORAGE_KEY, newMode).catch(err =>
+      console.warn('Failed to save theme preference:', err),
+    );
   }, []);
 
   const isDark = mode === 'system' ? systemScheme === 'dark' : mode === 'dark';

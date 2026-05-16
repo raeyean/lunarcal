@@ -39,17 +39,24 @@ export function ClashSection({ animal, emoji, description, direction, element, t
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then((v) => {
-      if (v === '1') setExpanded(true);
-      setHydrated(true);
-    });
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then((v) => {
+        if (v === '1') setExpanded(true);
+        setHydrated(true);
+      })
+      .catch(err => {
+        console.warn('Failed to load clash section state:', err);
+        setHydrated(true);
+      });
   }, []);
 
   const toggle = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     const next = !expanded;
     setExpanded(next);
-    AsyncStorage.setItem(STORAGE_KEY, next ? '1' : '0');
+    AsyncStorage.setItem(STORAGE_KEY, next ? '1' : '0').catch(err =>
+      console.warn('Failed to save clash section state:', err),
+    );
   };
 
   const summary = `${animal} · ${direction}`;

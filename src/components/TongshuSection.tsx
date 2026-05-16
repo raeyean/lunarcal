@@ -51,7 +51,7 @@ function TagRow({ label, items, color }: { label: string; items: string[]; color
       <Text style={[styles.tagLabel, { color: colors.subtleText }]}>{label}</Text>
       <View style={styles.tagRow}>
         {items.map((item, idx) => (
-          <View key={idx} style={[styles.tag, { backgroundColor: color || colors.badgeBg }]}>
+          <View key={`${item}-${idx}`} style={[styles.tag, { backgroundColor: color || colors.badgeBg }]}>
             <Text style={[styles.tagText, { color: color ? colors.white : colors.foreground }]}>{item}</Text>
           </View>
         ))}
@@ -75,17 +75,24 @@ function CollapsibleCard({ cardKey, title, summary, termId, onOpenGlossary, chil
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_PREFIX + cardKey).then((v) => {
-      if (v === '1') setExpanded(true);
-      setHydrated(true);
-    });
+    AsyncStorage.getItem(STORAGE_PREFIX + cardKey)
+      .then((v) => {
+        if (v === '1') setExpanded(true);
+        setHydrated(true);
+      })
+      .catch(err => {
+        console.warn(`Failed to load tongshu card state (${cardKey}):`, err);
+        setHydrated(true);
+      });
   }, [cardKey]);
 
   const toggle = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     const next = !expanded;
     setExpanded(next);
-    AsyncStorage.setItem(STORAGE_PREFIX + cardKey, next ? '1' : '0');
+    AsyncStorage.setItem(STORAGE_PREFIX + cardKey, next ? '1' : '0').catch(err =>
+      console.warn(`Failed to save tongshu card state (${cardKey}):`, err),
+    );
   };
 
   if (!hydrated) {
