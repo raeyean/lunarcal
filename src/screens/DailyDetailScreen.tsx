@@ -16,11 +16,13 @@ interface DailyDetailScreenProps {
   day: number;
   onPrevDay: () => void;
   onNextDay: () => void;
+  openGlossaryTerm?: 'yi' | 'ji' | null;
+  onGlossaryOpened?: () => void;
 }
 
 const noop = () => {};
 
-export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: DailyDetailScreenProps) {
+export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay, openGlossaryTerm, onGlossaryOpened }: DailyDetailScreenProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { panHandlers, animatedStyle, triggerPrev, triggerNext, screenWidth } = useSwipeGesture({
@@ -44,7 +46,11 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay }: Da
           style={styles.scrollView}
           contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xxl }}
         >
-          <EditorialDaily day={dayData} />
+          <EditorialDaily
+              day={dayData}
+              openGlossaryTerm={isCenter ? openGlossaryTerm : null}
+              onGlossaryOpened={isCenter ? onGlossaryOpened : undefined}
+            />
           {__DEV__ && isCenter && (
             <ApiDemoCard
               year={y}

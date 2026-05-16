@@ -23,12 +23,13 @@ interface TodayWidgetProps {
   visible: boolean;
   onDismiss: () => void;
   onDismissToday: () => void;
+  onOpenGlossary?: (term: 'yi' | 'ji') => void;
 }
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const DISMISS_THRESHOLD = 150;
 
-export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetProps) {
+export function TodayWidget({ visible, onDismiss, onDismissToday, onOpenGlossary }: TodayWidgetProps) {
   const { colors, isDark } = useTheme();
   const translateY = useRef(new Animated.Value(0)).current;
   const dismissRef = useRef(onDismiss);
@@ -97,13 +98,13 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
   const jiItems = ji.slice(0, 6);
 
   const gradientColors: [string, string] = isDark
-    ? [`${colors.primary}40`, colors.background]
+    ? [colors.primaryLight, colors.surfaceElevated]
     : [colors.primaryLight, colors.background];
 
-  const subCardYiBg = `${colors.primary}${isDark ? '1F' : '14'}`;
-  const subCardYiBorder = `${colors.primary}${isDark ? '40' : '33'}`;
-  const subCardJiBg = colors.subtleSurface;
-  const subCardJiBorder = colors.subtleBorder;
+  const subCardYiBg = isDark ? colors.primaryLight : `${colors.primary}14`;
+  const subCardYiBorder = `${colors.primary}${isDark ? '60' : '33'}`;
+  const subCardJiBg = isDark ? colors.chip : colors.subtleSurface;
+  const subCardJiBorder = isDark ? colors.divider : colors.subtleBorder;
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -139,7 +140,7 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
                 {yi.length > 6 && (
                   <MoreChip
                     count={yi.length - 6}
-                    onPress={() => {}}
+                    onPress={() => { onDismiss(); onOpenGlossary?.('yi'); }}
                     accessibilityLabel={`更多 ${yi.length - 6} 項宜`}
                   />
                 )}
@@ -152,7 +153,7 @@ export function TodayWidget({ visible, onDismiss, onDismissToday }: TodayWidgetP
                 {ji.length > 6 && (
                   <MoreChip
                     count={ji.length - 6}
-                    onPress={() => {}}
+                    onPress={() => { onDismiss(); onOpenGlossary?.('ji'); }}
                     accessibilityLabel={`更多 ${ji.length - 6} 項忌`}
                   />
                 )}

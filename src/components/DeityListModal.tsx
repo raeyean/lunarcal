@@ -40,6 +40,7 @@ export function DeityListModal({ visible, onClose }: DeityListModalProps) {
   useEffect(() => {
     if (visible) {
       setModalVisible(true);
+      slideAnim.stopAnimation();
       Animated.spring(slideAnim, {
         toValue: 0,
         useNativeDriver: true,
@@ -47,11 +48,14 @@ export function DeityListModal({ visible, onClose }: DeityListModalProps) {
         friction: 11,
       }).start();
     } else {
+      slideAnim.stopAnimation();
       Animated.timing(slideAnim, {
         toValue: 1000,
         duration: 200,
         useNativeDriver: true,
-      }).start(() => setModalVisible(false));
+      }).start(({ finished }) => {
+        if (finished) setModalVisible(false);
+      });
     }
   }, [visible, slideAnim]);
 
