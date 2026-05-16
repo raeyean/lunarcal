@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
@@ -15,15 +15,24 @@ import { findUpcomingDeity, type DayData } from '../utils/lunar';
 
 interface EditorialDailyProps {
   day: DayData;
+  openGlossaryTerm?: 'yi' | 'ji' | null;
+  onGlossaryOpened?: () => void;
 }
 
 const WK = ['日', '一', '二', '三', '四', '五', '六'];
 
 /** Editorial daily-view body — large lunar numeral hero, hairline-divided sections. */
-export function EditorialDaily({ day }: EditorialDailyProps) {
+export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: EditorialDailyProps) {
   const { colors, isDark } = useTheme();
   const [shichenOpen, setShichenOpen] = useState(false);
   const [glossaryTerm, setGlossaryTerm] = useState<GlossaryTermId | null>(null);
+
+  useEffect(() => {
+    if (openGlossaryTerm) {
+      setGlossaryTerm(openGlossaryTerm);
+      onGlossaryOpened?.();
+    }
+  }, [openGlossaryTerm]); // eslint-disable-line react-hooks/exhaustive-deps
   const dateObj = new Date(day.solar.year, day.solar.month - 1, day.solar.day);
   const dateStr = `${day.solar.year}.${String(day.solar.month).padStart(2, '0')}.${String(day.solar.day).padStart(2, '0')}`;
   const yiItems = day.yi.slice(0, 6);

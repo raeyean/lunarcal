@@ -38,6 +38,7 @@ import { TodayWidget } from './src/components/TodayWidget';
 import { AuspiciousFinderScreen } from './src/screens/AuspiciousFinderScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { IconButton } from './src/components/IconButton';
+import { Ionicons } from '@expo/vector-icons';
 import { Spacing } from './src/constants/spacing';
 import { Radius } from './src/constants/radius';
 import { LightColors, DarkColors } from './src/constants/colors';
@@ -56,6 +57,7 @@ function AppContent() {
   const [showWidget, setShowWidget] = useState(false);
   const [finderVisible, setFinderVisible] = useState(false);
   const [deityListVisible, setDeityListVisible] = useState(false);
+  const [pendingGlossary, setPendingGlossary] = useState<'yi' | 'ji' | null>(null);
 
   useEffect(() => {
     AsyncStorage.getItem('todayWidgetDismissedDate').then(val => {
@@ -174,7 +176,7 @@ function AppContent() {
           variant="ghost"
           style={styles.themeButton}
         >
-          <Text style={[styles.themeIcon, { color: colors.muted }]}>{'⚙'}</Text>
+          <Ionicons name="settings-outline" size={20} color={colors.muted} />
         </IconButton>
         <TogglePill activeTab={activeTab} onToggle={handleToggle} />
         <IconButton
@@ -183,7 +185,7 @@ function AppContent() {
           variant="ghost"
           style={styles.finderButton}
         >
-          <Text style={[styles.themeIcon, { color: colors.muted }]}>{'🧭'}</Text>
+          <Ionicons name="search-outline" size={20} color={colors.muted} />
         </IconButton>
       </View>
       <ErrorBoundary>
@@ -205,6 +207,8 @@ function AppContent() {
             day={selectedDay}
             onPrevDay={handlePrevDay}
             onNextDay={handleNextDay}
+            openGlossaryTerm={pendingGlossary}
+            onGlossaryOpened={() => setPendingGlossary(null)}
           />
         )}
       </ErrorBoundary>
@@ -221,6 +225,10 @@ function AppContent() {
         visible={showWidget}
         onDismiss={handleWidgetDismiss}
         onDismissToday={handleWidgetDismissToday}
+        onOpenGlossary={(term) => {
+          setActiveTab('daily');
+          setPendingGlossary(term);
+        }}
       />
       <AuspiciousFinderScreen
         visible={finderVisible}
@@ -296,9 +304,6 @@ const styles = StyleSheet.create({
   themeButton: {
     position: 'absolute',
     left: 24,
-  },
-  themeIcon: {
-    fontSize: 20,
   },
   todayFab: {
     position: 'absolute',

@@ -46,6 +46,7 @@ export function SettingsModal({ visible, onClose, onOpenDeityList }: SettingsMod
     if (visible) {
       setModalVisible(true);
       getNotificationSettings().then(setSettings);
+      slideAnim.stopAnimation();
       Animated.spring(slideAnim, {
         toValue: 0,
         useNativeDriver: true,
@@ -53,11 +54,14 @@ export function SettingsModal({ visible, onClose, onOpenDeityList }: SettingsMod
         friction: 11,
       }).start();
     } else {
+      slideAnim.stopAnimation();
       Animated.timing(slideAnim, {
         toValue: 300,
         duration: 200,
         useNativeDriver: true,
-      }).start(() => setModalVisible(false));
+      }).start(({ finished }) => {
+        if (finished) setModalVisible(false);
+      });
     }
   }, [visible, slideAnim]);
 
