@@ -14,7 +14,8 @@
     "lint": "expo lint",
     "build:api": "npm run build -w @lunarcal/api",
     "dev:api": "npm run build:watch -w @lunarcal/api",
-    "emulator": "npm run build:api && firebase emulators:start --only functions"
+    "emulator": "npm run build:api && firebase emulators:start --only functions",
+    "test": "npm run test -w @lunarcal/api && npm run test -w @lunarcal/shared"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
