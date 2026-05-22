@@ -35,6 +35,14 @@ describe('BirthProfileSchema', () => {
   it('rejects unexpected gender values', () => {
     expect(BirthProfileSchema.safeParse({ ...validProfile, gender: 'other' }).success).toBe(false);
   });
+
+  it('rejects malformed solarTime', () => {
+    expect(BirthProfileSchema.safeParse({ ...validProfile, solarTime: '1430' }).success).toBe(false);
+  });
+
+  it('rejects non-string solarTime that is not null', () => {
+    expect(BirthProfileSchema.safeParse({ ...validProfile, solarTime: 'abc' }).success).toBe(false);
+  });
 });
 
 const validSaved = {
@@ -55,6 +63,10 @@ describe('SavedDateSchema', () => {
 
   it('rejects malformed id', () => {
     expect(SavedDateSchema.safeParse({ ...validSaved, id: 'not-a-uuid' }).success).toBe(false);
+  });
+
+  it('rejects label longer than 50 characters', () => {
+    expect(SavedDateSchema.safeParse({ ...validSaved, label: 'a'.repeat(51) }).success).toBe(false);
   });
 });
 

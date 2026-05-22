@@ -1,18 +1,5 @@
-export interface BirthProfile {
-  version: 1;
-  solarDate: string;                   // 'YYYY-MM-DD' Gregorian
-  solarTime: string | null;            // 'HH:mm' 24h, null = 時辰未知
-  gender: 'male' | 'female' | null;    // null = unspecified
-  createdAt: string;                   // ISO
-  updatedAt: string;                   // ISO
-}
-
-export interface SavedDate {
-  id: string;
-  label: string;
-  solarDate: string;                   // 'YYYY-MM-DD'
-  createdAt: string;                   // ISO
-}
+import type { BirthProfile, SavedDate } from '../schemas/profile';
+export type { BirthProfile, SavedDate };
 
 export interface BaziPillar {
   gan: string;

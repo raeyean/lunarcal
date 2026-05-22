@@ -1,3 +1,13 @@
+/**
+ * Zod schemas for locally-persisted profile data.
+ *
+ * Note: solarDate/solarTime regexes validate FORMAT only, not calendar validity.
+ * Semantic validation (e.g. month <= 12, hour <= 23) is the responsibility of
+ * computeBazi (see packages/shared/src/bazi/compute.ts).
+ *
+ * The inferred types (BirthProfile, SavedDate) are the canonical type definitions
+ * for these shapes — bazi/types.ts re-exports them.
+ */
 import { z } from 'zod';
 
 export const BirthProfileSchema = z.object({
@@ -18,5 +28,5 @@ export const SavedDateSchema = z.object({
 
 export const SavedDatesArraySchema = z.array(SavedDateSchema);
 
-export type BirthProfileInput = z.infer<typeof BirthProfileSchema>;
-export type SavedDateInput = z.infer<typeof SavedDateSchema>;
+export type BirthProfile = z.infer<typeof BirthProfileSchema>;
+export type SavedDate = z.infer<typeof SavedDateSchema>;
