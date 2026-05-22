@@ -28,6 +28,7 @@ import { CalendarScreen } from './src/screens/CalendarScreen';
 import { DailyDetailScreen } from './src/screens/DailyDetailScreen';
 import { TogglePill } from './src/components/TogglePill';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { BirthProfileProvider } from './src/context/BirthProfileContext';
 import * as BackgroundFetch from 'expo-background-fetch';
 import { scheduleAllLunarNotifications } from './src/utils/lunarNotifications';
 import { BACKGROUND_NOTIFICATION_TASK } from './src/constants/tasks';
@@ -288,7 +289,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <AppContent />
+          <BirthProfileProvider>
+            <AppContent />
+          </BirthProfileProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </QueryClientProvider>
