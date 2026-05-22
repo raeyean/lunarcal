@@ -76,4 +76,17 @@ describe('computeBazi — pillars', () => {
   it('throws BaziError INVALID_DATE for malformed solarDate', () => {
     expect(() => computeBazi(profile({ solarDate: 'not-a-date' }))).toThrow(BaziError);
   });
+
+  it('throws BaziError INVALID_TIME for malformed solarTime', () => {
+    expect(() => computeBazi(profile({ solarTime: '25:99' }))).toThrow(BaziError);
+    try {
+      computeBazi(profile({ solarTime: '25:99' }));
+    } catch (e) {
+      expect((e as BaziError).code).toBe('INVALID_TIME');
+    }
+  });
+
+  it('throws BaziError INVALID_TIME for non-time-format string', () => {
+    expect(() => computeBazi(profile({ solarTime: 'abc' }))).toThrow(BaziError);
+  });
 });
