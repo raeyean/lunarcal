@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useBirthProfile } from '../context/BirthProfileContext';
-import { computeBazi, computeCompat, BaziError } from '@lunarcal/shared';
+import { computeCompat } from '@lunarcal/shared';
 import { getDayData } from '../utils/lunar';
 
 interface Props {
@@ -12,23 +12,20 @@ interface Props {
 }
 
 export function CompatStrip({ targetSolarDate, onPress, compact }: Props) {
-  const { profile, isLoading } = useBirthProfile();
+  const { profile, userBazi, isLoading } = useBirthProfile();
   const { colors } = useTheme();
 
   const result = useMemo(() => {
-    if (!profile) return null;
+    if (!userBazi) return null;
     try {
-      const userBazi = computeBazi(profile);
       const [y, m, d] = targetSolarDate.split('-').map(Number);
       const dayData = getDayData(y, m, d);
-      const targetGanZhi = dayData.ganzhi.day;
-      return computeCompat(userBazi.day.ganZhi, targetGanZhi);
+      return computeCompat(userBazi.day.ganZhi, dayData.ganzhi.day);
     } catch (e) {
-      if (e instanceof BaziError) return null;
-      console.warn('[CompatStrip] unexpected error', e);
+      console.warn('[CompatStrip] dayData fetch failed', e);
       return null;
     }
-  }, [profile, targetSolarDate]);
+  }, [userBazi, targetSolarDate]);
 
   if (isLoading) {
     return <View style={[styles.skeleton, { backgroundColor: colors.surface }]} />;

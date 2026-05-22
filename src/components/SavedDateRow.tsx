@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useBirthProfile } from '../context/BirthProfileContext';
-import { computeBazi, computeCompat } from '@lunarcal/shared';
+import { computeCompat } from '@lunarcal/shared';
 import { getDayData } from '../utils/lunar';
 import type { SavedDate } from '@lunarcal/shared';
 
@@ -15,19 +15,18 @@ interface Props {
 
 export function SavedDateRow({ item, onPress, onEdit, onDelete }: Props) {
   const { colors } = useTheme();
-  const { profile } = useBirthProfile();
+  const { userBazi } = useBirthProfile();
 
   const compat = useMemo(() => {
-    if (!profile) return null;
+    if (!userBazi) return null;
     try {
-      const userBazi = computeBazi(profile);
       const [y, m, d] = item.solarDate.split('-').map(Number);
       const dayData = getDayData(y, m, d);
       return computeCompat(userBazi.day.ganZhi, dayData.ganzhi.day);
     } catch {
       return null;
     }
-  }, [profile, item.solarDate]);
+  }, [userBazi, item.solarDate]);
 
   const lunarLabel = useMemo(() => {
     const [y, m, d] = item.solarDate.split('-').map(Number);

@@ -7,6 +7,7 @@ import {
   DI_HAI,
   DI_PO,
   WUXING_OF_GAN,
+  WUXING_OF_ZHI,
   WUXING_GENERATES,
   WUXING_CONTROLS,
 } from './tables';
@@ -43,14 +44,19 @@ export function zhiRelation(userZhi: string, targetZhi: string): ZhiRelation {
 
 function isValidGanZhi(gz: string): boolean {
   if (gz.length !== 2) return false;
-  return Boolean(WUXING_OF_GAN[gz[0] as keyof typeof WUXING_OF_GAN]);
+  return (
+    Boolean(WUXING_OF_GAN[gz[0] as keyof typeof WUXING_OF_GAN]) &&
+    Boolean(WUXING_OF_ZHI[gz[1] as keyof typeof WUXING_OF_ZHI])
+  );
 }
 
 export function computeCompat(userDayGanZhi: string, targetDayGanZhi: string): CompatScore {
   if (!isValidGanZhi(userDayGanZhi) || !isValidGanZhi(targetDayGanZhi)) {
-    console.warn(
-      `[computeCompat] invalid ganzhi input: user=${userDayGanZhi} target=${targetDayGanZhi}`,
-    );
+    // In dev, log without exposing user data. In prod, silent.
+    // __DEV__ is a React Native global; use globalThis to avoid TS errors in Node.
+    if ((globalThis as Record<string, unknown>).__DEV__) {
+      console.warn('[computeCompat] invalid ganzhi input shapes');
+    }
     return {
       stars: 3,
       reasonKey: 'neutral',

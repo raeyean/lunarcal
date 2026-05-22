@@ -10,12 +10,14 @@ import {
   clearSavedDates as wipeSavedDates,
   type ProfileInput,
 } from '../utils/profileStorage';
-import type { BirthProfile, SavedDate } from '@lunarcal/shared';
+import { computeBazi, BaziError } from '@lunarcal/shared';
+import type { BirthProfile, SavedDate, BaziChart } from '@lunarcal/shared';
 
 interface BirthProfileContextValue {
   profile: BirthProfile | null;
   savedDates: SavedDate[];
   isLoading: boolean;
+  userBazi: BaziChart | null;  // memoized — null if no profile or BaziError
   saveProfile: (input: ProfileInput) => Promise<void>;
   clearProfile: (alsoClearSavedDates: boolean) => Promise<void>;
   addSavedDate: (label: string, solarDate: string) => Promise<void>;
@@ -29,6 +31,16 @@ export function BirthProfileProvider({ children }: { children: React.ReactNode }
   const [profile, setProfile] = useState<BirthProfile | null>(null);
   const [savedDates, setSavedDates] = useState<SavedDate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const userBazi = React.useMemo<BaziChart | null>(() => {
+    if (!profile) return null;
+    try {
+      return computeBazi(profile);
+    } catch (e) {
+      if (e instanceof BaziError) return null;
+      throw e;
+    }
+  }, [profile]);
 
   useEffect(() => {
     let cancelled = false;
@@ -83,6 +95,7 @@ export function BirthProfileProvider({ children }: { children: React.ReactNode }
     profile,
     savedDates,
     isLoading,
+    userBazi,
     saveProfile,
     clearProfile,
     addSavedDate,

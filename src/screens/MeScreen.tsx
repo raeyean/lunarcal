@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet, Alert } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useBirthProfile } from '../context/BirthProfileContext';
-import { computeBazi, BaziError } from '@lunarcal/shared';
 import { BaziChart } from '../components/BaziChart';
 import { CompatStrip } from '../components/CompatStrip';
 import { ProfileForm } from '../components/ProfileForm';
@@ -28,6 +27,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
   const { colors } = useTheme();
   const {
     profile, savedDates, isLoading,
+    userBazi,
     saveProfile, clearProfile,
     addSavedDate, removeSavedDate, updateSavedDate,
   } = useBirthProfile();
@@ -38,15 +38,9 @@ export function MeScreen({ onNavigateToDate }: Props) {
 
   const baziResult = useMemo(() => {
     if (!profile) return { kind: 'none' as const };
-    try {
-      return { kind: 'ok' as const, chart: computeBazi(profile) };
-    } catch (e) {
-      if (e instanceof BaziError) {
-        return { kind: 'error' as const, code: e.code };
-      }
-      return { kind: 'error' as const, code: 'ENGINE_FAILURE' as const };
-    }
-  }, [profile]);
+    if (!userBazi) return { kind: 'error' as const, code: 'ENGINE_FAILURE' as const };
+    return { kind: 'ok' as const, chart: userBazi };
+  }, [profile, userBazi]);
 
   const handleClearProfile = () => {
     Alert.alert(
