@@ -18,7 +18,7 @@ export interface BaziPillar {
   gan: string;
   zhi: string;
   ganZhi: string;
-  wuXing: string;
+  wuXing: string;       // 2-char concat: gan element + zhi element (e.g. '金水')
   hideGan: string[];
   naYin: string;
   shiShenGan: string;
@@ -28,7 +28,7 @@ export interface BaziPillar {
 
 export interface DaYun {
   startAge: number;
-  startYear: number;
+  startYear: number;    // Gregorian calendar year DaYun begins
   ganZhi: string;
 }
 
@@ -41,14 +41,14 @@ export interface BaziChart {
   time: BaziPillar | null;
   dayMaster: string;
   dayMasterWuXing: string;
-  wuXingCounts: Record<string, number>;
+  wuXingCounts: Record<'木' | '火' | '土' | '金' | '水', number>;
   daYun: DaYun[] | null;
-  taiYuan: string;
-  mingGong: string;
+  taiYuan: string | null;
+  mingGong: string | null;
 }
 
 export type GanRelation =
-  | '相合' | '相剋' | '比和' | '生我' | '我生' | '剋我' | '我剋' | '無關';
+  | '相合' | '比和' | '生我' | '我生' | '剋我' | '我剋' | '無關';
 
 export type ZhiRelation =
   | '三合' | '六合' | '相沖' | '相刑' | '相害' | '相破' | '無關';
