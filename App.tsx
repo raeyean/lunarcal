@@ -38,6 +38,7 @@ import { DeityListModal } from './src/components/DeityListModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TodayWidget } from './src/components/TodayWidget';
 import { AuspiciousFinderScreen } from './src/screens/AuspiciousFinderScreen';
+import { MeScreen } from './src/screens/MeScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { IconButton } from './src/components/IconButton';
 import { Ionicons } from '@expo/vector-icons';
@@ -208,9 +209,14 @@ function AppContent() {
             onSelectDay={setSelectedDay}
           />
         ) : activeTab === 'me' ? (
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>Me tab — placeholder until Task 22</Text>
-          </View>
+          <MeScreen
+            onNavigateToDate={(y, m, d) => {
+              setYear(y);
+              setMonth(m);
+              setSelectedDay(d);
+              setActiveTab('daily');
+            }}
+          />
         ) : (
           <DailyDetailScreen
             key={`${year}-${month}-${selectedDay}`}
