@@ -26,7 +26,8 @@ import {
 } from '@expo-google-fonts/inter';
 import { CalendarScreen } from './src/screens/CalendarScreen';
 import { DailyDetailScreen } from './src/screens/DailyDetailScreen';
-import { TogglePill } from './src/components/TogglePill';
+import { BottomTabBar } from './src/components/BottomTabBar';
+import type { TabKey } from './src/components/BottomTabBar';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { BirthProfileProvider } from './src/context/BirthProfileContext';
 import * as BackgroundFetch from 'expo-background-fetch';
@@ -53,7 +54,7 @@ function AppContent() {
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [selectedDay, setSelectedDay] = useState(today.getDate());
-  const [activeTab, setActiveTab] = useState<'daily' | 'calendar'>('daily');
+  const [activeTab, setActiveTab] = useState<TabKey>('daily');
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [showWidget, setShowWidget] = useState(false);
   const [finderVisible, setFinderVisible] = useState(false);
@@ -153,10 +154,6 @@ function AppContent() {
     setSelectedDay(d.getDate());
   }, [year, month, selectedDay]);
 
-  const handleToggle = useCallback((tab: 'daily' | 'calendar') => {
-    setActiveTab(tab);
-  }, []);
-
   const handleGoToday = useCallback(() => {
     const now = new Date();
     setYear(now.getFullYear());
@@ -190,7 +187,6 @@ function AppContent() {
         >
           <Ionicons name="settings-outline" size={20} color={colors.muted} />
         </IconButton>
-        <TogglePill activeTab={activeTab} onToggle={handleToggle} />
         <IconButton
           onPress={() => setFinderVisible(true)}
           accessibilityLabel="擇吉日曆"
@@ -211,6 +207,10 @@ function AppContent() {
             onNextMonth={handleNextMonth}
             onSelectDay={setSelectedDay}
           />
+        ) : activeTab === 'me' ? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <Text>Me tab — placeholder until Task 22</Text>
+          </View>
         ) : (
           <DailyDetailScreen
             key={`${year}-${month}-${selectedDay}`}
@@ -224,6 +224,7 @@ function AppContent() {
           />
         )}
       </ErrorBoundary>
+      <BottomTabBar active={activeTab} onChange={setActiveTab} />
       <SettingsModal
         visible={settingsVisible}
         onClose={() => setSettingsVisible(false)}
