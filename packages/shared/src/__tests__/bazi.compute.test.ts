@@ -90,3 +90,37 @@ describe('computeBazi — pillars', () => {
     expect(() => computeBazi(profile({ solarTime: 'abc' }))).toThrow(BaziError);
   });
 });
+
+describe('computeBazi — daYun', () => {
+  it('returns null daYun when hasTime is false', () => {
+    const chart = computeBazi(profile({ solarTime: null }));
+    expect(chart.daYun).toBeNull();
+  });
+
+  it('returns null daYun when gender is null', () => {
+    const chart = computeBazi(profile({ gender: null }));
+    expect(chart.daYun).toBeNull();
+  });
+
+  it('returns 8 daYun entries for male with time set', () => {
+    const chart = computeBazi(profile({ gender: 'male' }));
+    expect(chart.daYun).not.toBeNull();
+    expect(chart.daYun!.length).toBe(8);
+  });
+
+  it('daYun startAge values are strictly ascending', () => {
+    const chart = computeBazi(profile({ gender: 'male' }));
+    const ages = chart.daYun!.map((d) => d.startAge);
+    for (let i = 1; i < ages.length; i++) {
+      expect(ages[i]).toBeGreaterThan(ages[i - 1]);
+    }
+  });
+
+  it('each daYun has a 2-character non-empty ganZhi', () => {
+    const chart = computeBazi(profile({ gender: 'female' }));
+    chart.daYun!.forEach((d) => {
+      expect(d.ganZhi).toHaveLength(2);
+      expect(d.ganZhi).not.toBe('');
+    });
+  });
+});

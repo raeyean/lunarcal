@@ -38,6 +38,18 @@ function countWuXing(pillars: BaziPillar[]): Record<'木' | '火' | '土' | '金
   return counts;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildDaYun(ec: any, gender: 'male' | 'female'): import('./types').DaYun[] {
+  const yun = ec.getYun(gender === 'male' ? 1 : 0);
+  const list = yun.getDaYun() as any[];
+  // Index 0 is 起運前 (pre-luck) — empty ganZhi. Skip it; take the next 8.
+  return list.slice(1, 9).map((dy: any) => ({
+    startAge: dy.getStartAge(),
+    startYear: dy.getStartYear(),
+    ganZhi: dy.getGanZhi(),
+  }));
+}
+
 export function computeBazi(profile: BirthProfile): BaziChart {
   const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(profile.solarDate);
   if (!dateMatch) {
@@ -97,7 +109,7 @@ export function computeBazi(profile: BirthProfile): BaziChart {
     dayMaster: day.gan,
     dayMasterWuXing: WUXING_OF_GAN[day.gan as keyof typeof WUXING_OF_GAN] ?? '',
     wuXingCounts,
-    daYun: null,                  // populated in Task 7
+    daYun: hasTime && profile.gender ? buildDaYun(ec, profile.gender) : null,
     taiYuan: taiYuanRaw ? taiYuanRaw : null,
     mingGong: mingGongRaw ? mingGongRaw : null,
   };
