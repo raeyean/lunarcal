@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useBirthProfile } from '../context/BirthProfileContext';
 import { computeCompat } from '@lunarcal/shared';
 import { getDayData } from '../utils/lunar';
-import { Typography, Fonts } from '../constants/typography';
+import { Typography } from '../constants/typography';
 
 interface Props {
   targetSolarDate: string;     // 'YYYY-MM-DD'
@@ -34,7 +35,6 @@ export function CompatStrip({ targetSolarDate, onPress, compact }: Props) {
 
   if (!profile || !result) return null;
 
-  const starString = '★'.repeat(result.stars) + '☆'.repeat(5 - result.stars);
   const a11y = `${result.stars} out of 5 stars, ${result.reasonText}`;
 
   const body = (
@@ -49,7 +49,17 @@ export function CompatStrip({ targetSolarDate, onPress, compact }: Props) {
     >
       {!compact && <Text style={[styles.label, { color: colors.muted }]}>今日對你</Text>}
       <View style={styles.row}>
-        <Text style={[styles.stars, { color: colors.primary }]}>{starString}</Text>
+        <View style={styles.starsRow}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Ionicons
+              key={i}
+              name={i < result.stars ? 'star' : 'star-outline'}
+              size={14}
+              color={colors.primary}
+              style={{ marginRight: 2 }}
+            />
+          ))}
+        </View>
         <Text style={[styles.reason, { color: colors.foreground }]} numberOfLines={1}>
           {result.reasonText}
         </Text>
@@ -73,7 +83,7 @@ const styles = StyleSheet.create({
   compact: { padding: 8, marginVertical: 2 },
   label: { ...Typography.microCaption, marginBottom: 4 },
   row: { flexDirection: 'row', alignItems: 'center' },
-  stars: { fontFamily: Fonts.outfitBold, fontSize: 14, marginRight: 8 },
+  starsRow: { flexDirection: 'row', marginRight: 8 },
   reason: { ...Typography.body, flexShrink: 1 },
   skeleton: { height: 32, borderRadius: 10, marginVertical: 4 },
 });

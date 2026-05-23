@@ -47,10 +47,12 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay, open
           style={styles.scrollView}
           contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xxl }}
         >
-          <CompatStrip
+          <View style={{ paddingHorizontal: Spacing.xl }}>
+            <CompatStrip
               targetSolarDate={`${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`}
               compact
             />
+          </View>
           <EditorialDaily
               day={dayData}
               openGlossaryTerm={isCenter ? openGlossaryTerm : null}

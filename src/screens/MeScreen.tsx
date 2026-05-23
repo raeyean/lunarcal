@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useBirthProfile } from '../context/BirthProfileContext';
 import { Typography } from '../constants/typography';
@@ -27,6 +28,8 @@ function todaySolarDate(): string {
 
 export function MeScreen({ onNavigateToDate }: Props) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = 65 + insets.bottom;
   const {
     profile, savedDates, isLoading,
     userBazi,
@@ -120,7 +123,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={{ padding: 16 }}
+      contentContainerStyle={{ padding: 16, paddingBottom: 16 + tabBarHeight }}
     >
       <Text style={[styles.h1, { color: colors.foreground }]}>我的</Text>
 
@@ -244,10 +247,10 @@ const styles = StyleSheet.create({
   addBtn: {
     borderWidth: 1,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderRadius: 8,
     marginTop: 20,
-    minHeight: 36,
+    minHeight: 44,
     justifyContent: 'center',
     alignItems: 'center',
   },

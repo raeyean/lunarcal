@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TextInput, Pressable, StyleSheet, Platform } from 'react-native';
+import { Modal, View, Text, TextInput, Pressable, StyleSheet, Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/ThemeContext';
@@ -60,53 +60,58 @@ export function SavedDateForm({ visible, initialLabel, initialSolarDate, onCance
       presentationStyle="formSheet"
       onRequestClose={onCancel}
     >
-      <SafeAreaView edges={['top', 'left', 'right']} style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>
-          {initialLabel ? '編輯日子' : '新增日子'}
-        </Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1, backgroundColor: colors.background }}
+      >
+        <SafeAreaView edges={['top', 'left', 'right']} style={[styles.container, { backgroundColor: colors.background }]}>
+          <Text style={[styles.title, { color: colors.foreground }]}>
+            {initialLabel ? '編輯日子' : '新增日子'}
+          </Text>
 
-        <Text style={[styles.label, { color: colors.muted }]}>名稱</Text>
-        <TextInput
-          value={label}
-          onChangeText={setLabel}
-          placeholder="婚禮、生日…"
-          placeholderTextColor={colors.muted}
-          style={[styles.input, { borderColor: colors.line, color: colors.foreground }]}
-          maxLength={50}
-          accessibilityLabel="名稱"
-        />
+          <Text style={[styles.label, { color: colors.muted }]}>名稱</Text>
+          <TextInput
+            value={label}
+            onChangeText={setLabel}
+            placeholder="婚禮、生日…"
+            placeholderTextColor={colors.muted}
+            style={[styles.input, { borderColor: colors.line, color: colors.foreground }]}
+            maxLength={50}
+            accessibilityLabel="名稱"
+          />
 
-        <Text style={[styles.label, { color: colors.muted }]}>日期</Text>
-        <DateTimePicker
-          value={date}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'compact' : 'default'}
-          minimumDate={new Date(1900, 0, 1)}
-          maximumDate={new Date(2100, 11, 31)}
-          onChange={(_, d) => d && setDate(d)}
-          accessibilityLabel="日期"
-        />
+          <Text style={[styles.label, { color: colors.muted }]}>日期</Text>
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'compact' : 'default'}
+            minimumDate={new Date(1900, 0, 1)}
+            maximumDate={new Date(2100, 11, 31)}
+            onChange={(_, d) => d && setDate(d)}
+            accessibilityLabel="日期"
+          />
 
-        {error && <Text style={[styles.error, { color: colors.danger }]}>{error}</Text>}
+          {error && <Text style={[styles.error, { color: colors.danger }]}>{error}</Text>}
 
-        <View style={styles.actions}>
-          <Pressable
-            onPress={onCancel}
-            style={[styles.btn, styles.btnGhost, { borderColor: colors.line }]}
-          >
-            <Text style={[styles.btnLabel, { color: colors.foreground }]}>取消</Text>
-          </Pressable>
-          <Pressable
-            onPress={handleSubmit}
-            disabled={submitting}
-            style={[styles.btn, { backgroundColor: colors.primary, opacity: submitting ? 0.6 : 1 }]}
-          >
-            <Text style={[styles.btnLabel, { color: colors.onPrimary }]}>
-              {submitting ? '儲存中…' : '儲存'}
-            </Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
+          <View style={styles.actions}>
+            <Pressable
+              onPress={onCancel}
+              style={[styles.btn, styles.btnGhost, { borderColor: colors.line }]}
+            >
+              <Text style={[styles.btnLabel, { color: colors.foreground }]}>取消</Text>
+            </Pressable>
+            <Pressable
+              onPress={handleSubmit}
+              disabled={submitting}
+              style={[styles.btn, { backgroundColor: colors.primary, opacity: submitting ? 0.6 : 1 }]}
+            >
+              <Text style={[styles.btnLabel, { color: colors.onPrimary }]}>
+                {submitting ? '儲存中…' : '儲存'}
+              </Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
