@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import { Typography } from '../constants/typography';
 import type { BaziPillar } from '@lunarcal/shared';
 
 interface Props {
@@ -57,9 +58,9 @@ const styles = StyleSheet.create({
     minHeight: 96,
   },
   emphasized: { borderWidth: 2 },
-  label: { fontSize: 10, marginBottom: 4 },
-  gan: { fontSize: 22, fontWeight: '700', lineHeight: 26 },
-  zhi: { fontSize: 18, lineHeight: 22, marginTop: 2 },
-  nayin: { fontSize: 9, marginTop: 6 },
-  unknownText: { fontSize: 11, marginTop: 24 },
+  label: { ...Typography.microCaption, marginBottom: 4 },
+  gan: { ...Typography.headingLG, fontSize: 22, lineHeight: 26 },
+  zhi: { ...Typography.calendarDay, marginTop: 2 },
+  nayin: { ...Typography.microCaption, fontSize: 9, marginTop: 6 },
+  unknownText: { ...Typography.subtitle, marginTop: 24 },
 });

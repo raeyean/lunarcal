@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useBirthProfile } from '../context/BirthProfileContext';
 import { computeCompat } from '@lunarcal/shared';
 import { getDayData } from '../utils/lunar';
+import { Typography, Fonts } from '../constants/typography';
 
 interface Props {
   targetSolarDate: string;     // 'YYYY-MM-DD'
@@ -44,6 +45,7 @@ export function CompatStrip({ targetSolarDate, onPress, compact }: Props) {
         compact && styles.compact,
       ]}
       accessibilityLabel={a11y}
+      accessibilityRole="text"
     >
       {!compact && <Text style={[styles.label, { color: colors.muted }]}>今日對你</Text>}
       <View style={styles.row}>
@@ -69,9 +71,9 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   compact: { padding: 8, marginVertical: 2 },
-  label: { fontSize: 10, marginBottom: 4 },
+  label: { ...Typography.microCaption, marginBottom: 4 },
   row: { flexDirection: 'row', alignItems: 'center' },
-  stars: { fontSize: 14, marginRight: 8 },
-  reason: { fontSize: 12, flexShrink: 1 },
+  stars: { fontFamily: Fonts.outfitBold, fontSize: 14, marginRight: 8 },
+  reason: { ...Typography.body, flexShrink: 1 },
   skeleton: { height: 32, borderRadius: 10, marginVertical: 4 },
 });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Pressable, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
@@ -27,12 +28,14 @@ interface Props {
 
 export function BottomTabBar({ active, onChange }: Props) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <View
+      accessibilityRole="tablist"
       style={[
         styles.bar,
-        { backgroundColor: colors.background, borderTopColor: colors.line },
+        { backgroundColor: colors.background, borderTopColor: colors.line, paddingBottom: Spacing.md + insets.bottom },
       ]}
     >
       {TABS.map((t) => {

@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useBirthProfile } from '../context/BirthProfileContext';
+import { Typography } from '../constants/typography';
 import { BaziChart } from '../components/BaziChart';
 import { CompatStrip } from '../components/CompatStrip';
 import { ProfileForm } from '../components/ProfileForm';
@@ -72,7 +74,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
           style={[styles.cta, { backgroundColor: colors.primary }]}
           onPress={() => setProfileFormVisible(true)}
         >
-          <Text style={styles.ctaText}>開始設定</Text>
+          <Text style={[styles.ctaText, { color: colors.onPrimary }]}>開始設定</Text>
         </Pressable>
         <ProfileForm
           visible={profileFormVisible}
@@ -96,7 +98,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
           style={[styles.cta, { backgroundColor: colors.primary }]}
           onPress={() => setProfileFormVisible(true)}
         >
-          <Text style={styles.ctaText}>重新輸入</Text>
+          <Text style={[styles.ctaText, { color: colors.onPrimary }]}>重新輸入</Text>
         </Pressable>
         <ProfileForm
           visible={profileFormVisible}
@@ -137,7 +139,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
           accessibilityLabel="編輯個人資料"
           style={styles.editBtn}
         >
-          <Text style={[styles.editIcon, { color: colors.muted }]}>✎</Text>
+          <Ionicons name="pencil-outline" size={18} color={colors.muted} />
         </Pressable>
       </View>
 
@@ -160,7 +162,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
           style={[styles.addBtn, { borderColor: colors.primary }]}
           accessibilityLabel="新增日子"
         >
-          <Text style={{ color: colors.primary, fontSize: 12 }}>+ 新增</Text>
+          <Text style={[styles.addBtnText, { color: colors.primary }]}>+ 新增</Text>
         </Pressable>
       </View>
       {savedDates.length === 0 ? (
@@ -222,11 +224,11 @@ export function MeScreen({ onNavigateToDate }: Props) {
 
 const styles = StyleSheet.create({
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  emptyTitle: { fontSize: 18, fontWeight: '600' },
-  emptyBody: { fontSize: 14, marginTop: 8, textAlign: 'center' },
+  emptyTitle: { ...Typography.cardTitle, fontSize: 18 },
+  emptyBody: { ...Typography.body, fontSize: 14, marginTop: 8, textAlign: 'center' },
   cta: { marginTop: 24, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  ctaText: { color: '#fff', fontWeight: '600' },
-  h1: { fontSize: 24, fontWeight: '700', marginBottom: 12 },
+  ctaText: { ...Typography.toggleActive },
+  h1: { ...Typography.screenHeader, fontSize: 24, marginBottom: 12 },
   hero: {
     flexDirection: 'row',
     borderWidth: 1,
@@ -234,27 +236,25 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 20,
   },
-  heroSub: { fontSize: 11 },
-  heroMain: { fontSize: 22, fontWeight: '700', marginTop: 6 },
-  editBtn: { padding: 8 },
-  editIcon: { fontSize: 18 },
-  sectionLabel: {
-    fontSize: 11,
-    marginBottom: 8,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
+  heroSub: { ...Typography.subtitle },
+  heroMain: { ...Typography.headingLG, fontSize: 22, marginTop: 6 },
+  editBtn: { padding: 12, minWidth: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' },
+  sectionLabel: { ...Typography.sectionTitle, marginBottom: 8, textTransform: 'uppercase' },
   savedHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   addBtn: {
     borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 8,
     marginTop: 20,
+    minHeight: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  savedEmpty: { fontSize: 12, fontStyle: 'italic', marginVertical: 8 },
-  disclaimer: { fontSize: 11, textAlign: 'center', marginTop: 32, lineHeight: 16 },
+  addBtnText: { ...Typography.subtitle },
+  savedEmpty: { ...Typography.subtitle, fontStyle: 'italic', marginVertical: 8 },
+  disclaimer: { ...Typography.subtitle, textAlign: 'center', marginTop: 32 },
   clearBtn: { alignItems: 'center', marginTop: 16, marginBottom: 32, paddingVertical: 12 },
-  clearText: { fontSize: 13 },
+  clearText: { ...Typography.bodyMedium },
   skeletonBlock: { height: 80, margin: 16, borderRadius: 12 },
 });

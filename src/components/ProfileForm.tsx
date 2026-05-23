@@ -8,8 +8,10 @@ import {
   Switch,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/ThemeContext';
+import { Typography, Fonts } from '../constants/typography';
 import type { BirthProfile } from '@lunarcal/shared';
 import type { ProfileInput } from '../utils/profileStorage';
 
@@ -108,7 +110,7 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
       presentationStyle="formSheet"
       onRequestClose={onCancel}
     >
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={[styles.container, { backgroundColor: colors.background }]}>
         <Text style={[styles.title, { color: colors.foreground }]}>個人資料</Text>
 
         <Text style={[styles.label, { color: colors.muted }]}>出生日期</Text>
@@ -163,20 +165,20 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
                 accessibilityState={{ selected }}
                 accessibilityLabel={`性別 ${lbl}`}
               >
-                <Text style={{ color: selected ? '#fff' : colors.foreground }}>{lbl}</Text>
+                <Text style={{ fontFamily: Fonts.interMedium, color: selected ? colors.onPrimary : colors.foreground }}>{lbl}</Text>
               </Pressable>
             );
           })}
         </View>
 
-        {error && <Text style={[styles.error, { color: colors.primary }]}>{error}</Text>}
+        {error && <Text style={[styles.error, { color: colors.danger }]}>{error}</Text>}
 
         <View style={styles.actions}>
           <Pressable
             onPress={onCancel}
             style={[styles.btn, styles.btnGhost, { borderColor: colors.line }]}
           >
-            <Text style={{ color: colors.foreground }}>取消</Text>
+            <Text style={[styles.btnLabel, { color: colors.foreground }]}>取消</Text>
           </Pressable>
           <Pressable
             onPress={handleSubmit}
@@ -188,22 +190,22 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
             ]}
             accessibilityRole="button"
           >
-            <Text style={{ color: '#fff', fontWeight: '600' }}>
+            <Text style={[styles.btnLabel, { color: colors.onPrimary }]}>
               {submitting ? '儲存中…' : '儲存'}
             </Text>
           </Pressable>
         </View>
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 24 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 24 },
-  label: { fontSize: 12, marginTop: 12, marginBottom: 6 },
+  title: { ...Typography.screenHeader, marginBottom: 24 },
+  label: { ...Typography.microCaption, marginTop: 12, marginBottom: 6 },
   toggleRow: { flexDirection: 'row', alignItems: 'center', marginTop: 16 },
-  toggleHint: { marginLeft: 8, fontSize: 12 },
+  toggleHint: { ...Typography.subtitle, marginLeft: 8 },
   genderRow: { flexDirection: 'row', gap: 8 },
   genderBtn: {
     flex: 1,
@@ -214,7 +216,8 @@ const styles = StyleSheet.create({
   },
   actions: { flexDirection: 'row', marginTop: 32, gap: 12 },
   btn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
+  btnLabel: { ...Typography.toggleActive },
   btnGhost: { borderWidth: 1 },
   btnPrimary: {},
-  error: { marginTop: 12, fontSize: 12 },
+  error: { ...Typography.subtitle, marginTop: 12 },
 });

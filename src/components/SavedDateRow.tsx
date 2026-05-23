@@ -5,6 +5,7 @@ import { useBirthProfile } from '../context/BirthProfileContext';
 import { computeCompat } from '@lunarcal/shared';
 import { getDayData } from '../utils/lunar';
 import type { SavedDate } from '@lunarcal/shared';
+import { Typography, Fonts } from '../constants/typography';
 
 interface Props {
   item: SavedDate;
@@ -61,7 +62,7 @@ export function SavedDateRow({ item, onPress, onEdit, onDelete }: Props) {
       }}
     >
       <View style={styles.left}>
-        <Text style={[styles.label, { color: colors.foreground }]}>{item.label}</Text>
+        <Text style={[styles.label, { color: colors.foreground }]} numberOfLines={2} ellipsizeMode="tail">{item.label}</Text>
         <Text style={[styles.date, { color: colors.muted }]}>
           {item.solarDate}{lunarLabel ? ` · 農曆${lunarLabel}` : ''}
         </Text>
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   left: { flex: 1 },
-  label: { fontSize: 14, fontWeight: '600' },
-  date: { fontSize: 11, marginTop: 2 },
-  stars: { fontSize: 14 },
+  label: { ...Typography.bodyMedium, fontSize: 14 },
+  date: { ...Typography.subtitle, marginTop: 2 },
+  stars: { fontFamily: Fonts.outfitBold, fontSize: 14 },
 });

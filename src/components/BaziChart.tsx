@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import { Typography } from '../constants/typography';
 import { BaziPillarCell } from './BaziPillarCell';
 import type { BaziChart as BaziChartShape } from '@lunarcal/shared';
 
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
   },
-  toggleText: { fontSize: 12 },
+  toggleText: { ...Typography.microCaption },
   detail: {
     marginTop: 10,
     borderWidth: 1,
@@ -144,14 +145,14 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   detailRow: { marginBottom: 8 },
-  detailLabel: { fontSize: 10, marginBottom: 4 },
+  detailLabel: { ...Typography.microCaption, marginBottom: 4 },
   detailValues: { flexDirection: 'row', justifyContent: 'space-between' },
-  detailValue: { flex: 1, fontSize: 11, textAlign: 'center' },
+  detailValue: { ...Typography.subtitle, flex: 1, textAlign: 'center' },
   metaRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
-  metaLabel: { fontSize: 10 },
-  metaValue: { fontSize: 12, marginLeft: 6 },
+  metaLabel: { ...Typography.microCaption },
+  metaValue: { ...Typography.bodyMedium, fontSize: 12, marginLeft: 6 },
   daYunBlock: { marginTop: 10 },
-  daYunTitle: { fontSize: 10, marginBottom: 6 },
+  daYunTitle: { ...Typography.microCaption, marginBottom: 6 },
   daYunRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   daYunCell: {
     borderWidth: 1,
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
     minWidth: 56,
     alignItems: 'center',
   },
-  daYunAge: { fontSize: 9 },
-  daYunGanZhi: { fontSize: 13, fontWeight: '600' },
-  daYunHint: { fontSize: 11, marginTop: 8, textAlign: 'center', fontStyle: 'italic' },
+  daYunAge: { ...Typography.microCaption },
+  daYunGanZhi: { ...Typography.bodyMedium, fontSize: 13 },
+  daYunHint: { ...Typography.subtitle, marginTop: 8, textAlign: 'center', fontStyle: 'italic' },
 });
