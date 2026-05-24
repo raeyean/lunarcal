@@ -162,10 +162,16 @@ export function MeScreen({ onNavigateToDate }: Props) {
         <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: 20 }]}>已存日子</Text>
         <Pressable
           onPress={() => setAdding(true)}
-          style={[styles.addBtn, { borderColor: colors.primary }]}
+          style={({ pressed }) => [
+            styles.addBtn,
+            { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
+          ]}
           accessibilityLabel="新增日子"
+          accessibilityRole="button"
+          hitSlop={6}
         >
-          <Text style={[styles.addBtnText, { color: colors.primary }]}>+ 新增</Text>
+          <Ionicons name="add" size={18} color={colors.onPrimary} style={{ marginRight: 4 }} />
+          <Text style={[styles.addBtnText, { color: colors.onPrimary }]}>新增</Text>
         </Pressable>
       </View>
       {savedDates.length === 0 ? (
@@ -245,16 +251,21 @@ const styles = StyleSheet.create({
   sectionLabel: { ...Typography.sectionTitle, marginBottom: 8, textTransform: 'uppercase' },
   savedHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   addBtn: {
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 20,
-    minHeight: 44,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginTop: 20,
+    minHeight: 36,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  addBtnText: { ...Typography.subtitle },
+  addBtnText: { ...Typography.bodyMedium, fontWeight: '600' },
   savedEmpty: { ...Typography.subtitle, fontStyle: 'italic', marginVertical: 8 },
   disclaimer: { ...Typography.subtitle, textAlign: 'center', marginTop: 32 },
   clearBtn: { alignItems: 'center', marginTop: 16, marginBottom: 32, paddingVertical: 12 },
