@@ -113,39 +113,46 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
       <SafeAreaView edges={['top', 'left', 'right']} style={[styles.container, { backgroundColor: colors.background }]}>
         <Text style={[styles.title, { color: colors.foreground }]}>個人資料</Text>
 
-        <Text style={[styles.label, { color: colors.muted }]}>出生日期</Text>
-        <DateTimePicker
-          value={dateValue}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'compact' : 'default'}
-          maximumDate={new Date()}
-          minimumDate={new Date(1900, 0, 1)}
-          onChange={(_, d) => d && setDateValue(d)}
-          accessibilityLabel="出生日期"
-        />
-
-        <View style={styles.toggleRow}>
-          <Text style={[styles.label, { color: colors.muted, flex: 1 }]}>出生時辰</Text>
-          <Switch
-            value={timeKnown}
-            onValueChange={setTimeKnown}
-            accessibilityLabel="出生時辰是否已知"
+        <View style={styles.fieldRow}>
+          <Text style={[styles.fieldLabel, { color: colors.muted }]}>出生日期</Text>
+          <DateTimePicker
+            value={dateValue}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'compact' : 'default'}
+            maximumDate={new Date()}
+            minimumDate={new Date(1900, 0, 1)}
+            onChange={(_, d) => d && setDateValue(d)}
+            accessibilityLabel="出生日期"
           />
-          <Text style={[styles.toggleHint, { color: colors.muted }]}>
-            {timeKnown ? '已知' : '未知'}
-          </Text>
+        </View>
+
+        <View style={styles.fieldRow}>
+          <Text style={[styles.fieldLabel, { color: colors.muted }]}>出生時辰</Text>
+          <View style={styles.timeToggleGroup}>
+            <Text style={[styles.toggleHint, { color: colors.muted }]}>
+              {timeKnown ? '已知' : '未知'}
+            </Text>
+            <Switch
+              value={timeKnown}
+              onValueChange={setTimeKnown}
+              accessibilityLabel="出生時辰是否已知"
+            />
+          </View>
         </View>
         {timeKnown && (
-          <DateTimePicker
-            value={timeValue}
-            mode="time"
-            display={Platform.OS === 'ios' ? 'compact' : 'default'}
-            onChange={(_, d) => d && setTimeValue(d)}
-            accessibilityLabel="出生時辰"
-          />
+          <View style={styles.fieldRow}>
+            <Text style={[styles.fieldLabel, { color: colors.muted }]}>時辰</Text>
+            <DateTimePicker
+              value={timeValue}
+              mode="time"
+              display={Platform.OS === 'ios' ? 'compact' : 'default'}
+              onChange={(_, d) => d && setTimeValue(d)}
+              accessibilityLabel="出生時辰"
+            />
+          </View>
         )}
 
-        <Text style={[styles.label, { color: colors.muted, marginTop: 16 }]}>性別 (選填)</Text>
+        <Text style={[styles.label, { color: colors.muted, marginTop: 20 }]}>性別 (選填)</Text>
         <View style={styles.genderRow}>
           {(['male', 'female', null] as const).map((g) => {
             const lbl = g === 'male' ? '男' : g === 'female' ? '女' : '不指定';
@@ -204,8 +211,16 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 24 },
   title: { ...Typography.screenHeader, marginBottom: 24 },
   label: { ...Typography.microCaption, marginTop: 12, marginBottom: 6 },
-  toggleRow: { flexDirection: 'row', alignItems: 'center', marginTop: 16 },
-  toggleHint: { ...Typography.subtitle, marginLeft: 8 },
+  fieldRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    minHeight: 48,
+  },
+  fieldLabel: { ...Typography.bodyMedium, flex: 1 },
+  timeToggleGroup: { flexDirection: 'row', alignItems: 'center' },
+  toggleHint: { ...Typography.subtitle, marginRight: 8 },
   genderRow: { flexDirection: 'row', gap: 8 },
   genderBtn: {
     flex: 1,
