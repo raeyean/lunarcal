@@ -80,16 +80,18 @@ export function SavedDateForm({ visible, initialLabel, initialSolarDate, onCance
             accessibilityLabel="名稱"
           />
 
-          <Text style={[styles.label, { color: colors.muted }]}>日期</Text>
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display={Platform.OS === 'ios' ? 'compact' : 'default'}
-            minimumDate={new Date(1900, 0, 1)}
-            maximumDate={new Date(2100, 11, 31)}
-            onChange={(_, d) => d && setDate(d)}
-            accessibilityLabel="日期"
-          />
+          <View style={styles.fieldRow}>
+            <Text style={[styles.fieldLabel, { color: colors.muted }]}>日期</Text>
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'compact' : 'default'}
+              minimumDate={new Date(1900, 0, 1)}
+              maximumDate={new Date(2100, 11, 31)}
+              onChange={(_, d) => d && setDate(d)}
+              accessibilityLabel="日期"
+            />
+          </View>
 
           {error && <Text style={[styles.error, { color: colors.danger }]}>{error}</Text>}
 
@@ -121,6 +123,15 @@ const styles = StyleSheet.create({
   title: { ...Typography.screenHeader, marginBottom: 24 },
   label: { ...Typography.microCaption, marginTop: 16, marginBottom: 6 },
   input: { ...Typography.bodyMedium, borderWidth: 1, borderRadius: 10, padding: 10 },
+  fieldRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    marginTop: 4,
+    minHeight: 48,
+  },
+  fieldLabel: { ...Typography.bodyMedium, flex: 1 },
   actions: { flexDirection: 'row', marginTop: 32, gap: 12 },
   btn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
   btnLabel: { ...Typography.toggleActive },
