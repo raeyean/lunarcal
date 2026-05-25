@@ -91,6 +91,41 @@ describe('computeBazi — pillars', () => {
   });
 });
 
+describe('computeBazi — date validation', () => {
+  it('throws INVALID_DATE for Feb 30', () => {
+    expect(() =>
+      computeBazi(profile({ solarDate: '2026-02-30' }))
+    ).toThrow(BaziError);
+    try {
+      computeBazi(profile({ solarDate: '2026-02-30' }));
+    } catch (e) {
+      expect(e instanceof BaziError && e.code).toBe('INVALID_DATE');
+    }
+  });
+
+  it('throws INVALID_DATE for Apr 31', () => {
+    try {
+      computeBazi(profile({ solarDate: '2026-04-31' }));
+    } catch (e) {
+      expect(e instanceof BaziError && e.code).toBe('INVALID_DATE');
+    }
+  });
+
+  it('accepts Feb 29 in a leap year', () => {
+    expect(() =>
+      computeBazi(profile({ solarDate: '2028-02-29', solarTime: null }))
+    ).not.toThrow();
+  });
+
+  it('throws INVALID_DATE for Feb 29 in a non-leap year', () => {
+    try {
+      computeBazi(profile({ solarDate: '2026-02-29' }));
+    } catch (e) {
+      expect(e instanceof BaziError && e.code).toBe('INVALID_DATE');
+    }
+  });
+});
+
 describe('computeBazi — daYun', () => {
   it('returns null daYun when hasTime is false', () => {
     const chart = computeBazi(profile({ solarTime: null }));

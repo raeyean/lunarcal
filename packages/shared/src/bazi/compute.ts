@@ -61,6 +61,11 @@ export function computeBazi(profile: BirthProfile): BaziChart {
   if (y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) {
     throw new BaziError('INVALID_DATE', `solarDate out of range: ${profile.solarDate}`);
   }
+  // Validate actual calendar day (catches Feb 30, Apr 31, etc.)
+  const dateCheck = new Date(y, m - 1, d);
+  if (dateCheck.getFullYear() !== y || dateCheck.getMonth() !== m - 1 || dateCheck.getDate() !== d) {
+    throw new BaziError('INVALID_DATE', `solarDate is not a real calendar date: ${profile.solarDate}`);
+  }
 
   const hasTime = profile.solarTime !== null;
   let hh = 12;
