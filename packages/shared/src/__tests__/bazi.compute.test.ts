@@ -104,6 +104,7 @@ describe('computeBazi — date validation', () => {
   });
 
   it('throws INVALID_DATE for Apr 31', () => {
+    expect(() => computeBazi(profile({ solarDate: '2026-04-31' }))).toThrow(BaziError);
     try {
       computeBazi(profile({ solarDate: '2026-04-31' }));
     } catch (e) {
@@ -118,6 +119,7 @@ describe('computeBazi — date validation', () => {
   });
 
   it('throws INVALID_DATE for Feb 29 in a non-leap year', () => {
+    expect(() => computeBazi(profile({ solarDate: '2026-02-29' }))).toThrow(BaziError);
     try {
       computeBazi(profile({ solarDate: '2026-02-29' }));
     } catch (e) {
