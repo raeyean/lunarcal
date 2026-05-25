@@ -41,7 +41,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           {this.props.fallbackMessage ?? '發生錯誤'}
         </Text>
         <Text style={[styles.detail, { color: palette.subtleText }]} numberOfLines={3}>
-          {this.state.error?.message}
+          {__DEV__ ? this.state.error?.message : this.props.fallbackMessage ?? '請重試'}
         </Text>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: palette.primary }]}
