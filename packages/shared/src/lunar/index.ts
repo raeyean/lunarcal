@@ -300,13 +300,22 @@ export function findUpcomingDeity(
 export function getMonthDays(year: number, month: number): DayData[][] {
   const weeks: DayData[][] = [];
   const firstDay = Solar.fromYmd(year, month, 1);
-  const firstWeekDay = firstDay.getWeek();
+  const firstWeekDay = firstDay.getWeek(); // 0=Sun … 6=Sat
   const daysInMonth = new Date(year, month, 0).getDate();
   let currentWeek: DayData[] = [];
 
-  for (let i = 0; i < firstWeekDay; i++) {
-    currentWeek.push(getDayData(year, month, 1, month));
+  // Leading cells: days from the previous month
+  if (firstWeekDay > 0) {
+    const prevMonth = month === 1 ? 12 : month - 1;
+    const prevYear = month === 1 ? year - 1 : year;
+    const daysInPrevMonth = new Date(prevYear, prevMonth, 0).getDate();
+    const startDay = daysInPrevMonth - firstWeekDay + 1;
+    for (let d = startDay; d <= daysInPrevMonth; d++) {
+      currentWeek.push(getDayData(prevYear, prevMonth, d, month));
+    }
   }
+
+  // Current month days
   for (let day = 1; day <= daysInMonth; day++) {
     currentWeek.push(getDayData(year, month, day, month));
     if (currentWeek.length === 7) {
@@ -314,12 +323,19 @@ export function getMonthDays(year: number, month: number): DayData[][] {
       currentWeek = [];
     }
   }
+
+  // Trailing cells: days from the next month
   if (currentWeek.length > 0) {
+    const nextMonth = month === 12 ? 1 : month + 1;
+    const nextYear = month === 12 ? year + 1 : year;
+    let nextDay = 1;
     while (currentWeek.length < 7) {
-      currentWeek.push(getDayData(year, month, 1, month));
+      currentWeek.push(getDayData(nextYear, nextMonth, nextDay, month));
+      nextDay++;
     }
     weeks.push(currentWeek);
   }
+
   return weeks;
 }
 
