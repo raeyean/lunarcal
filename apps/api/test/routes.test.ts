@@ -125,6 +125,22 @@ describe('GET /api/deity/:lm/:ld', () => {
     const { status } = await get('/api/deity/13/31');
     expect(status).toBe(400);
   });
+
+  it('returns null (not 400) for day 30 of a 29-day month (known limitation)', async () => {
+    // Lunar month 2 in most years has 29 days. Day 30 is invalid but
+    // isValidSolarDate-style check is not applied; deity lookup returns null.
+    // This test documents the current behavior and signals if validation improves.
+    const { status, body } = await get('/api/deity/2/30');
+    // Currently returns 200 with null deity (not 400). Document this.
+    expect(status).toBe(200);
+    const parsed = DeityResponseSchema.parse(body);
+    expect(parsed.deity).toBeNull();
+  });
+
+  it('returns 400 for lunarMonth=0', async () => {
+    const { status } = await get('/api/deity/0/1');
+    expect(status).toBe(400);
+  });
 });
 
 describe('GET /api/openapi.json', () => {
