@@ -47,3 +47,32 @@ export {
   ActivityItemSchema,
   YiJiResponseSchema,
 } from './schemas/yiji';
+
+// Bazi engine + compat scoring (local-only; no API exposure)
+export {
+  computeBazi,
+  computeCompat,
+  ganRelation,
+  zhiRelation,
+  COMPAT_REASONS_ZH_HANT,
+  BaziError,
+} from './bazi';
+
+export type {
+  BirthProfile,
+  SavedDate,
+  BaziPillar,
+  BaziChart,
+  DaYun,
+  GanRelation,
+  ZhiRelation,
+  CompatReason,
+  CompatScore,
+} from './bazi';
+
+// Profile schemas (local-only; used by mobile profileStorage)
+export {
+  BirthProfileSchema,
+  SavedDateSchema,
+  SavedDatesArraySchema,
+} from './schemas/profile';

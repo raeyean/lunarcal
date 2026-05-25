@@ -38,6 +38,10 @@ npx expo lint      # Run ESLint
 # API
 npm run emulator              # Firebase emulator + esbuild watch
 npm test -w @lunarcal/api     # Run Vitest tests
+
+# Shared
+npm test -w @lunarcal/shared  # Run shared package Vitest tests
+npm test                      # Run all workspace tests (api + shared)
 ```
 
 ## Architecture
@@ -116,6 +120,6 @@ No navigation library. App.tsx manages screen state directly:
 
 ## Known Gaps / Future Work
 
-- No mobile test runner (Jest, Detox) — API has Vitest coverage
+- No mobile UI test runner (Jest, Detox) — pure-fn code in `@lunarcal/shared` has Vitest coverage; mobile screens rely on manual QA
 - Web layout not optimised for desktop/tablet widths
 - Notification background fetch may be killed by Android battery optimisation; foreground fallback on app resume is in place via AppState listener

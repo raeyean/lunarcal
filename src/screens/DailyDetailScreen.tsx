@@ -3,6 +3,7 @@ import { View, ScrollView, Animated, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MonthHeader } from '../components/MonthHeader';
 import { EditorialDaily } from '../components/EditorialDaily';
+import { CompatStrip } from '../components/CompatStrip';
 import { ApiDemoCard } from '../components/ApiDemoCard';
 import { useTheme } from '../context/ThemeContext';
 import { getDayData, getChineseDayName } from '../utils/lunar';
@@ -46,6 +47,12 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay, open
           style={styles.scrollView}
           contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xxl }}
         >
+          <View style={{ paddingHorizontal: Spacing.xl }}>
+            <CompatStrip
+              targetSolarDate={`${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`}
+              compact
+            />
+          </View>
           <EditorialDaily
               day={dayData}
               openGlossaryTerm={isCenter ? openGlossaryTerm : null}
