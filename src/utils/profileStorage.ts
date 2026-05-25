@@ -72,7 +72,7 @@ export async function getSavedDates(): Promise<SavedDate[]> {
     for (const item of parsed) {
       const r = SavedDateSchema.safeParse(item);
       if (r.success) good.push(r.data);
-      else console.warn('[profileStorage] dropped malformed saved date', item);
+      else console.warn('[profileStorage] dropped malformed saved date id=%s', (item as { id?: unknown })?.id ?? '(unknown)');
     }
     return good;
   } catch (e) {
