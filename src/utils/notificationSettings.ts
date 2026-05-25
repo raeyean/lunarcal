@@ -19,7 +19,14 @@ export async function getNotificationSettings(): Promise<NotificationSettings> {
   if (!raw) return DEFAULT_SETTINGS;
   try {
     const parsed = JSON.parse(raw);
-    return { ...DEFAULT_SETTINGS, ...parsed };
+    const enabled = typeof parsed.enabled === 'boolean' ? parsed.enabled : DEFAULT_SETTINGS.enabled;
+    const hour = Number.isInteger(parsed.hour) && parsed.hour >= 0 && parsed.hour <= 23
+      ? parsed.hour
+      : DEFAULT_SETTINGS.hour;
+    const minute = Number.isInteger(parsed.minute) && parsed.minute >= 0 && parsed.minute <= 59
+      ? parsed.minute
+      : DEFAULT_SETTINGS.minute;
+    return { enabled, hour, minute };
   } catch (err) {
     console.warn('Failed to parse notification settings; using defaults:', err);
     return DEFAULT_SETTINGS;
