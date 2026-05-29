@@ -17,6 +17,7 @@ interface CalendarCellProps {
   isEmpty: boolean;
   isToday?: boolean;
   isLunarFirst?: boolean;
+  isCurrentMonth?: boolean;
   /** Full day-data — drives deity dot + 朔/望 mini moon. */
   dayData?: DayData;
   accessibilityLabel?: string;
@@ -32,6 +33,7 @@ function CalendarCellInner({
   isEmpty,
   isToday,
   isLunarFirst,
+  isCurrentMonth = true,
   dayData,
   accessibilityLabel,
   onSelectDay,
@@ -43,6 +45,17 @@ function CalendarCellInner({
 
   if (isEmpty) {
     return <View style={styles.container} />;
+  }
+
+  if (!isCurrentMonth) {
+    return (
+      <View style={[styles.container, styles.dimmed]}>
+        <Text style={[styles.dayNumber, { color: colors.foreground }]}>{day}</Text>
+        <Text style={[styles.lunarText, { color: colors.muted }]} numberOfLines={1}>
+          {lunarText}
+        </Text>
+      </View>
+    );
   }
 
   const containerExtra: ViewStyle[] = [];
@@ -138,6 +151,9 @@ const styles = StyleSheet.create({
   },
   lunarText: {
     ...Typography.lunarDateCell,
+  },
+  dimmed: {
+    opacity: 0.35,
   },
   deityDot: {
     position: 'absolute',

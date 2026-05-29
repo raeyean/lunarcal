@@ -9,7 +9,6 @@ import { CalendarLegend } from '../components/CalendarLegend';
 import { DeityStrip } from '../components/DeityStrip';
 import { useTheme } from '../context/ThemeContext';
 import { getMonthDays, getChineseMonthName, getDayData } from '../utils/lunar';
-import { Solar } from 'lunar-javascript';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { getPrevMonth, getNextMonth } from '../utils/dateHelpers';
 
@@ -80,9 +79,6 @@ export function CalendarScreen({
 
   const renderMonthPanel = (y: number, m: number, sd: number, isCenter: boolean) => {
     const weeks = getMonthDays(y, m);
-    const firstDay = Solar.fromYmd(y, m, 1);
-    const firstWeekDay = firstDay.getWeek();
-    const daysInMonth = new Date(y, m, 0).getDate();
 
     return (
       <View key={`${y}-${m}`} style={{ width: screenWidth }}>
@@ -95,8 +91,6 @@ export function CalendarScreen({
         <CalendarGrid
           weeks={weeks}
           selectedDay={isCenter ? sd : 0}
-          daysInMonth={daysInMonth}
-          firstWeekDay={firstWeekDay}
           onSelectDay={isCenter ? onSelectDay : noopDay}
           year={y}
           month={m}
