@@ -184,6 +184,7 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
           <Pressable
             onPress={onCancel}
             style={[styles.btn, styles.btnGhost, { borderColor: colors.line }]}
+            accessibilityRole="button"
           >
             <Text style={[styles.btnLabel, { color: colors.foreground }]}>取消</Text>
           </Pressable>
