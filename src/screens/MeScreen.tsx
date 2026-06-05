@@ -76,6 +76,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
         <Pressable
           style={[styles.cta, { backgroundColor: colors.primary }]}
           onPress={() => setProfileFormVisible(true)}
+          accessibilityRole="button"
         >
           <Text style={[styles.ctaText, { color: colors.onPrimary }]}>開始設定</Text>
         </Pressable>
@@ -100,6 +101,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
         <Pressable
           style={[styles.cta, { backgroundColor: colors.primary }]}
           onPress={() => setProfileFormVisible(true)}
+          accessibilityRole="button"
         >
           <Text style={[styles.ctaText, { color: colors.onPrimary }]}>重新輸入</Text>
         </Pressable>
@@ -140,6 +142,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
         <Pressable
           onPress={() => setProfileFormVisible(true)}
           accessibilityLabel="編輯個人資料"
+          accessibilityRole="button"
           style={styles.editBtn}
         >
           <Ionicons name="pencil-outline" size={18} color={colors.muted} />
@@ -194,7 +197,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
       <Text style={[styles.disclaimer, { color: colors.muted }]}>
         日柱對比僅作日常參考，{'\n'}非完整命理分析。
       </Text>
-      <Pressable onPress={handleClearProfile} style={styles.clearBtn}>
+      <Pressable onPress={handleClearProfile} style={styles.clearBtn} accessibilityRole="button">
         <Text style={[styles.clearText, { color: colors.primary }]}>清除個人資料</Text>
       </Pressable>
 

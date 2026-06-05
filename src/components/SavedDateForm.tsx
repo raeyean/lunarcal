@@ -99,6 +99,7 @@ export function SavedDateForm({ visible, initialLabel, initialSolarDate, onCance
             <Pressable
               onPress={onCancel}
               style={[styles.btn, styles.btnGhost, { borderColor: colors.line }]}
+              accessibilityRole="button"
             >
               <Text style={[styles.btnLabel, { color: colors.foreground }]}>取消</Text>
             </Pressable>
@@ -106,6 +107,7 @@ export function SavedDateForm({ visible, initialLabel, initialSolarDate, onCance
               onPress={handleSubmit}
               disabled={submitting}
               style={[styles.btn, { backgroundColor: colors.primary, opacity: submitting ? 0.6 : 1 }]}
+              accessibilityRole="button"
             >
               <Text style={[styles.btnLabel, { color: colors.onPrimary }]}>
                 {submitting ? '儲存中…' : '儲存'}
