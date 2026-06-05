@@ -7,8 +7,6 @@ import { Spacing } from '../constants/spacing';
 interface CalendarGridProps {
   weeks: DayData[][];
   selectedDay: number;
-  daysInMonth: number;
-  firstWeekDay: number;
   onSelectDay: (day: number) => void;
   year: number;
   month: number;
@@ -17,8 +15,6 @@ interface CalendarGridProps {
 export function CalendarGrid({
   weeks,
   selectedDay,
-  daysInMonth,
-  firstWeekDay,
   onSelectDay,
   year,
   month,
@@ -33,23 +29,22 @@ export function CalendarGrid({
       {weeks.map((week, weekIdx) => (
         <View key={weekIdx} style={styles.weekRow}>
           {week.map((dayData, cellIdx) => {
-            const globalIdx = weekIdx * 7 + cellIdx;
-            const isEmpty = globalIdx < firstWeekDay || globalIdx >= firstWeekDay + daysInMonth;
-
-            if (isEmpty) {
+            if (!dayData.isCurrentMonth) {
+              const lunarText = dayData.jieqi || dayData.festivalShort || dayData.lunar.dayCn;
               return (
                 <CalendarCell
                   key={cellIdx}
-                  day={0}
-                  lunarText=""
+                  day={dayData.solar.day}
+                  lunarText={lunarText}
                   isActive={false}
                   isJieqi={false}
-                  isEmpty={true}
+                  isEmpty={false}
+                  isCurrentMonth={false}
                 />
               );
             }
 
-            const day = globalIdx - firstWeekDay + 1;
+            const day = dayData.solar.day;
             const isFestival = !!dayData.festivalShort;
             const lunarText = dayData.jieqi || dayData.festivalShort || dayData.lunar.dayCn;
             const isJieqi = !!dayData.jieqi;
