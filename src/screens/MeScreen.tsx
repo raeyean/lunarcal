@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   emptyBody: { ...Typography.body, fontSize: 14, marginTop: 8, textAlign: 'center' },
   cta: { marginTop: 24, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
   ctaText: { ...Typography.toggleActive },
-  h1: { ...Typography.screenHeader, fontSize: 24, marginBottom: 12 },
+  h1: { ...Typography.screenHeader, fontSize: 24, lineHeight: 32, marginBottom: 12 },
   hero: {
     flexDirection: 'row',
     borderWidth: 1,
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   heroMain: { ...Typography.headingLG, fontSize: 22, marginTop: 6 },
   editBtn: { padding: 12, minWidth: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' },
   sectionLabel: { ...Typography.sectionTitle, marginBottom: 8, textTransform: 'uppercase' },
-  savedHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  savedHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
   addBtn: {
     flexDirection: 'row',
     alignItems: 'center',
