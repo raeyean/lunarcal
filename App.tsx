@@ -33,6 +33,7 @@ import { BirthProfileProvider } from './src/context/BirthProfileContext';
 import * as BackgroundFetch from 'expo-background-fetch';
 import { scheduleAllLunarNotifications } from './src/utils/lunarNotifications';
 import { BACKGROUND_NOTIFICATION_TASK } from './src/constants/tasks';
+import { syncWidget } from './src/utils/widgetSync';
 import { SettingsModal } from './src/components/SettingsModal';
 import { DeityListModal } from './src/components/DeityListModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -107,6 +108,9 @@ function AppContent() {
     }
     initNotifications();
 
+    // Push today's real almanac data to the home-screen widget on launch.
+    syncWidget();
+
     // Reschedule when the app comes to the foreground in case background fetch
     // was killed by the OS (common on Android with battery optimisation).
     const subscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
@@ -114,6 +118,8 @@ function AppContent() {
         scheduleAllLunarNotifications().catch(err =>
           console.warn('Failed to reschedule notifications on resume:', err),
         );
+        // Refresh widget data too (handles date rollover while backgrounded).
+        syncWidget();
       }
       appState.current = nextState;
     });
