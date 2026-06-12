@@ -57,6 +57,19 @@ function withWatch(config) {
       }
     }
 
+    // 1b. Keep the watch's companion bundle ID in sync with the actual app
+    //     bundle ID (app.json ios.bundleIdentifier can differ per environment,
+    //     e.g. local device testing under another team). The committed
+    //     Info.plist hardcodes the production ID; rewrite it in the COPY only.
+    const watchPlistPath = path.join(destDir, 'Info.plist');
+    if (fs.existsSync(watchPlistPath)) {
+      const plist = fs.readFileSync(watchPlistPath, 'utf8').replace(
+        /(<key>WKCompanionAppBundleIdentifier<\/key>\s*<string>)[^<]*(<\/string>)/,
+        `$1${bundleId}$2`
+      );
+      fs.writeFileSync(watchPlistPath, plist);
+    }
+
     // 2. PBXGroup
     const groupKey = xcodeProject.pbxCreateGroup(WATCH_NAME, WATCH_NAME);
     const projectSection = xcodeProject.pbxProjectSection();
