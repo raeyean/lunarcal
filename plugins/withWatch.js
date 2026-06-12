@@ -100,6 +100,19 @@ function withWatch(config) {
     //    cover the standalone case too. (withWidget's own addTargetDependency
     //    silently no-ops without them — same node-xcode bug, unnoticed because
     //    the widget is same-SDK.)
+    // Idempotency guard: skip if the watch target already exists in pbxproj.
+    // CAVEAT: sources were already copied above, but a NEW file added to
+    // targets/watch/ or targets/shared/ will NOT be registered in the pbxproj
+    // on this skip path — run `expo prebuild -p ios --clean` after adding files.
+    const existingTargets = xcodeProject.pbxNativeTargetSection();
+    const alreadyAdded = Object.values(existingTargets).some(
+      t => t && typeof t === 'object' && (t.name === WATCH_NAME || t.name === `"${WATCH_NAME}"`)
+    );
+    if (alreadyAdded) {
+      console.log(`[withWatch] ${WATCH_NAME} target already exists, skipping pbxproj registration (new files need --clean)`);
+      return config;
+    }
+
     const objects = xcodeProject.hash.project.objects;
     if (!objects.PBXTargetDependency) objects.PBXTargetDependency = {};
     if (!objects.PBXContainerItemProxy) objects.PBXContainerItemProxy = {};
