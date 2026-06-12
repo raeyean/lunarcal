@@ -424,6 +424,21 @@ git add docs/superpowers/plans/2026-06-12-watchos-app.md
 git commit -m "docs(watch): record EAS watch-target build spike result"
 ```
 
+### Task 4 spike result (2026-06-12)
+
+**Status: BLOCKED on interactive Apple credential setup — watch-target risk still UNVALIDATED.**
+
+- Auth OK: `eas whoami` → `raeyean`. Project `@raeyean/LunarCal` (e9499a56-…) confirmed.
+- Local `eas-cli` is 14.4.1, below the `>= 18.3.0` constraint in eas.json. Ran via `npx eas-cli@latest` (resolved 20.1.0) to satisfy it. (Consider bumping the dev dependency / global install.)
+- `eas build --platform ios --profile development --non-interactive` failed at credential setup:
+  > `Failed to set up credentials. You're in non-interactive mode. EAS CLI couldn't find any credentials suitable for internal distribution. Run this command again in interactive mode.`
+- `eas device:list` → `No Apple teams found for account raeyean.` and `eas build:list -p ios` → `[]` (no prior iOS cloud builds). So the assumed "existing phone + widget credentials on EAS" are **not** present/usable server-side in a non-interactive context — there is no linked Apple Developer team for the CLI to use.
+- `eas credentials -p ios` is fully interactive and cannot be driven here: it requires a TTY (rejects piped/redirected stdin with `Input is required, but stdin is not readable`). Minting any provisioning profile (including the new watch bundle ID) requires an interactive Apple ID login + 2FA, which this environment cannot supply.
+
+**Diagnosis:** the failure is an environment/auth limitation (no TTY + no Apple team linked on EAS), **not** proof that EAS cannot handle the watch target. EAS never progressed far enough to attempt minting a profile for `com.raeyean.LunarCal.watchkitapp`, so spec risk #1 remains genuinely open.
+
+**Required to unblock (user action, real terminal):** run `eas build --platform ios --profile development` interactively (no `--non-interactive`), log into the Apple Developer account when prompted, and let EAS register the phone, widget, and new watch bundle IDs + ad-hoc devices. Only the watch-bundle-ID provisioning step proves/refutes risk #1. No project config was changed.
+
 ---
 
 ### Task 5: Glance UI + crown paging
