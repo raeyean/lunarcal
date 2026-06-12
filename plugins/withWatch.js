@@ -149,7 +149,21 @@ function withWatch(config) {
     }
     xcodeProject.addFile(groupRelPrefix + 'Info.plist', groupKey);
     for (const dir of copiedDirs.filter(d => d.endsWith('.xcassets'))) {
-      xcodeProject.addResourceFile(groupRelPrefix + dir, { target: target.uuid }, groupKey);
+      // node-xcode's addResourceFile() calls correctForResourcesPath() which
+      // calls pbxGroupByName('Resources') — this returns null when there is no
+      // top-level PBX group literally named "Resources", crashing with
+      // "Cannot read properties of null (reading 'path')". Bypass it by
+      // registering the file reference and build phase entries directly, the
+      // same way @expo/config-plugins' addResourceFileToGroup() does it.
+      const pbxFile = require('xcode/lib/pbxFile.js');
+      const assetFile = new pbxFile(groupRelPrefix + dir, { target: target.uuid });
+      assetFile.uuid = xcodeProject.generateUuid();
+      assetFile.fileRef = xcodeProject.generateUuid();
+      assetFile.target = target.uuid;
+      xcodeProject.addToPbxFileReferenceSection(assetFile);
+      xcodeProject.addToPbxBuildFileSection(assetFile);
+      xcodeProject.addToPbxResourcesBuildPhase(assetFile);
+      xcodeProject.addToPbxGroup(assetFile, groupKey);
     }
     // The group's `path` (set by pbxCreateGroup to WATCH_NAME) would now double
     // up with the qualified file paths (LunarCalWatch/LunarCalWatch/<file>).
