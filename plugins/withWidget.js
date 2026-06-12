@@ -50,6 +50,19 @@ function withWidget(config) {
     const mainGroupId = projectSection[mainProjectKey].mainGroup;
     xcodeProject.addToPbxGroup(widgetGroupKey, mainGroupId);
 
+    // Idempotency guard: skip if the widget target already exists in pbxproj.
+    // CAVEAT: sources were already copied above, but a NEW file added to
+    // targets/widget/ or targets/shared/ will NOT be registered in the pbxproj
+    // on this skip path — run `expo prebuild -p ios --clean` after adding files.
+    const existingTargets = xcodeProject.pbxNativeTargetSection();
+    const alreadyAdded = Object.values(existingTargets).some(
+      t => t && typeof t === 'object' && (t.name === WIDGET_NAME || t.name === `"${WIDGET_NAME}"`)
+    );
+    if (alreadyAdded) {
+      console.log(`[withWidget] ${WIDGET_NAME} target already exists, skipping pbxproj registration (new files need --clean)`);
+      return config;
+    }
+
     // 3. Add widget target
     const target = xcodeProject.addTarget(
       WIDGET_NAME,
