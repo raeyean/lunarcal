@@ -38,6 +38,7 @@
     "plugins": [
       "expo-font",
       "./plugins/withWidget",
+      "./plugins/withWatch",
       [
         "expo-notifications",
         {
