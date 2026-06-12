@@ -1,5 +1,6 @@
 // src/utils/zodiacStorage.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { syncZodiacToWatch } from '../../modules/watch-sync';
 
 const STORAGE_KEY = 'userZodiac';
 
@@ -19,4 +20,6 @@ export async function setZodiac(animal: string): Promise<void> {
     throw new Error(`Invalid zodiac animal: ${animal}`);
   }
   await AsyncStorage.setItem(STORAGE_KEY, animal);
+  // Fire-and-forget: watch sync must never block or fail the save
+  syncZodiacToWatch(animal);
 }
