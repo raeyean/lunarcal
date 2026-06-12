@@ -12,20 +12,30 @@ function withWidget(config) {
     const bundleId = config.ios?.bundleIdentifier || 'com.lunarcal';
     const widgetBundleId = `${bundleId}.widget`;
 
-    // 1. Copy widget source files to ios build directory
-    const widgetSrcDir = path.join(projectRoot, 'targets', 'widget');
+    // 1. Copy widget + shared source files to ios build directory
+    const widgetSrcDirs = [
+      path.join(projectRoot, 'targets', 'widget'),
+      path.join(projectRoot, 'targets', 'shared'),
+    ];
     const widgetDestDir = path.join(platformRoot, WIDGET_NAME);
 
     if (!fs.existsSync(widgetDestDir)) {
       fs.mkdirSync(widgetDestDir, { recursive: true });
     }
 
-    const allFiles = fs.readdirSync(widgetSrcDir);
-    for (const file of allFiles) {
-      const src = path.join(widgetSrcDir, file);
-      const dest = path.join(widgetDestDir, file);
-      if (fs.statSync(src).isFile()) {
-        fs.copyFileSync(src, dest);
+    const allFiles = [];
+    for (const dir of widgetSrcDirs) {
+      if (!fs.existsSync(dir)) continue;
+      for (const file of fs.readdirSync(dir)) {
+        const src = path.join(dir, file);
+        const dest = path.join(widgetDestDir, file);
+        if (fs.statSync(src).isFile()) {
+          if (allFiles.includes(file)) {
+            console.warn(`[withWidget] filename collision: "${file}" from both widget/ and shared/. shared/ wins.`);
+          }
+          fs.copyFileSync(src, dest);
+          allFiles.push(file);
+        }
       }
     }
 
