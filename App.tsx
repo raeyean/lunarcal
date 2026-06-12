@@ -38,6 +38,8 @@ import { scheduleAllLunarNotifications } from './src/utils/lunarNotifications';
 import { BACKGROUND_NOTIFICATION_TASK } from './src/constants/tasks';
 import { syncWidget } from './src/utils/widgetSync';
 import { SettingsModal } from './src/components/SettingsModal';
+import { getZodiac } from './src/utils/zodiacStorage';
+import { syncZodiacToWatch } from './modules/watch-sync';
 import { DeityListModal } from './src/components/DeityListModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TodayWidget } from './src/components/TodayWidget';
@@ -130,6 +132,15 @@ function AppContent() {
 
     // Push today's real almanac data to the home-screen widget on launch.
     syncWidget();
+
+    // Re-push the saved zodiac to the watch on launch so a selection made
+    // before the watch app was installed still reaches it (the phone only
+    // pushes on save otherwise).
+    getZodiac()
+      .then(zodiac => {
+        if (zodiac) syncZodiacToWatch(zodiac);
+      })
+      .catch(() => {});
 
     // Reschedule when the app comes to the foreground in case background fetch
     // was killed by the OS (common on Android with battery optimisation).
