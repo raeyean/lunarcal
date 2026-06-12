@@ -8,6 +8,7 @@ extension Color {
 
 struct GlanceView: View {
     let offset: Int
+    @EnvironmentObject var connectivity: ConnectivityManager
 
     private var info: LunarDayInfo {
         let date = Calendar.current.date(byAdding: .day, value: offset, to: Date()) ?? Date()
@@ -48,11 +49,28 @@ struct GlanceView: View {
 
                 Divider().padding(.top, 4)
 
-                // clashBranch is a single earthly branch character (e.g. "亥").
-                // Format mirrors LargeWidgetView: "沖豬(亥) 煞西"
-                Text("沖\(info.clashAnimal)(\(info.clashBranch)) 煞\(info.sha)")
-                    .font(.system(size: 13))
-                    .foregroundColor(.secondary)
+                if let zodiac = connectivity.zodiac, zodiac == info.clashAnimal {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("⚠ 今日沖\(info.clashAnimal) — 你屬\(zodiac)")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.lunarAccent)
+                        Text("諸事不宜，宜靜不宜動")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.lunarAccent, lineWidth: 0.5)
+                    )
+                } else {
+                    // clashBranch is a single earthly branch character (e.g. "亥").
+                    // Format mirrors LargeWidgetView: "沖豬(亥) 煞西"
+                    Text("沖\(info.clashAnimal)(\(info.clashBranch)) 煞\(info.sha)")
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 4)
