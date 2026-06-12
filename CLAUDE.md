@@ -67,6 +67,12 @@ packages/shared/              Shared between API and mobile (npm workspace)
 ├── src/lunar/index.ts        lunar-javascript wrapper (re-exported by mobile)
 ├── src/data/                 activityMeanings · deityDays · specialEvents
 └── src/schemas/              Zod schemas: yiji · directions · deity
+targets/
+├── shared/                   LunarCalculator.swift — Swift lunar engine shared by widget + watch
+├── widget/                   iOS home-screen widget (WidgetKit)
+└── watch/                    watchOS app (SwiftUI, single-target, watchOS 10+)
+modules/
+└── watch-sync/               Local Expo module: phone→watch zodiac sync (WCSession)
 ```
 
 ### Mobile (Expo app)
@@ -129,6 +135,7 @@ No navigation library. App.tsx manages screen state directly:
 - **Android**: Edge-to-edge (mandatory since SDK 55), adaptive icon configured, predictive back gesture disabled
 - **Lint**: `eslint.config.js` downgrades the React Compiler hook rules (`react-hooks/refs`, `set-state-in-effect`, `preserve-manual-memoization`) to warnings until existing code is migrated
 - **Web**: Favicon configured; layout is portrait-optimised (not responsive for desktop widths)
+- **watchOS**: Native SwiftUI glance app (no RN). Lunar data computed on-watch via targets/shared/LunarCalculator.swift. Zodiac synced from phone via WatchConnectivity applicationContext. Target injected at prebuild by plugins/withWatch.js.
 
 ## Known Gaps / Future Work
 

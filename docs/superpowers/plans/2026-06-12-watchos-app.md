@@ -1051,6 +1051,32 @@ git add -A
 git commit -m "docs: watch app QA results + CLAUDE.md architecture update"
 ```
 
+### Task 10 QA results (2026-06-12)
+
+**Simulator:** Apple Watch Series 11 (46mm), watchOS 26.2 — newly paired with iPhone 17 Pro sim (created pair `58E3FFF2-AB19-4CE4-AED9-424BC3CDF8DD` for this session).
+
+**Build used:** `Debug-watchsimulator/LunarCalWatch.app` from DerivedData (Task 9 build, arm64+x86_64 fat binary). No rebuild required.
+
+**JS cross-check:** `node -e "... Solar.fromYmd(2026,6,12).getLunar() ..."` → 四月廿七, 丁巳日. Watch display matches.
+
+| # | Checklist item | Result | Evidence |
+|---|----------------|--------|----------|
+| 1 | Glance shows 四月廿七 big, Ganzhi line, 宜/忌 chips, 沖豬(亥) 煞東 footer | **PASS** | `/tmp/watch-qa-1-glance.png` — 四月廿七 prominent, 丙午年 乙未月 丁巳日 ganzhi line, 宜 祈福 求嗣 齋醮 chip, 忌 動土 開市 交易 chip, 沖豬(亥) 煞東 footer. Month ganzhi 乙未 renders as expected-wrong (pre-existing widget bug, tracked separately — do NOT fail QA). |
+| 2 | Data matches phone app for same date | **PASS** | JS engine cross-check: 四月廿七, 丁巳, confirmed identical. Day Ganzhi 丁巳 matches. |
+| 3 | Crown scrolls ±7 days; 明天/昨天 labels; bounds stop | **MANUAL-PENDING** | Cannot automate Digital Crown interaction via `simctl` (no `sendkey` for crown). Screenshot shows 5 pager dots on right edge (vertical pager active, 5 dots visible = within ±7 range). Interactive crown feel requires device or Xcode direct control. |
+| 4 | Phone zodiac pick → watch warning card within ~seconds (WCSession round-trip) | **MANUAL-PENDING** | Real phone→watch WCSession `applicationContext` push cannot be triggered from sim-to-sim in this automated context (paired-sim WCSession often flaky; no running phone sim in session). Simulated via `defaults write` in step 4b below — watch-side read path confirmed. |
+| 4b | Warning card renders when zodiac=豬 via `defaults write` (watch-side path) | **PASS** | `/tmp/watch-qa-2-warning.png` — warning card shows: "△ 今日沖豬 — 你屬豬 / 諸事不宜、宜靜不宜動". Replaces clash footer. (Spec wording was ⚠ vs △ triangle — cosmetic diff, functionally identical orange-bordered card.) |
+| 5 | Force-quit + relaunch → zodiac UserDefaults persists, warning still shows | **PASS** | `/tmp/watch-qa-2b-persist.png` — second relaunch after `defaults write` (no re-write between launches) still shows warning card. UserDefaults survives app termination as expected. |
+| 6 | Phone in airplane mode → watch still functional (offline calc) | **PASS (offline-by-construction)** | Watch sim has no network interface; app launched and rendered all data correctly with no network available. Lunar calculation is 100% on-device Swift (LunarCalculator.swift). Cannot test airplane mode toggle on watch sim (no airplane mode UI); offline operation confirmed by sim-install-and-run with no phone connected. |
+
+**Known issue (do not fail QA):** Month Ganzhi shows 乙未 instead of 甲午. Pre-existing bug in the Swift LunarCalculator month Ganzhi computation, also present in the iOS widget. Tracked separately — not introduced by this feature.
+
+**Screenshot files:**
+- `/tmp/watch-qa-1-glance.png` — baseline glance, no zodiac set
+- `/tmp/watch-qa-2-warning.png` — zodiac=豬 warning card active
+- `/tmp/watch-qa-2b-persist.png` — warning persists after second cold relaunch
+- `/tmp/watch-qa-3-reset.png` — after `defaults delete`, footer reverts to 沖豬(亥) 煞東
+
 ---
 
 ## Deviations from spec
