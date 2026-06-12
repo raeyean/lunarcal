@@ -1,6 +1,6 @@
 import Foundation
 
-struct LunarDayInfo {
+struct LunarDayInfo: Codable {
     let solarYear: Int
     let solarMonth: Int
     let solarDay: Int
@@ -27,6 +27,27 @@ struct LunarDayInfo {
 }
 
 struct LunarCalculator {
+
+    // MARK: - Shared data (App Group)
+    //
+    // The app writes the real lunar-javascript data (the same engine the app UI
+    // uses) into the shared App Group on launch / resume. We prefer that here so
+    // the widget and the app never disagree. The local computation below is only
+    // a fallback for the window before the app is first opened.
+
+    private static let appGroup = "group.com.raeyean.LunarCal"
+    private static let dataKey = "widgetData"
+
+    static func shared(year: Int, month: Int, day: Int) -> LunarDayInfo? {
+        guard
+            let defaults = UserDefaults(suiteName: appGroup),
+            let json = defaults.string(forKey: dataKey),
+            let data = json.data(using: .utf8),
+            let map = try? JSONDecoder().decode([String: LunarDayInfo].self, from: data)
+        else { return nil }
+        let key = String(format: "%04d-%02d-%02d", year, month, day)
+        return map[key]
+    }
 
     // MARK: - Constants
 
@@ -65,7 +86,7 @@ struct LunarCalculator {
         "申":"南","酉":"東","戌":"北","亥":"西"
     ]
 
-    // Yi/Ji activities based on day Heavenly Stem index
+    // Yi/Ji activities based on day Heavenly Stem index (fallback only)
     private static let yiByDayStem: [[String]] = [
         ["祭祀","祈福","求嗣","開光","出行","納采"],      // 甲
         ["嫁娶","納采","祭祀","祈福","出行","動土"],      // 乙
@@ -153,6 +174,14 @@ struct LunarCalculator {
         ]
     ]
 
+    // The 12 sectional terms (節) that start each Ganzhi month, mapped to the
+    // month branch and its 0-based index in the 寅-first month order.
+    private static let sectionalTerms: [String: (branch: String, idx: Int)] = [
+        "立春": ("寅", 0), "驚蟄": ("卯", 1), "清明": ("辰", 2), "立夏": ("巳", 3),
+        "芒種": ("午", 4), "小暑": ("未", 5), "立秋": ("申", 6), "白露": ("酉", 7),
+        "寒露": ("戌", 8), "立冬": ("亥", 9), "大雪": ("子", 10), "小寒": ("丑", 11)
+    ]
+
     // MARK: - Calculation Methods
 
     /// Julian Day Number for a given date
@@ -166,9 +195,6 @@ struct LunarCalculator {
     /// Get day Ganzhi index (0-59) for a solar date
     private static func dayGanzhiIndex(year: Int, month: Int, day: Int) -> Int {
         let jd = julianDay(year: year, month: month, day: day)
-        // Jan 1, 1900 is 甲子 (index 0) at JD 2415021
-        // Actually JD for Jan 1, 1900 = 2415021, and that day is 甲戌 (index 10)
-        // We need offset: (jd - 2415020 + 9) % 60
         return ((jd - 2415020 + 9) % 60 + 60) % 60
     }
 
@@ -177,25 +203,57 @@ struct LunarCalculator {
         return ((year - 4) % 60 + 60) % 60
     }
 
-    /// Approximate month Ganzhi index
-    /// Month Ganzhi follows: Year Stem determines the starting stem for months
-    /// Rule: 甲己年起丙寅月, 乙庚年起戊寅月, 丙辛年起庚寅月, 丁壬年起壬寅月, 戊癸年起甲寅月
-    private static func monthGanzhiIndex(year: Int, month: Int) -> Int {
-        let yearStemIdx = yearGanzhiIndex(year: year) % 10
-        let startStem: Int
+    /// 五虎遁 starting stem of the 寅 month for a given year-stem index.
+    private static func startStem(forYearStem yearStemIdx: Int) -> Int {
         switch yearStemIdx {
-        case 0, 5: startStem = 2  // 甲己 -> 丙
-        case 1, 6: startStem = 4  // 乙庚 -> 戊
-        case 2, 7: startStem = 6  // 丙辛 -> 庚
-        case 3, 8: startStem = 8  // 丁壬 -> 壬
-        case 4, 9: startStem = 0  // 戊癸 -> 甲
-        default: startStem = 0
+        case 0, 5: return 2  // 甲己 -> 丙
+        case 1, 6: return 4  // 乙庚 -> 戊
+        case 2, 7: return 6  // 丙辛 -> 庚
+        case 3, 8: return 8  // 丁壬 -> 壬
+        case 4, 9: return 0  // 戊癸 -> 甲
+        default: return 0
         }
-        // Month 1 (寅月) = index 2 in branches, each month advances by 1
-        let monthOffset = month - 1 // 0-based
-        let stemIdx = (startStem + monthOffset) % 10
-        let branchIdx = (2 + monthOffset) % 12
-        return stemIdx * 12 + branchIdx // Not quite right, need proper Jiazi index
+    }
+
+    /// 立春 (month, day) for a year, if known.
+    private static func lichun(_ year: Int) -> (Int, Int)? {
+        guard let terms = jieqiDates[year] else { return nil }
+        for (m, d, name) in terms where name == "立春" { return (m, d) }
+        return nil
+    }
+
+    /// Month pillar (月柱) from the most recent sectional term (節) on or before
+    /// the date — NOT the Gregorian month. The lunar year stem flips at 立春.
+    private static func monthGanzhi(year: Int, month: Int, day: Int) -> String {
+        var best: (y: Int, m: Int, d: Int, name: String)?
+        for y in [year - 1, year] {
+            guard let terms = jieqiDates[y] else { continue }
+            for (m, d, name) in terms where sectionalTerms[name] != nil {
+                let onOrBefore = y < year || m < month || (m == month && d <= day)
+                guard onOrBefore else { continue }
+                if let b = best {
+                    if (y, m, d) > (b.y, b.m, b.d) { best = (y, m, d, name) }
+                } else {
+                    best = (y, m, d, name)
+                }
+            }
+        }
+
+        guard let term = best, let info = sectionalTerms[term.name] else {
+            // Deep fallback (jieqi table lacks the year): rough Gregorian mapping.
+            let yIdx = yearGanzhiIndex(year: year) % 10
+            let stemIdx = (startStem(forYearStem: yIdx) + month - 1) % 10
+            return heavenlyStems[stemIdx] + earthlyBranches[(month + 1) % 12]
+        }
+
+        // Year stem for 五虎遁: flips to the previous year before 立春.
+        var stemYear = year
+        if let (lm, ld) = lichun(year), month < lm || (month == lm && day < ld) {
+            stemYear = year - 1
+        }
+        let yearStemIdx = yearGanzhiIndex(year: stemYear) % 10
+        let stemIdx = (startStem(forYearStem: yearStemIdx) + info.idx) % 10
+        return heavenlyStems[stemIdx] + info.branch
     }
 
     private static func ganzhiString(index: Int) -> String {
@@ -223,7 +281,6 @@ struct LunarCalculator {
 
     /// Find the next Jieqi from a given date
     private static func findNextJieqi(year: Int, month: Int, day: Int) -> (name: String, dateStr: String)? {
-        // Check current year and next year
         for y in [year, year + 1] {
             guard let terms = jieqiDates[y] else { continue }
             for (m, d, name) in terms {
@@ -246,7 +303,15 @@ struct LunarCalculator {
 
     // MARK: - Public API
 
+    /// Prefer real data shared by the app; fall back to local computation.
     static func calculate(year: Int, month: Int, day: Int) -> LunarDayInfo {
+        if let sharedInfo = shared(year: year, month: month, day: day) {
+            return sharedInfo
+        }
+        return computeFallback(year: year, month: month, day: day)
+    }
+
+    private static func computeFallback(year: Int, month: Int, day: Int) -> LunarDayInfo {
         let date = makeDate(year: year, month: month, day: day)
         let lunarComps = lunarComponents(from: date)
         let gregorianCal = Calendar(identifier: .gregorian)
@@ -261,21 +326,7 @@ struct LunarCalculator {
         // Ganzhi
         let yearIdx = yearGanzhiIndex(year: year)
         let yearGZ = ganzhiString(index: yearIdx)
-
-        // Month Ganzhi
-        let yearStemIdx = yearIdx % 10
-        let startStem: Int
-        switch yearStemIdx {
-        case 0, 5: startStem = 2
-        case 1, 6: startStem = 4
-        case 2, 7: startStem = 6
-        case 3, 8: startStem = 8
-        case 4, 9: startStem = 0
-        default: startStem = 0
-        }
-        let monthStemIdx = (startStem + month - 1) % 10
-        let monthBranchIdx = (month + 1) % 12  // month 1 -> 寅(2)
-        let monthGZ = heavenlyStems[monthStemIdx] + earthlyBranches[monthBranchIdx]
+        let monthGZ = monthGanzhi(year: year, month: month, day: day)
 
         // Day Ganzhi
         let dayIdx = dayGanzhiIndex(year: year, month: month, day: day)
