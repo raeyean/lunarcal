@@ -28,7 +28,8 @@ from the phone app.
 ## Architecture
 
 - **Target:** single-target watchOS SwiftUI app `LunarCalWatch`
-  (watchOS 9+ deployment, no separate WatchKit extension).
+  (watchOS 10+ deployment — `.verticalPage` crown paging requires 10; same
+  hardware coverage as 9, Series 4+ — no separate WatchKit extension).
   Bundle ID `com.raeyean.LunarCal.watchkitapp`; Info.plist
   `WKCompanionAppBundleIdentifier = com.raeyean.LunarCal`,
   `WKApplication = true`.
