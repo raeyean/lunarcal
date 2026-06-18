@@ -19,7 +19,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.raeyean.LunarCal",
+      "bundleIdentifier": "com.alphapod.testground",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
