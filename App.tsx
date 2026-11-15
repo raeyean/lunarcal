@@ -114,7 +114,7 @@ function AppContent() {
     // Reschedule when the app comes to the foreground in case background fetch
     // was killed by the OS (common on Android with battery optimisation).
     const subscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
-      if (appState.current.match(/inactive|background/) && nextState === 'active') {
+      if (appState.current?.match(/inactive|background/) && nextState === 'active') {
         scheduleAllLunarNotifications().catch(err =>
           console.warn('Failed to reschedule notifications on resume:', err),
         );
