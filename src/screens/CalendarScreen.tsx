@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MonthHeader } from '../components/MonthHeader';
 import { WeekHeader } from '../components/WeekHeader';
@@ -51,7 +53,7 @@ export function CalendarScreen({
     });
   };
 
-  const { panHandlers, animatedStyle, triggerPrev, triggerNext, screenWidth } = useSwipeGesture({
+  const { gesture, animatedStyle, triggerPrev, triggerNext, screenWidth } = useSwipeGesture({
     onSwipeLeft: onNextMonth,
     onSwipeRight: onPrevMonth,
   });
@@ -63,7 +65,7 @@ export function CalendarScreen({
 
   // Deity days for the *current* month — rendered outside the swipe area so
   // the strip's horizontal ScrollView owns its own gestures without fighting
-  // the parent month-swipe PanResponder.
+  // the parent month-swipe pan gesture.
   const currentDeityDays = useMemo(() => {
     const weeks = getMonthDays(year, month);
     const seen = new Set<number>();
@@ -102,11 +104,13 @@ export function CalendarScreen({
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.swipeArea}>
-        <Animated.View style={[styles.panelRow, animatedStyle, { width: screenWidth * 3 }]} {...panHandlers}>
-          {renderMonthPanel(prevYear, prevMonth, 1, false)}
-          {renderMonthPanel(year, month, selectedDay, true)}
-          {renderMonthPanel(nextYear, nextMonth, 1, false)}
-        </Animated.View>
+        <GestureDetector gesture={gesture}>
+          <Animated.View style={[styles.panelRow, animatedStyle, { width: screenWidth * 3 }]}>
+            {renderMonthPanel(prevYear, prevMonth, 1, false)}
+            {renderMonthPanel(year, month, selectedDay, true)}
+            {renderMonthPanel(nextYear, nextMonth, 1, false)}
+          </Animated.View>
+        </GestureDetector>
       </View>
       <DeityStrip days={currentDeityDays} onSelect={onSelectDay} />
       <CalendarLegend expanded={legendExpanded} onToggle={toggleLegend} />

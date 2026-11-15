@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, ScrollView, Animated, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MonthHeader } from '../components/MonthHeader';
 import { EditorialDaily } from '../components/EditorialDaily';
@@ -19,6 +21,11 @@ interface DailyDetailScreenProps {
   onNextDay: () => void;
   openGlossaryTerm?: 'yi' | 'ji' | null;
   onGlossaryOpened?: () => void;
+  /**
+   * Direction of the last prev/next day navigation (-1 = prev, 1 = next).
+   * Accepted for the daily hero numeral roll (#23); not used yet.
+   */
+  navDirection?: -1 | 1;
 }
 
 const noop = () => {};
@@ -26,7 +33,7 @@ const noop = () => {};
 export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay, openGlossaryTerm, onGlossaryOpened }: DailyDetailScreenProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const { panHandlers, animatedStyle, triggerPrev, triggerNext, screenWidth } = useSwipeGesture({
+  const { gesture, animatedStyle, triggerPrev, triggerNext, screenWidth } = useSwipeGesture({
     onSwipeLeft: onNextDay,
     onSwipeRight: onPrevDay,
   });
@@ -74,11 +81,13 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay, open
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Animated.View style={[styles.panelRow, animatedStyle, { width: screenWidth * 3 }]} {...panHandlers}>
-        {renderDayPanel(prev.year, prev.month, prev.day, false)}
-        {renderDayPanel(year, month, day, true)}
-        {renderDayPanel(next.year, next.month, next.day, false)}
-      </Animated.View>
+      <GestureDetector gesture={gesture}>
+        <Animated.View style={[styles.panelRow, animatedStyle, { width: screenWidth * 3 }]}>
+          {renderDayPanel(prev.year, prev.month, prev.day, false)}
+          {renderDayPanel(year, month, day, true)}
+          {renderDayPanel(next.year, next.month, next.day, false)}
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 }
