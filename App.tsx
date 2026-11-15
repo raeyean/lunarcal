@@ -1,4 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import Animated, { ReduceMotion, withTiming, type EntryExitAnimationFunction } from 'react-native-reanimated';
+import { Duration, EASE_OUT, Offset } from './src/constants/motion';
 import { View, Text, StyleSheet, ActivityIndicator, AppState, AppStateStatus, useColorScheme } from 'react-native';
 
 // Cap accessibility text scaling so layouts don't break, while still respecting the OS setting.
@@ -205,6 +207,7 @@ function AppContent() {
         </IconButton>
       </View>
       <ErrorBoundary>
+        <Animated.View key={activeTab} entering={tabEntering} style={{ flex: 1 }}>
         {activeTab === 'calendar' ? (
           <CalendarScreen
             key={`${year}-${month}`}
@@ -236,6 +239,7 @@ function AppContent() {
             onGlossaryOpened={handleGlossaryOpened}
           />
         )}
+        </Animated.View>
       </ErrorBoundary>
       <BottomTabBar active={activeTab} onChange={setActiveTab} />
       <SettingsModal
@@ -274,6 +278,18 @@ function AppContent() {
     </SafeAreaView>
   );
 }
+
+const tabEntering: EntryExitAnimationFunction = () => {
+  'worklet';
+  const config = { duration: Duration.tabIn, easing: EASE_OUT, reduceMotion: ReduceMotion.System };
+  return {
+    initialValues: { opacity: 0, transform: [{ translateY: Offset.tabY }] },
+    animations: {
+      opacity: withTiming(1, config),
+      transform: [{ translateY: withTiming(0, config) }],
+    },
+  };
+};
 
 export default function App() {
   const systemScheme = useColorScheme();

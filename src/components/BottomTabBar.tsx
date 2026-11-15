@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Pressable, Text, StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
+import { Offset } from '../constants/motion';
+import { useMotion } from '../hooks/useMotion';
 
 export type TabKey = 'daily' | 'calendar' | 'me';
 
@@ -26,18 +29,73 @@ interface Props {
   onChange: (key: TabKey) => void;
 }
 
+const PILL_W = 72;
+const PILL_H = 48;
+
+function TabIcon({ name, color, selected }: { name: keyof typeof Ionicons.glyphMap; color: string; selected: boolean }) {
+  const { spring } = useMotion();
+  const scale = useSharedValue(1);
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    if (selected) {
+      scale.value = Offset.tabIconScaleFrom;
+      scale.value = withSpring(1, spring);
+    }
+  }, [selected, scale, spring]);
+
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
+  return (
+    <Animated.View style={style}>
+      <Ionicons name={name} size={22} color={color} />
+    </Animated.View>
+  );
+}
+
 export function BottomTabBar({ active, onChange }: Props) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { spring } = useMotion();
+  const [barWidth, setBarWidth] = useState(0);
+  const pillX = useSharedValue(0);
+  const placed = useRef(false);
+
+  const activeIndex = TABS.findIndex((t) => t.key === active);
+
+  useEffect(() => {
+    if (barWidth === 0) return;
+    const tabW = barWidth / TABS.length;
+    const target = activeIndex * tabW + (tabW - PILL_W) / 2;
+    if (!placed.current) {
+      placed.current = true;
+      pillX.value = target;
+    } else {
+      pillX.value = withSpring(target, spring);
+    }
+  }, [barWidth, activeIndex, pillX, spring]);
+
+  const pillStyle = useAnimatedStyle(() => ({ transform: [{ translateX: pillX.value }] }));
 
   return (
     <View
       accessibilityRole="tablist"
+      onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}
       style={[
         styles.bar,
         { backgroundColor: colors.background, borderTopColor: colors.line, paddingBottom: Spacing.md + insets.bottom },
       ]}
     >
+      {barWidth > 0 && (
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.pill, { backgroundColor: colors.primarySoft }, pillStyle]}
+        />
+      )}
       {TABS.map((t) => {
         const selected = t.key === active;
         const iconName = selected ? t.iconActive : t.icon;
@@ -52,7 +110,7 @@ export function BottomTabBar({ active, onChange }: Props) {
             accessibilityState={{ selected }}
             accessibilityLabel={t.label}
           >
-            <Ionicons name={iconName} size={22} color={iconColor} />
+            <TabIcon name={iconName} color={iconColor} selected={selected} />
             <Text style={[styles.label, { color: iconColor }]}>{t.label}</Text>
           </Pressable>
         );
@@ -67,6 +125,14 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     paddingTop: Spacing.sm,
     paddingBottom: Spacing.md,
+  },
+  pill: {
+    position: 'absolute',
+    top: Spacing.sm - 5,
+    left: 0,
+    width: PILL_W,
+    height: PILL_H,
+    borderRadius: 16,
   },
   tab: {
     flex: 1,
