@@ -1,12 +1,42 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, type ViewStyle } from 'react-native';
+import { View, Text, Pressable, StyleSheet, type ViewStyle } from 'react-native';
+import Animated, {
+  Easing,
+  Keyframe,
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { Radius } from '../constants/radius';
 import { Spacing } from '../constants/spacing';
+import { Duration, EASE_OUT, Offset } from '../constants/motion';
+import { useMotion } from '../hooks/useMotion';
 import { Moon } from './Moon';
+import { SelectionBurst } from './SelectionBurst';
 import { deityColor } from '../constants/colors';
 import type { DayData } from '../utils/lunar';
+
+const PRESS_SCALE = 0.93;
+const PRESS_MS = 140;
+
+/**
+ * Selection pop: scale 0.55 -> 1 with the prototype's overshoot curve
+ * (cubic-bezier(.34,1.56,.64,1)) plus a quick opacity fade-in.
+ */
+const popEntering = new Keyframe({
+  0: { opacity: 0, transform: [{ scale: Offset.cellPopScaleFrom }] },
+  30: { opacity: 1 },
+  100: {
+    opacity: 1,
+    transform: [{ scale: 1 }],
+    easing: Easing.bezier(0.34, 1.56, 0.64, 1),
+  },
+})
+  .duration(Duration.cellPop)
+  .reduceMotion(ReduceMotion.System);
 
 interface CalendarCellProps {
   day: number;
@@ -39,9 +69,35 @@ function CalendarCellInner({
   onSelectDay,
 }: CalendarCellProps) {
   const { colors, isDark } = useTheme();
+  const { reduced } = useMotion();
+  const pressScale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: pressScale.value }] }));
+  // Set in onPress so only user-initiated selection can trigger the burst.
+  const pressedByUser = React.useRef(false);
+  const [bursting, setBursting] = React.useState(false);
+  const dayNum = dayData?.lunar.dayNum;
+  const special = isJieqi || !!isFestival || dayNum === 1 || dayNum === 15;
+
   const handlePress = React.useCallback(() => {
+    pressedByUser.current = true;
     onSelectDay?.(day);
   }, [onSelectDay, day]);
+  const handlePressIn = React.useCallback(() => {
+    pressScale.value = withTiming(PRESS_SCALE, { duration: PRESS_MS, easing: EASE_OUT });
+  }, [pressScale]);
+  const handlePressOut = React.useCallback(() => {
+    pressScale.value = withTiming(1, { duration: PRESS_MS, easing: EASE_OUT });
+  }, [pressScale]);
+  const handleBurstDone = React.useCallback(() => setBursting(false), []);
+
+  React.useEffect(() => {
+    if (isActive) {
+      if (pressedByUser.current && special && !reduced) setBursting(true);
+    } else {
+      pressedByUser.current = false;
+      setBursting(false);
+    }
+  }, [isActive, special, reduced]);
 
   if (isEmpty) {
     return <View style={styles.container} />;
@@ -60,7 +116,8 @@ function CalendarCellInner({
 
   const containerExtra: ViewStyle[] = [];
   if (isActive) {
-    containerExtra.push({ backgroundColor: colors.primary, borderRadius: Radius.md });
+    // Lift above neighbours so the burst isn't covered.
+    containerExtra.push({ zIndex: 1 });
   } else {
     if (isFestival) {
       containerExtra.push({ backgroundColor: colors.festivalLight, borderRadius: Radius.md });
@@ -84,58 +141,83 @@ function CalendarCellInner({
   const deityHue = deity ? deityColor(deity.kind, colors) : null;
 
   return (
-    <TouchableOpacity
-      style={[styles.container, ...containerExtra]}
+    <Pressable
+      style={[styles.pressable, isActive && styles.pressableActive]}
       onPress={handlePress}
-      activeOpacity={0.6}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? `${day}日，農曆${lunarText}${isActive ? '，已選取' : ''}`}
       accessibilityState={{ selected: isActive }}
     >
-      {/* deity dot — top-left */}
-      {deity && !isActive && !isFestival && !isJieqi ? (
-        <View style={[styles.deityDot, { backgroundColor: deityHue || colors.primary }]} />
-      ) : null}
+      <Animated.View style={[styles.container, ...containerExtra, pressStyle]}>
+        {isActive ? (
+          <Animated.View
+            entering={popEntering}
+            style={[styles.selectedBg, { backgroundColor: colors.primary }]}
+          />
+        ) : null}
 
-      {/* mini moon — top-right at 朔/望 */}
-      {showMiniMoon ? (
-        <View style={styles.miniMoon}>
-          <Moon phase={phase} size={10} theme={isActive || isDark ? 'dark' : 'light'} />
-        </View>
-      ) : null}
+        {bursting ? (
+          <SelectionBurst
+            colorA={colors.primary}
+            colorB={colors.accent}
+            onDone={handleBurstDone}
+          />
+        ) : null}
 
-      <Text style={[
-        styles.dayNumber,
-        { color: colors.foreground },
-        isActive && { ...Typography.calendarDayActive, color: colors.onPrimary },
-      ]}>
-        {day}
-      </Text>
-      <Text style={[
-        styles.lunarText,
-        { color: colors.muted },
-        isActive && { color: colors.onPrimary },
-        isJieqi && !isActive && { color: colors.primary, fontFamily: Fonts.interMedium },
-        isFestival && !isActive && { color: colors.festival, fontFamily: Fonts.interMedium },
-        deity && !isJieqi && !isFestival && !isActive && deityHue
-          ? { color: deityHue, fontFamily: Fonts.interMedium }
-          : null,
-        isLunarFirst && !isJieqi && !isFestival && !deity && !isActive && {
-          color: colors.foreground,
-          fontFamily: Fonts.interMedium,
-        },
-      ]}
-        numberOfLines={1}
-      >
-        {labelText}
-      </Text>
-    </TouchableOpacity>
+        {/* deity dot — top-left */}
+        {deity && !isActive && !isFestival && !isJieqi ? (
+          <View style={[styles.deityDot, { backgroundColor: deityHue || colors.primary }]} />
+        ) : null}
+
+        {/* mini moon — top-right at 朔/望 */}
+        {showMiniMoon ? (
+          <View style={styles.miniMoon}>
+            <Moon phase={phase} size={10} theme={isActive || isDark ? 'dark' : 'light'} />
+          </View>
+        ) : null}
+
+        <Text style={[
+          styles.dayNumber,
+          { color: colors.foreground },
+          isActive && { ...Typography.calendarDayActive, color: colors.onPrimary },
+        ]}>
+          {day}
+        </Text>
+        <Text style={[
+          styles.lunarText,
+          { color: colors.muted },
+          isActive && { color: colors.onPrimary },
+          isJieqi && !isActive && { color: colors.primary, fontFamily: Fonts.interMedium },
+          isFestival && !isActive && { color: colors.festival, fontFamily: Fonts.interMedium },
+          deity && !isJieqi && !isFestival && !isActive && deityHue
+            ? { color: deityHue, fontFamily: Fonts.interMedium }
+            : null,
+          isLunarFirst && !isJieqi && !isFestival && !deity && !isActive && {
+            color: colors.foreground,
+            fontFamily: Fonts.interMedium,
+          },
+        ]}
+          numberOfLines={1}
+        >
+          {labelText}
+        </Text>
+      </Animated.View>
+    </Pressable>
   );
 }
 
 export const CalendarCell = React.memo(CalendarCellInner);
 
 const styles = StyleSheet.create({
+  pressable: {
+    flex: 1,
+    maxWidth: 72,
+  },
+  pressableActive: {
+    zIndex: 1,
+  },
   container: {
     flex: 1,
     maxWidth: 72,
@@ -145,6 +227,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: Spacing.xxs,
     position: 'relative',
+  },
+  selectedBg: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: Radius.md,
   },
   dayNumber: {
     ...Typography.calendarDay,
