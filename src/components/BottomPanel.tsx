@@ -9,6 +9,8 @@ import { meaningsFor } from '../data/activityMeanings';
 import { DayData } from '../utils/lunar';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { Duration } from '../constants/motion';
+import { RiseIn } from './RiseIn';
 
 interface BottomPanelProps {
   dayData: DayData;
@@ -43,6 +45,11 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bottomPanelBg }]}>
+      <RiseIn
+        key={`${dayData.solar.year}-${dayData.solar.month}-${dayData.solar.day}`}
+        style={styles.content}
+        duration={Duration.panelRise}
+      >
       <View style={styles.dateRow}>
         <View style={styles.dateLeft}>
           <Text style={[styles.dateNum, { color: colors.foreground }]}>{dateStr}</Text>
@@ -85,6 +92,7 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
           {jiStr2 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{jiStr2}</Text> : null}
         </View>
       </View>
+      </RiseIn>
 
       <GlossarySheet
         visible={glossaryTerm !== null}
@@ -101,6 +109,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: Spacing.lg,
     paddingHorizontal: Spacing.xl,
+  },
+  content: {
+    flex: 1,
     gap: Spacing.md,
   },
   dateRow: {

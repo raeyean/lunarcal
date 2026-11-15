@@ -4,7 +4,19 @@ import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import Animated, {
+  Easing,
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { Duration, Offset, Stagger } from '../constants/motion';
+import { useMotion } from '../hooks/useMotion';
 import { Moon } from './Moon';
+import { RiseIn } from './RiseIn';
 import { DeityCard, UpcomingDeity } from './DeityCard';
 import { CompassRose } from './CompassRose';
 import { HelpIcon } from './HelpIcon';
@@ -17,12 +29,93 @@ interface EditorialDailyProps {
   day: DayData;
   openGlossaryTerm?: 'yi' | 'ji' | null;
   onGlossaryOpened?: () => void;
+  /** Direction of the last day navigation (-1 = prev, 1 = next); drives the numeral roll. */
+  navDirection?: -1 | 1;
+  /** False for off-screen prev/next panels: render statically, no entrance motion. */
+  animate?: boolean;
+}
+
+const NUMERAL_LINE_HEIGHT = 96;
+const META_DELAY = 40;
+const META_DURATION = 300;
+const MOON_FLOAT_PX = 4;
+const MOON_FLOAT_HALF_CYCLE = 2100;
+
+/** Lunar day numeral that rolls in from the swipe direction, clipped to its line box. */
+function HeroNumeral({
+  text,
+  color,
+  direction,
+  animate,
+}: {
+  text: string;
+  color: string;
+  direction?: -1 | 1;
+  animate: boolean;
+}) {
+  const { spring, timing } = useMotion();
+  const y = useSharedValue(
+    animate && direction ? direction * Offset.heroRollFraction * NUMERAL_LINE_HEIGHT : 0,
+  );
+  const opacity = useSharedValue(animate ? 0 : 1);
+
+  useEffect(() => {
+    if (!animate) return;
+    y.value = withSpring(0, spring);
+    opacity.value = withTiming(1, timing(direction ? Duration.heroRoll : META_DURATION));
+    // Mount-only: the panel remounts per day.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const style = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: y.value }],
+  }));
+
+  return (
+    <View style={styles.heroNumeralClip}>
+      <Animated.Text style={[styles.heroNumeral, { color }, style]}>{text}</Animated.Text>
+    </View>
+  );
+}
+
+/** Gentle vertical float for the hero moon; static when reduced or not animating. */
+function FloatingMoon({ animate, children }: { animate: boolean; children: React.ReactNode }) {
+  const { reduced } = useMotion();
+  const y = useSharedValue(0);
+
+  useEffect(() => {
+    if (!animate || reduced) {
+      cancelAnimation(y);
+      y.value = 0;
+      return;
+    }
+    y.value = -MOON_FLOAT_PX;
+    y.value = withRepeat(
+      withTiming(MOON_FLOAT_PX, {
+        duration: MOON_FLOAT_HALF_CYCLE,
+        easing: Easing.inOut(Easing.sin),
+      }),
+      -1,
+      true,
+    );
+    return () => cancelAnimation(y);
+  }, [animate, reduced, y]);
+
+  const style = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
+  return <Animated.View style={style}>{children}</Animated.View>;
 }
 
 const WK = ['日', '一', '二', '三', '四', '五', '六'];
 
 /** Editorial daily-view body — large lunar numeral hero, hairline-divided sections. */
-export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: EditorialDailyProps) {
+export function EditorialDaily({
+  day,
+  openGlossaryTerm,
+  onGlossaryOpened,
+  navDirection,
+  animate = true,
+}: EditorialDailyProps) {
   const { colors, isDark } = useTheme();
   const [shichenOpen, setShichenOpen] = useState(false);
   const [glossaryTerm, setGlossaryTerm] = useState<GlossaryTermId | null>(null);
@@ -49,10 +142,10 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
   return (
     <View style={{ backgroundColor: colors.background }}>
       {/* Top meta */}
-      <View style={styles.metaRow}>
+      <RiseIn style={styles.metaRow} delay={META_DELAY} duration={META_DURATION} animate={animate}>
         <Text style={[styles.metaText, { color: colors.muted }]}>{dateStr}</Text>
         <Text style={[styles.metaText, { color: colors.muted }]}>星期{WK[dateObj.getDay()]}</Text>
-      </View>
+      </RiseIn>
 
       {/* Hero — giant lunar day numeral */}
       <View style={styles.hero}>
@@ -60,13 +153,22 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
           <Text style={[styles.heroLabel, { color: colors.subtleText }]}>
             農曆 · {day.lunar.monthCn}月
           </Text>
-          <Text style={[styles.heroNumeral, { color: colors.foreground }]}>{day.lunar.dayCn}</Text>
-          <Text style={[styles.heroGanzhi, { color: colors.muted }]}>
-            {day.ganzhi.year}年 · {day.ganzhi.month}月 · {day.ganzhi.day}日
-          </Text>
+          <HeroNumeral
+            text={day.lunar.dayCn}
+            color={colors.foreground}
+            direction={navDirection}
+            animate={animate}
+          />
+          <RiseIn delay={META_DELAY} duration={META_DURATION} animate={animate}>
+            <Text style={[styles.heroGanzhi, { color: colors.muted }]}>
+              {day.ganzhi.year}年 · {day.ganzhi.month}月 · {day.ganzhi.day}日
+            </Text>
+          </RiseIn>
         </View>
         <View style={{ marginTop: 8 }}>
-          <Moon phase={day.phase} size={72} animated theme={isDark ? 'dark' : 'light'} />
+          <FloatingMoon animate={animate}>
+            <Moon phase={day.phase} size={72} animated={animate} theme={isDark ? 'dark' : 'light'} />
+          </FloatingMoon>
         </View>
       </View>
 
@@ -89,9 +191,14 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
           </TouchableOpacity>
           <View style={styles.yijiList}>
             {yiItems.map((it, i) => (
-              <Text key={`${it}-${i}`} style={[styles.yijiItem, { color: colors.foreground }]}>
-                {it}
-              </Text>
+              <RiseIn
+                key={`${it}-${i}`}
+                delay={Stagger.base + i * Stagger.list}
+                duration={Duration.listItem}
+                animate={animate}
+              >
+                <Text style={[styles.yijiItem, { color: colors.foreground }]}>{it}</Text>
+              </RiseIn>
             ))}
             {day.yi.length > 6 && (
               <Text style={[styles.yijiItem, { color: colors.muted }]}>
@@ -114,9 +221,14 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
           </TouchableOpacity>
           <View style={styles.yijiList}>
             {jiItems.map((it, i) => (
-              <Text key={`${it}-${i}`} style={[styles.yijiItem, { color: colors.foreground }]}>
-                {it}
-              </Text>
+              <RiseIn
+                key={`${it}-${i}`}
+                delay={Stagger.base + i * Stagger.list}
+                duration={Duration.listItem}
+                animate={animate}
+              >
+                <Text style={[styles.yijiItem, { color: colors.foreground }]}>{it}</Text>
+              </RiseIn>
             ))}
             {day.ji.length > 6 && (
               <Text style={[styles.yijiItem, { color: colors.muted }]}>
@@ -148,8 +260,11 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
           ['煞', day.clash.sha],
           ['宿', day.xingxiu],
         ].map(([k, v], i) => (
-          <View
+          <RiseIn
             key={k}
+            delay={Stagger.statsBase + i * Stagger.stats}
+            duration={Duration.listItem}
+            animate={animate}
             style={[
               styles.statCell,
               i < 3 ? { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: colors.line } : null,
@@ -157,7 +272,7 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
           >
             <Text style={[styles.statKicker, { color: colors.muted }]}>{(k as string).toUpperCase()}</Text>
             <Text style={[styles.statValue, { color: colors.foreground }]}>{v}</Text>
-          </View>
+          </RiseIn>
         ))}
       </View>
 
@@ -273,6 +388,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.5,
     marginBottom: 6,
+  },
+  heroNumeralClip: {
+    height: NUMERAL_LINE_HEIGHT,
+    overflow: 'hidden',
   },
   heroNumeral: {
     fontFamily: Fonts.outfitBlack,

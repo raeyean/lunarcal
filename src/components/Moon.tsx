@@ -9,6 +9,17 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 import { LightColors, DarkColors } from '../constants/colors';
+import { Duration, EASE_OUT } from '../constants/motion';
+import { useMotion } from '../hooks/useMotion';
+
+/**
+ * Phase last shown by an `animated` (hero) moon. The daily screen remounts per
+ * day, so a fresh Moon reads this as its tween start and slides to the new
+ * phase. Only `animated` moons touch it, so off-screen prev/next panels (static)
+ * and calendar mini moons never disturb it.
+ */
+let lastHeroPhase: number | null = null;
+const easeOut = EASE_OUT.factory();
 
 interface MoonProps {
   /** 0 = 朔 new, 0.25 = 上弦 first quarter, 0.5 = 望 full, 0.75 = 下弦 last quarter. */
@@ -24,32 +35,36 @@ interface MoonProps {
  * phase and flips between waxing/waning halves.
  */
 export function Moon({ phase = 0.5, size = 120, animated = false, theme = 'light' }: MoonProps) {
-  const [t, setT] = useState(phase);
-  const fromRef = useRef(phase);
+  const { reduced } = useMotion();
+  const [t, setT] = useState(() =>
+    animated && !reduced && lastHeroPhase != null ? lastHeroPhase : phase,
+  );
+  const fromRef = useRef(t);
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!animated) {
+    if (!animated || reduced) {
       setT(phase);
       fromRef.current = phase;
+      if (animated) lastHeroPhase = phase;
       return;
     }
     const start = Date.now();
     const from = fromRef.current;
     const to = phase;
     const tick = () => {
-      const k = Math.min(1, (Date.now() - start) / 800);
-      const eased = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      const next = from + (to - from) * eased;
+      const k = Math.min(1, (Date.now() - start) / Duration.moonPhase);
+      const next = from + (to - from) * easeOut(k);
       setT(next);
       fromRef.current = next;
+      lastHeroPhase = next;
       if (k < 1) rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => {
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
-  }, [phase, animated]);
+  }, [phase, animated, reduced]);
 
   const litFrac = t < 0.5 ? t * 2 : (1 - t) * 2;
   const waxing = t < 0.5;

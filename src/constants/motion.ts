@@ -46,8 +46,10 @@ export const Stagger = {
   base: 80,
   /** Added delay per item (generic lists, e.g. 宜/忌). */
   list: 45,
-  /** Step for stats rows; same as list unless a ticket tunes it. */
-  stats: 45,
+  /** Initial delay before the first 五行/冲/煞/宿 stat cell (#23). */
+  statsBase: 220,
+  /** Step per stat cell. Tuned to 60 (not the generic 45) by #23. */
+  stats: 60,
   /** Step for chips; same as list unless a ticket tunes it. */
   chips: 45,
 } as const;

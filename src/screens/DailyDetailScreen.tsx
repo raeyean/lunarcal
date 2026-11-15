@@ -23,14 +23,14 @@ interface DailyDetailScreenProps {
   onGlossaryOpened?: () => void;
   /**
    * Direction of the last prev/next day navigation (-1 = prev, 1 = next).
-   * Accepted for the daily hero numeral roll (#23); not used yet.
+   * Drives the hero numeral roll direction on the center panel (#23).
    */
   navDirection?: -1 | 1;
 }
 
 const noop = () => {};
 
-export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay, openGlossaryTerm, onGlossaryOpened }: DailyDetailScreenProps) {
+export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay, openGlossaryTerm, onGlossaryOpened, navDirection }: DailyDetailScreenProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { gesture, animatedStyle, triggerPrev, triggerNext, screenWidth } = useSwipeGesture({
@@ -62,6 +62,8 @@ export function DailyDetailScreen({ year, month, day, onPrevDay, onNextDay, open
           </View>
           <EditorialDaily
               day={dayData}
+              navDirection={isCenter ? navDirection : undefined}
+              animate={isCenter}
               openGlossaryTerm={isCenter ? openGlossaryTerm : null}
               onGlossaryOpened={isCenter ? onGlossaryOpened : undefined}
             />
