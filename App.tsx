@@ -63,6 +63,7 @@ function AppContent() {
   const [finderVisible, setFinderVisible] = useState(false);
   const [deityListVisible, setDeityListVisible] = useState(false);
   const [pendingGlossary, setPendingGlossary] = useState<'yi' | 'ji' | null>(null);
+  const [navDirection, setNavDirection] = useState<-1 | 1 | undefined>(undefined);
 
   useEffect(() => {
     AsyncStorage.getItem('todayWidgetDismissedDate')
@@ -149,6 +150,7 @@ function AppContent() {
   }, [month]);
 
   const handlePrevDay = useCallback(() => {
+    setNavDirection(-1);
     const d = new Date(year, month - 1, selectedDay - 1);
     setYear(d.getFullYear());
     setMonth(d.getMonth() + 1);
@@ -156,6 +158,7 @@ function AppContent() {
   }, [year, month, selectedDay]);
 
   const handleNextDay = useCallback(() => {
+    setNavDirection(1);
     const d = new Date(year, month - 1, selectedDay + 1);
     setYear(d.getFullYear());
     setMonth(d.getMonth() + 1);
@@ -232,6 +235,7 @@ function AppContent() {
             day={selectedDay}
             onPrevDay={handlePrevDay}
             onNextDay={handleNextDay}
+            navDirection={navDirection}
             openGlossaryTerm={pendingGlossary}
             onGlossaryOpened={handleGlossaryOpened}
           />
