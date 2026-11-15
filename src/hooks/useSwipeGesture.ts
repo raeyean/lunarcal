@@ -66,16 +66,16 @@ export function useSwipeGesture({ onSwipeLeft, onSwipeRight }: SwipeConfig) {
     (direction: SwipeDirection) => {
       'worklet';
       if (isAnimating.value) return;
-      isAnimating.value = true;
+      isAnimating.set(true);
       const toValue = direction === 1 ? -2 * SCREEN_WIDTH : 0;
-      translateX.value = withTiming(toValue, commitTiming, (finished?: boolean) => {
+      translateX.set(withTiming(toValue, commitTiming, (finished?: boolean) => {
         'worklet';
         if (finished) {
           scheduleOnRN(finishCommit, direction);
         } else {
           isAnimating.value = false;
         }
-      });
+      }));
     },
     [commitTiming, finishCommit, isAnimating, translateX],
   );
@@ -87,7 +87,7 @@ export function useSwipeGesture({ onSwipeLeft, onSwipeRight }: SwipeConfig) {
         .failOffsetY([-FAIL_Y_THRESHOLD, FAIL_Y_THRESHOLD])
         .onUpdate(e => {
           if (isAnimating.value) return;
-          translateX.value = BASE_OFFSET + e.translationX;
+          translateX.set(BASE_OFFSET + e.translationX);
         })
         .onEnd((e, success) => {
           if (isAnimating.value) return;
@@ -98,7 +98,7 @@ export function useSwipeGesture({ onSwipeLeft, onSwipeRight }: SwipeConfig) {
           } else if (success && (dx > SWIPE_THRESHOLD || vx > VELOCITY_THRESHOLD)) {
             startCommit(-1);
           } else {
-            translateX.value = withSpring(BASE_OFFSET, spring);
+            translateX.set(withSpring(BASE_OFFSET, spring));
           }
         }),
     [isAnimating, translateX, startCommit, spring],

@@ -66,7 +66,7 @@ export function MonthHeader({ titleCn, onPrev, onNext }: MonthHeaderProps) {
         const seen = await AsyncStorage.getItem(SWIPE_HINT_KEY);
         if (seen || cancelled) return;
         setHintVisible(true);
-        hintOpacity.value = withSequence(
+        hintOpacity.set(withSequence(
           withTiming(1, timing(HINT_FADE_IN)),
           withDelay(
             HINT_HOLD,
@@ -75,7 +75,7 @@ export function MonthHeader({ titleCn, onPrev, onNext }: MonthHeaderProps) {
               if (finished) scheduleOnRN(setHintVisible, false);
             }),
           ),
-        );
+        ));
         await AsyncStorage.setItem(SWIPE_HINT_KEY, '1');
       } catch {
         // ignore

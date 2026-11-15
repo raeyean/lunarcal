@@ -43,8 +43,8 @@ function TabIcon({ name, color, selected }: { name: keyof typeof Ionicons.glyphM
       return;
     }
     if (selected) {
-      scale.value = Offset.tabIconScaleFrom;
-      scale.value = withSpring(1, spring);
+      scale.set(Offset.tabIconScaleFrom);
+      scale.set(withSpring(1, spring));
     }
   }, [selected, scale, spring]);
 
@@ -73,9 +73,9 @@ export function BottomTabBar({ active, onChange }: Props) {
     const target = activeIndex * tabW + (tabW - PILL_W) / 2;
     if (!placed.current) {
       placed.current = true;
-      pillX.value = target;
+      pillX.set(target);
     } else {
-      pillX.value = withSpring(target, spring);
+      pillX.set(withSpring(target, spring));
     }
   }, [barWidth, activeIndex, pillX, spring]);
 

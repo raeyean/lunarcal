@@ -137,15 +137,15 @@ export function AnimatedSheet({
   }, [mounted]);
 
   const animateIn = useCallback(() => {
-    scrim.value = withTiming(1, scrimInTiming);
-    translateY.value = withSpring(0, openSpring);
+    scrim.set(withTiming(1, scrimInTiming));
+    translateY.set(withSpring(0, openSpring));
   }, [scrim, translateY, scrimInTiming, openSpring]);
 
   const animateOut = useCallback(() => {
-    scrim.value = withTiming(0, scrimOutTiming);
-    translateY.value = withTiming(offscreen.value, closeTiming, (finished) => {
+    scrim.set(withTiming(0, scrimOutTiming));
+    translateY.set(withTiming(offscreen.value, closeTiming, (finished) => {
       if (finished) scheduleOnRN(unmount);
-    });
+    }));
   }, [scrim, translateY, offscreen, scrimOutTiming, closeTiming, unmount]);
 
   useEffect(() => {
@@ -154,9 +154,9 @@ export function AnimatedSheet({
         // First frame renders off-screen; onLayout measures and starts the open.
         mountedRef.current = true;
         awaitingLayout.current = true;
-        offscreen.value = windowHeight;
-        translateY.value = windowHeight;
-        scrim.value = 0;
+        offscreen.set(windowHeight);
+        translateY.set(windowHeight);
+        scrim.set(0);
         setMounted(true);
       } else {
         animateIn();
@@ -174,10 +174,10 @@ export function AnimatedSheet({
       const h = e.nativeEvent.layout.height;
       // A bottom sheet hides at its own height; a centred card needs the window height.
       const distance = isBottom && h > 0 ? h : windowHeight;
-      offscreen.value = distance;
+      offscreen.set(distance);
       if (awaitingLayout.current) {
         awaitingLayout.current = false;
-        translateY.value = distance;
+        translateY.set(distance);
         animateIn();
       }
     },
@@ -190,27 +190,27 @@ export function AnimatedSheet({
         .enabled(dismissible)
         .activeOffsetY([-10, 10])
         .onStart(() => {
-          dragStart.value = translateY.value;
+          dragStart.set(translateY.value);
         })
         .onUpdate((e) => {
           const raw = dragStart.value + e.translationY;
-          translateY.value = raw > 0 ? raw : raw * UPWARD_DAMPING;
-          scrim.value = interpolate(
+          translateY.set(raw > 0 ? raw : raw * UPWARD_DAMPING);
+          scrim.set(interpolate(
             translateY.value,
             [0, offscreen.value],
             [1, 0],
             Extrapolation.CLAMP,
-          );
+          ));
         })
         .onEnd((e) => {
           if (e.translationY >= Sheet.dismissDistance || e.velocityY > DISMISS_VELOCITY) {
             // Start leaving right away; the parent's visible=false continues it to unmount.
-            scrim.value = withTiming(0, scrimOutTiming);
-            translateY.value = withTiming(offscreen.value, closeTiming);
+            scrim.set(withTiming(0, scrimOutTiming));
+            translateY.set(withTiming(offscreen.value, closeTiming));
             scheduleOnRN(requestClose);
           } else {
-            scrim.value = withTiming(1, scrimInTiming);
-            translateY.value = withSpring(0, { ...openSpring, velocity: e.velocityY });
+            scrim.set(withTiming(1, scrimInTiming));
+            translateY.set(withSpring(0, { ...openSpring, velocity: e.velocityY }));
           }
         }),
     [
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
   },
   scrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   sheetBottom: {
     borderTopLeftRadius: Radius.xl,

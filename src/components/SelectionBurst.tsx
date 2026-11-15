@@ -54,9 +54,9 @@ export function SelectionBurst({ colorA, colorB, onDone }: SelectionBurstProps) 
       onDone();
       return;
     }
-    progress.value = withTiming(1, timing(Duration.burst, EASE_OUT), (finished) => {
+    progress.set(withTiming(1, timing(Duration.burst, EASE_OUT), (finished) => {
       if (finished) runOnJS(onDone)();
-    });
+    }));
     // Run once on mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -79,7 +79,7 @@ export function SelectionBurst({ colorA, colorB, onDone }: SelectionBurstProps) 
 
 const styles = StyleSheet.create({
   layer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'visible',

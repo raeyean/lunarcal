@@ -83,10 +83,10 @@ function CalendarCellInner({
     onSelectDay?.(day);
   }, [onSelectDay, day]);
   const handlePressIn = React.useCallback(() => {
-    pressScale.value = withTiming(PRESS_SCALE, { duration: PRESS_MS, easing: EASE_OUT });
+    pressScale.set(withTiming(PRESS_SCALE, { duration: PRESS_MS, easing: EASE_OUT }));
   }, [pressScale]);
   const handlePressOut = React.useCallback(() => {
-    pressScale.value = withTiming(1, { duration: PRESS_MS, easing: EASE_OUT });
+    pressScale.set(withTiming(1, { duration: PRESS_MS, easing: EASE_OUT }));
   }, [pressScale]);
   const handleBurstDone = React.useCallback(() => setBursting(false), []);
 
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   selectedBg: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: Radius.md,
   },
   dayNumber: {

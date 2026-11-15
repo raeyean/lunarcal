@@ -61,8 +61,8 @@ function HeroNumeral({
 
   useEffect(() => {
     if (!animate) return;
-    y.value = withSpring(0, spring);
-    opacity.value = withTiming(1, timing(direction ? Duration.heroRoll : META_DURATION));
+    y.set(withSpring(0, spring));
+    opacity.set(withTiming(1, timing(direction ? Duration.heroRoll : META_DURATION)));
     // Mount-only: the panel remounts per day.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -87,18 +87,18 @@ function FloatingMoon({ animate, children }: { animate: boolean; children: React
   useEffect(() => {
     if (!animate || reduced) {
       cancelAnimation(y);
-      y.value = 0;
+      y.set(0);
       return;
     }
-    y.value = -MOON_FLOAT_PX;
-    y.value = withRepeat(
+    y.set(-MOON_FLOAT_PX);
+    y.set(withRepeat(
       withTiming(MOON_FLOAT_PX, {
         duration: MOON_FLOAT_HALF_CYCLE,
         easing: Easing.inOut(Easing.sin),
       }),
       -1,
       true,
-    );
+    ));
     return () => cancelAnimation(y);
   }, [animate, reduced, y]);
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Insets, Pressable, StyleSheet, ViewStyle } from 'react-native';
+import { Insets, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
@@ -12,7 +12,7 @@ interface IconButtonProps {
   size?: number;
   variant?: 'default' | 'primary' | 'ghost';
   disabled?: boolean;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   hitSlop?: Insets;
 }
 
