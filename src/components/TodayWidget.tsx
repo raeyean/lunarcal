@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   cardWrapper: {
     width: '100%',

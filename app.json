@@ -6,16 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#f6f3ec",
-      "dark": {
-        "image": "./assets/splash-icon.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#0e0d0b"
-      }
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.raeyean.LunarCal",
@@ -44,7 +34,21 @@
           "color": "#a02617"
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#f6f3ec",
+          "enableFullScreenImage_legacy": true,
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#0e0d0b"
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {

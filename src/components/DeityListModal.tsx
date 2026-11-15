@@ -164,7 +164,7 @@ function DeityRowView({ item, colors }: DeityRowViewProps) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'flex-end' },
-  overlay: { ...StyleSheet.absoluteFillObject },
+  overlay: { ...StyleSheet.absoluteFill },
   sheet: {
     height: '85%',
     maxHeight: '85%',
