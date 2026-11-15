@@ -65,7 +65,13 @@ function AppContent() {
   const [finderVisible, setFinderVisible] = useState(false);
   const [deityListVisible, setDeityListVisible] = useState(false);
   const [pendingGlossary, setPendingGlossary] = useState<'yi' | 'ji' | null>(null);
-  const [navDirection, setNavDirection] = useState<-1 | 1 | undefined>(undefined);
+  // Direction of the last prev/next day step, tied to the date it landed on so
+  // that tab switches and direct date jumps never replay a stale roll (#23).
+  const [lastStep, setLastStep] = useState<{ dir: -1 | 1; key: string } | null>(null);
+  const changeTab = useCallback((tab: TabKey) => {
+    setLastStep(null);
+    setActiveTab(tab);
+  }, []);
 
   useEffect(() => {
     AsyncStorage.getItem('todayWidgetDismissedDate')
@@ -152,16 +158,16 @@ function AppContent() {
   }, [month]);
 
   const handlePrevDay = useCallback(() => {
-    setNavDirection(-1);
     const d = new Date(year, month - 1, selectedDay - 1);
+    setLastStep({ dir: -1, key: `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}` });
     setYear(d.getFullYear());
     setMonth(d.getMonth() + 1);
     setSelectedDay(d.getDate());
   }, [year, month, selectedDay]);
 
   const handleNextDay = useCallback(() => {
-    setNavDirection(1);
     const d = new Date(year, month - 1, selectedDay + 1);
+    setLastStep({ dir: 1, key: `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}` });
     setYear(d.getFullYear());
     setMonth(d.getMonth() + 1);
     setSelectedDay(d.getDate());
@@ -183,8 +189,8 @@ function AppContent() {
     setYear(y);
     setMonth(m);
     setSelectedDay(d);
-    setActiveTab('daily');
-  }, []);
+    changeTab('daily');
+  }, [changeTab]);
 
   const handleGlossaryOpened = useCallback(() => setPendingGlossary(null), []);
 
@@ -227,7 +233,7 @@ function AppContent() {
               setYear(y);
               setMonth(m);
               setSelectedDay(d);
-              setActiveTab('daily');
+              changeTab('daily');
             }}
           />
         ) : (
@@ -238,14 +244,14 @@ function AppContent() {
             day={selectedDay}
             onPrevDay={handlePrevDay}
             onNextDay={handleNextDay}
-            navDirection={navDirection}
+            navDirection={lastStep?.key === `${year}-${month}-${selectedDay}` ? lastStep.dir : undefined}
             openGlossaryTerm={pendingGlossary}
             onGlossaryOpened={handleGlossaryOpened}
           />
         )}
         </Animated.View>
       </ErrorBoundary>
-      <BottomTabBar active={activeTab} onChange={setActiveTab} />
+      <BottomTabBar active={activeTab} onChange={changeTab} />
       <SettingsModal
         visible={settingsVisible}
         onClose={() => setSettingsVisible(false)}
@@ -260,7 +266,7 @@ function AppContent() {
         onDismiss={handleWidgetDismiss}
         onDismissToday={handleWidgetDismissToday}
         onOpenGlossary={(term) => {
-          setActiveTab('daily');
+          changeTab('daily');
           setPendingGlossary(term);
         }}
       />
