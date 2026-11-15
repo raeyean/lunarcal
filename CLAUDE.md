@@ -14,6 +14,7 @@ LunarCal is a React Native lunar calendar app built with Expo (managed workflow)
 - **TypeScript** with strict mode (`tsconfig.json` extends `expo/tsconfig.base`)
 - **React Native New Architecture** enabled (`newArchEnabled: true` in app.json)
 - **lunar-javascript** v1.7.7 — core lunar calendar engine (Solar ↔ Lunar, Ganzhi, Jieqi, Yi/Ji)
+- **react-native-reanimated 4** (+ `react-native-worklets`) — animations; **react-native-gesture-handler** — gestures (root wrapped in `GestureHandlerRootView`)
 - **TanStack Query** — API data fetching with `staleTime=Infinity` (data is deterministic per date)
 - **expo-notifications** + **expo-background-fetch** — notification scheduling
 - **AsyncStorage** — persists theme, notification settings, zodiac preference
@@ -108,6 +109,7 @@ No navigation library. App.tsx manages screen state directly:
 - **Theming**: `useTheme()` hook from ThemeContext provides `colors`, `isDark`, `toggleTheme`
 - **Swipe navigation**: `useSwipeGesture(onPrev, onNext)` returns PanResponder props
 - **Lunar data**: All lunar calculations go through `@lunarcal/shared` (lunar-javascript wrapper); `src/utils/lunar.ts` re-exports from there
+- **Motion**: tokens in `src/constants/motion.ts`, use `useMotion()` for reduced-motion-aware configs.
 - **API data**: `src/api/hooks.ts` TanStack Query hooks; base URL from `EXPO_PUBLIC_API_TRIGGER_URL` env var, falls back to production URL
 - **Shared schemas**: Zod schemas in `packages/shared/src/schemas/` are the source of truth for API shapes — both API routes and mobile client import from there
 - **Fonts**: Outfit (headings) and Inter (body) loaded in App.tsx via `useFonts`; all components assume fonts are loaded before rendering
