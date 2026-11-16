@@ -65,12 +65,19 @@ function AppContent() {
   const [finderVisible, setFinderVisible] = useState(false);
   const [deityListVisible, setDeityListVisible] = useState(false);
   const [pendingGlossary, setPendingGlossary] = useState<'yi' | 'ji' | null>(null);
-  // Direction of the last prev/next day step, tied to the date it landed on so
-  // that tab switches and direct date jumps never replay a stale roll (#23).
-  const [lastStep, setLastStep] = useState<{ dir: -1 | 1; key: string } | null>(null);
+  // Bumped by direct date jumps (今天, finder, 我的), never by prev/next steps.
+  // The calendar and daily screens are keyed by it: a step keeps them mounted
+  // so the swiped-in panel's entrance runs on across the swap; a jump remounts
+  // them with the plain entrance (#29).
+  const [jumpId, setJumpId] = useState(0);
   const changeTab = useCallback((tab: TabKey) => {
-    setLastStep(null);
     setActiveTab(tab);
+  }, []);
+  const jumpTo = useCallback((y: number, m: number, d: number) => {
+    setYear(y);
+    setMonth(m);
+    setSelectedDay(d);
+    setJumpId(id => id + 1);
   }, []);
 
   useEffect(() => {
@@ -159,7 +166,6 @@ function AppContent() {
 
   const handlePrevDay = useCallback(() => {
     const d = new Date(year, month - 1, selectedDay - 1);
-    setLastStep({ dir: -1, key: `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}` });
     setYear(d.getFullYear());
     setMonth(d.getMonth() + 1);
     setSelectedDay(d.getDate());
@@ -167,7 +173,6 @@ function AppContent() {
 
   const handleNextDay = useCallback(() => {
     const d = new Date(year, month - 1, selectedDay + 1);
-    setLastStep({ dir: 1, key: `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}` });
     setYear(d.getFullYear());
     setMonth(d.getMonth() + 1);
     setSelectedDay(d.getDate());
@@ -175,10 +180,8 @@ function AppContent() {
 
   const handleGoToday = useCallback(() => {
     const now = new Date();
-    setYear(now.getFullYear());
-    setMonth(now.getMonth() + 1);
-    setSelectedDay(now.getDate());
-  }, []);
+    jumpTo(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  }, [jumpTo]);
 
   const isToday = (() => {
     const now = new Date();
@@ -186,11 +189,9 @@ function AppContent() {
   })();
 
   const handleFinderSelectDate = useCallback((y: number, m: number, d: number) => {
-    setYear(y);
-    setMonth(m);
-    setSelectedDay(d);
+    jumpTo(y, m, d);
     changeTab('daily');
-  }, [changeTab]);
+  }, [jumpTo, changeTab]);
 
   const handleGlossaryOpened = useCallback(() => setPendingGlossary(null), []);
 
@@ -219,7 +220,7 @@ function AppContent() {
         <Animated.View key={activeTab} entering={tabEntering} style={{ flex: 1 }}>
         {activeTab === 'calendar' ? (
           <CalendarScreen
-            key={`${year}-${month}`}
+            key={jumpId}
             year={year}
             month={month}
             selectedDay={selectedDay}
@@ -230,21 +231,18 @@ function AppContent() {
         ) : activeTab === 'me' ? (
           <MeScreen
             onNavigateToDate={(y, m, d) => {
-              setYear(y);
-              setMonth(m);
-              setSelectedDay(d);
+              jumpTo(y, m, d);
               changeTab('daily');
             }}
           />
         ) : (
           <DailyDetailScreen
-            key={`${year}-${month}-${selectedDay}`}
+            key={jumpId}
             year={year}
             month={month}
             day={selectedDay}
             onPrevDay={handlePrevDay}
             onNextDay={handleNextDay}
-            navDirection={lastStep?.key === `${year}-${month}-${selectedDay}` ? lastStep.dir : undefined}
             openGlossaryTerm={pendingGlossary}
             onGlossaryOpened={handleGlossaryOpened}
           />

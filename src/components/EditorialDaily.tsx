@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
@@ -10,11 +10,13 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
+  withSequence,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { Duration, Offset, Stagger } from '../constants/motion';
 import { useMotion } from '../hooks/useMotion';
+import { usePanelEntrance } from '../hooks/usePanelEntrance';
 import { Moon } from './Moon';
 import { RiseIn } from './RiseIn';
 import { DeityCard, UpcomingDeity } from './DeityCard';
@@ -30,10 +32,14 @@ interface EditorialDailyProps {
   day: DayData;
   openGlossaryTerm?: 'yi' | 'ji' | null;
   onGlossaryOpened?: () => void;
-  /** Direction of the last day navigation (-1 = prev, 1 = next); drives the numeral roll. */
-  navDirection?: -1 | 1;
-  /** False for off-screen prev/next panels: render statically, no entrance motion. */
+  /**
+   * True for the centre panel: plays the plain entrance on mount and floats the
+   * moon. Off-screen prev/next panels mount static; they play the directional
+   * entrance when a swipe commit starts toward them (#29).
+   */
   animate?: boolean;
+  /** Off-screen panels: the centre day's moon phase, shown until the entrance plays. */
+  heldMoonPhase?: number;
 }
 
 const NUMERAL_LINE_HEIGHT = 96;
@@ -42,35 +48,45 @@ const META_DURATION = 300;
 const MOON_FLOAT_PX = 4;
 const MOON_FLOAT_HALF_CYCLE = 2100;
 
-/** Lunar day numeral that rolls in from the swipe direction, clipped to its line box. */
+/**
+ * Lunar day numeral, clipped to its line box. Fades in on mount when `animate`
+ * (first open, tab switch); rolls in from the swipe direction when a swipe
+ * commit starts toward its panel (#23, #29).
+ */
 function HeroNumeral({
   text,
   color,
-  direction,
   animate,
 }: {
   text: string;
   color: string;
-  direction?: -1 | 1;
   animate: boolean;
 }) {
-  const { spring, timing } = useMotion();
-  const y = useSharedValue(
-    animate && direction ? direction * Offset.heroRollFraction * NUMERAL_LINE_HEIGHT : 0,
-  );
+  const { reduced, spring, timing } = useMotion();
+  const y = useSharedValue(0);
   const opacity = useSharedValue(animate ? 0 : 1);
+  const rollTiming = useMemo(() => timing(Duration.heroRoll), [timing]);
 
   useEffect(() => {
     if (!animate) return;
-    y.set(withSpring(0, spring));
-    opacity.set(withTiming(1, timing(direction ? Duration.heroRoll : META_DURATION)));
-    // Mount-only: the panel remounts per day.
+    opacity.set(withTiming(1, timing(META_DURATION)));
+    // Mount-only: later plays come from the swipe commit.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const roll = useCallback((dir: -1 | 1) => {
+    'worklet';
+    if (reduced) return;
+    y.set(dir * Offset.heroRollFraction * NUMERAL_LINE_HEIGHT);
+    opacity.set(0);
+    y.set(withSpring(0, spring));
+    opacity.set(withTiming(1, rollTiming));
+  }, [reduced, spring, rollTiming, y, opacity]);
+  usePanelEntrance(roll);
+
   const style = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: y.value }],
+    opacity: opacity.get(),
+    transform: [{ translateY: y.get() }],
   }));
 
   return (
@@ -91,14 +107,21 @@ function FloatingMoon({ animate, children }: { animate: boolean; children: React
       y.set(0);
       return;
     }
-    y.set(-MOON_FLOAT_PX);
-    y.set(withRepeat(
-      withTiming(MOON_FLOAT_PX, {
-        duration: MOON_FLOAT_HALF_CYCLE,
-        easing: Easing.inOut(Easing.sin),
+    // Ease out of rest instead of jumping to -4 px: `animate` turns on when a
+    // swiped-in panel becomes the centre, in full view (#29).
+    y.set(withSequence(
+      withTiming(-MOON_FLOAT_PX, {
+        duration: MOON_FLOAT_HALF_CYCLE / 2,
+        easing: Easing.out(Easing.sin),
       }),
-      -1,
-      true,
+      withRepeat(
+        withTiming(MOON_FLOAT_PX, {
+          duration: MOON_FLOAT_HALF_CYCLE,
+          easing: Easing.inOut(Easing.sin),
+        }),
+        -1,
+        true,
+      ),
     ));
     return () => cancelAnimation(y);
   }, [animate, reduced, y]);
@@ -114,8 +137,8 @@ export function EditorialDaily({
   day,
   openGlossaryTerm,
   onGlossaryOpened,
-  navDirection,
   animate = true,
+  heldMoonPhase,
 }: EditorialDailyProps) {
   const { colors, isDark } = useTheme();
   const [shichenOpen, setShichenOpen] = useState(false);
@@ -157,7 +180,6 @@ export function EditorialDaily({
           <HeroNumeral
             text={day.lunar.dayCn}
             color={colors.foreground}
-            direction={navDirection}
             animate={animate}
           />
           <RiseIn delay={META_DELAY} duration={META_DURATION} animate={animate}>
@@ -168,7 +190,13 @@ export function EditorialDaily({
         </View>
         <View style={{ marginTop: 8 }}>
           <FloatingMoon animate={animate}>
-            <Moon phase={day.phase} size={72} animated={animate} theme={isDark ? 'dark' : 'light'} />
+            <Moon
+              phase={day.phase}
+              heldPhase={heldMoonPhase}
+              size={72}
+              animated
+              theme={isDark ? 'dark' : 'light'}
+            />
           </FloatingMoon>
         </View>
       </View>

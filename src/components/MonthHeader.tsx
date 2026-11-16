@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
   cancelAnimation,
@@ -7,7 +7,6 @@ import Animated, {
   withDelay,
   withSequence,
   withTiming,
-  type EntryExitAnimationFunction,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,13 +16,16 @@ import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { IconButton } from './IconButton';
 import { withOpacity } from '../constants/colorUtils';
-import { Duration, Offset } from '../constants/motion';
+import { Duration } from '../constants/motion';
 import { useMotion } from '../hooks/useMotion';
+import { RiseIn } from './RiseIn';
 
 interface MonthHeaderProps {
   titleCn: string;
   onPrev: () => void;
   onNext: () => void;
+  /** Play the title rise on mount. False for off-screen swipe panels. */
+  animate?: boolean;
 }
 
 const SWIPE_HINT_KEY = 'calendarSwipeHintShown';
@@ -32,30 +34,11 @@ const HINT_FADE_IN = 400;
 const HINT_HOLD = 2500;
 const HINT_FADE_OUT = 350;
 
-export function MonthHeader({ titleCn, onPrev, onNext }: MonthHeaderProps) {
+export function MonthHeader({ titleCn, onPrev, onNext, animate = true }: MonthHeaderProps) {
   const { colors } = useTheme();
   const { reduced, timing } = useMotion();
   const [hintVisible, setHintVisible] = useState(false);
   const hintOpacity = useSharedValue(0);
-
-  // Title rises and fades in whenever it mounts with a new `titleCn` (#21).
-  const titleEntering = useMemo(() => {
-    const cfg = timing(Duration.panelRise);
-    const entering: EntryExitAnimationFunction = () => {
-      'worklet';
-      return {
-        initialValues: {
-          opacity: 0,
-          transform: [{ translateY: Offset.panelY }],
-        },
-        animations: {
-          opacity: withTiming(1, cfg),
-          transform: [{ translateY: withTiming(0, cfg) }],
-        },
-      };
-    };
-    return entering;
-  }, [timing]);
 
   useEffect(() => {
     // The hint is decorative: skip it entirely under reduced motion.
@@ -99,9 +82,11 @@ export function MonthHeader({ titleCn, onPrev, onNext }: MonthHeaderProps) {
         <Text style={[styles.arrow, { color: colors.foreground }]}>‹</Text>
       </IconButton>
       <View style={styles.titleGroup}>
-        <Animated.View key={titleCn} entering={titleEntering}>
+        {/* Rises and fades in on mount when `animate`, and during the slide
+            when a swipe commit starts toward this panel (#21, #29). */}
+        <RiseIn key={titleCn} duration={Duration.panelRise} animate={animate}>
           <Text style={[styles.titleCn, { color: colors.foreground }]}>{titleCn}</Text>
-        </Animated.View>
+        </RiseIn>
       </View>
       <IconButton
         onPress={onNext}

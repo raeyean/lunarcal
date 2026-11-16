@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, type StyleProp, type ViewStyle } from 'react-native';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Offset } from '../constants/motion';
 import { useMotion } from '../hooks/useMotion';
+import { usePanelEntrance } from '../hooks/usePanelEntrance';
 
 interface RiseInProps {
   children: React.ReactNode;
@@ -18,13 +19,15 @@ interface RiseInProps {
   duration: number;
   /** Starting translateY in px. */
   offset?: number;
-  /** When false, renders statically (used for off-screen swipe panels). */
+  /** Play on mount. False for off-screen swipe panels, which mount static. */
   animate?: boolean;
 }
 
 /**
- * Fades in and rises `offset` px to rest on mount (issue #23). Remount it (new
- * `key`) to replay. Instant when the OS Reduce Motion setting is on.
+ * Fades in and rises `offset` px to rest (issue #23). Plays on mount when
+ * `animate`, and again when a swipe commit starts toward the `SwipePanel` it
+ * sits in, so the rise runs during the slide (#29). Remount it (new `key`) to
+ * replay outside a swipe panel. Instant when the OS Reduce Motion setting is on.
  */
 export function RiseIn({
   children,
@@ -34,21 +37,31 @@ export function RiseIn({
   offset = Offset.panelY,
   animate = true,
 }: RiseInProps) {
-  const { timing } = useMotion();
+  const { reduced, timing } = useMotion();
   const progress = useSharedValue(animate ? 0 : 1);
+  const config = useMemo(() => timing(duration), [timing, duration]);
 
   useEffect(() => {
     if (!animate) return;
-    progress.value = withDelay(delay, withTiming(1, timing(duration)));
-    // Mount-only: replay is by remounting with a new key.
+    progress.set(withDelay(delay, withTiming(1, config)));
+    // Mount-only: later plays come from the swipe commit, or a remount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const play = useCallback(() => {
+    'worklet';
+    if (reduced) return;
+    progress.set(0);
+    progress.set(withDelay(delay, withTiming(1, config)));
+  }, [reduced, delay, config, progress]);
+  usePanelEntrance(play);
+
   const animatedStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    transform: [{ translateY: (1 - progress.value) * offset }],
+    opacity: progress.get(),
+    transform: [{ translateY: (1 - progress.get()) * offset }],
   }));
 
-  if (!animate) return <View style={style}>{children}</View>;
+  // Always an Animated.View: `animate` flips when a panel becomes the centre,
+  // and switching element types would remount the children.
   return <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>;
 }
