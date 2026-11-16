@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, type DimensionValue } from 'react-native';
+import { View, Text, StyleSheet, type DimensionValue } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { PressableScale } from './PressableScale';
 
 const ZODIAC_ANIMALS = [
   { name: '鼠', emoji: '🐀' }, { name: '牛', emoji: '🐂' },
@@ -32,7 +33,7 @@ export function ZodiacPicker({ selected, onSelect, compact = false }: ZodiacPick
       {ZODIAC_ANIMALS.map(({ name, emoji }) => {
         const isSelected = selected === name;
         return (
-          <TouchableOpacity
+          <PressableScale
             key={name}
             style={[
               styles.cell,
@@ -41,7 +42,6 @@ export function ZodiacPicker({ selected, onSelect, compact = false }: ZodiacPick
               isSelected && { borderColor: colors.primary, borderWidth: 2 },
             ]}
             onPress={() => onSelect(name)}
-            activeOpacity={0.6}
             accessibilityRole="button"
             accessibilityLabel={`生肖 ${emoji} ${name}`}
             accessibilityState={{ selected: isSelected }}
@@ -54,7 +54,7 @@ export function ZodiacPicker({ selected, onSelect, compact = false }: ZodiacPick
             ]}>
               {name}
             </Text>
-          </TouchableOpacity>
+          </PressableScale>
         );
       })}
     </View>

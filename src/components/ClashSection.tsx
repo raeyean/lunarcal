@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
   LayoutAnimation,
   Platform,
   UIManager,
@@ -16,6 +15,8 @@ import { Chevron } from './Chevron';
 import type { GlossaryTermId } from './GlossarySheet';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -67,7 +68,7 @@ export function ClashSection({ animal, emoji, description, direction, element, t
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surface }]}>
-      <Pressable
+      <PressableScale scaleTo={Press.card}
         onPress={toggle}
         style={styles.header}
         accessibilityRole="button"
@@ -78,7 +79,7 @@ export function ClashSection({ animal, emoji, description, direction, element, t
         <View style={styles.chevron}>
           <Chevron expanded={expanded} size={14} color={colors.subtleText} />
         </View>
-      </Pressable>
+      </PressableScale>
       {expanded ? (
         <>
           <View style={styles.animalRow}>

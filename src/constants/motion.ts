@@ -67,6 +67,13 @@ export const Sheet = {
   dismissDistance: 90,
 } as const;
 
+/**
+ * Press-feedback scales (#28). `control` for icon buttons, chips, pills and
+ * tabs; `card` for wide rows and cards. `ms` is the press-in/out duration.
+ * Consumed by PressableScale.
+ */
+export const Press = { control: 0.93, card: 0.98, ms: 140 } as const;
+
 /** Offsets used by enter/commit motions (#18). */
 export const Offset = {
   tabY: 8,

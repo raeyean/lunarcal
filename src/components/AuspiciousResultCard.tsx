@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { AuspiciousResult } from '../utils/auspiciousScan';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { withOpacity } from '../constants/colorUtils';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 const WEEKDAY_NAMES = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
 
@@ -24,10 +26,9 @@ export function AuspiciousResultCard({ result, matchedActivity, onPress }: Auspi
   const a11yHint = `${result.tianShenType} ${result.tianShen} · 宜 ${yiTop.join('、')} · 點擊查看當日詳情`;
 
   return (
-    <TouchableOpacity
+    <PressableScale scaleTo={Press.card}
       style={[styles.container, { backgroundColor: colors.surface }]}
       onPress={onPress}
-      activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityLabel={a11yLabel}
       accessibilityHint={a11yHint}
@@ -83,7 +84,7 @@ export function AuspiciousResultCard({ result, matchedActivity, onPress }: Auspi
           );
         })}
       </View>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 

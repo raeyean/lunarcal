@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TouchableWithoutFeedback,
-  TouchableOpacity,
   Switch,
   StyleSheet,
   Platform,
@@ -24,6 +23,8 @@ import { scheduleAllLunarNotifications, requestNotificationPermissions, Permissi
 import { IconButton } from './IconButton';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 interface SettingsModalProps {
   visible: boolean;
@@ -194,7 +195,7 @@ export function SettingsModal({ visible, onClose, onOpenDeityList }: SettingsMod
           {onOpenDeityList && (
             <>
               <Text style={[styles.sectionHeader, { color: colors.muted }]}>資料</Text>
-              <TouchableOpacity
+              <PressableScale scaleTo={Press.card}
                 style={[styles.row, { borderBottomColor: colors.divider }]}
                 onPress={() => {
                   onClose();
@@ -211,7 +212,7 @@ export function SettingsModal({ visible, onClose, onOpenDeityList }: SettingsMod
                   </Text>
                 </View>
                 <Text style={[styles.timeText, { color: colors.primary }]}>›</Text>
-              </TouchableOpacity>
+              </PressableScale>
             </>
           )}
         </Animated.View>

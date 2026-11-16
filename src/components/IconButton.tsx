@@ -1,8 +1,9 @@
 import React from 'react';
-import { Insets, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { Insets, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { PressableScale } from './PressableScale';
 
 interface IconButtonProps {
   children: React.ReactNode;
@@ -36,23 +37,22 @@ export function IconButton({
   };
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
       disabled={disabled}
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
       accessibilityRole="button"
       hitSlop={hitSlop}
-      style={({ pressed }) => [
+      style={[
         styles.container,
         { backgroundColor: backgroundColors[variant ?? 'default'] },
-        pressed && { opacity: 0.6 },
         disabled && { opacity: 0.4 },
         style,
       ]}
     >
       {children}
-    </Pressable>
+    </PressableScale>
   );
 }
 

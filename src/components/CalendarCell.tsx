@@ -1,26 +1,21 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, type ViewStyle } from 'react-native';
+import { View, Text, StyleSheet, type ViewStyle } from 'react-native';
 import Animated, {
   Easing,
   Keyframe,
   ReduceMotion,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
 } from 'react-native-reanimated';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { Radius } from '../constants/radius';
 import { Spacing } from '../constants/spacing';
-import { Duration, EASE_OUT, Offset } from '../constants/motion';
+import { Duration, Offset } from '../constants/motion';
 import { useMotion } from '../hooks/useMotion';
+import { PressableScale } from './PressableScale';
 import { Moon } from './Moon';
 import { SelectionBurst } from './SelectionBurst';
 import { deityColor } from '../constants/colors';
 import type { DayData } from '../utils/lunar';
-
-const PRESS_SCALE = 0.93;
-const PRESS_MS = 140;
 
 /**
  * Selection pop: scale 0.55 -> 1 with the prototype's overshoot curve
@@ -70,8 +65,6 @@ function CalendarCellInner({
 }: CalendarCellProps) {
   const { colors, isDark } = useTheme();
   const { reduced } = useMotion();
-  const pressScale = useSharedValue(1);
-  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: pressScale.value }] }));
   // Set in onPress so only user-initiated selection can trigger the burst.
   const pressedByUser = React.useRef(false);
   const [bursting, setBursting] = React.useState(false);
@@ -82,12 +75,6 @@ function CalendarCellInner({
     pressedByUser.current = true;
     onSelectDay?.(day);
   }, [onSelectDay, day]);
-  const handlePressIn = React.useCallback(() => {
-    pressScale.set(withTiming(PRESS_SCALE, { duration: PRESS_MS, easing: EASE_OUT }));
-  }, [pressScale]);
-  const handlePressOut = React.useCallback(() => {
-    pressScale.set(withTiming(1, { duration: PRESS_MS, easing: EASE_OUT }));
-  }, [pressScale]);
   const handleBurstDone = React.useCallback(() => setBursting(false), []);
 
   React.useEffect(() => {
@@ -141,16 +128,13 @@ function CalendarCellInner({
   const deityHue = deity ? deityColor(deity.kind, colors) : null;
 
   return (
-    <Pressable
-      style={[styles.pressable, isActive && styles.pressableActive]}
+    <PressableScale
+      style={[styles.pressable, isActive && styles.pressableActive, styles.container, ...containerExtra]}
       onPress={handlePress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? `${day}日，農曆${lunarText}${isActive ? '，已選取' : ''}`}
       accessibilityState={{ selected: isActive }}
     >
-      <Animated.View style={[styles.container, ...containerExtra, pressStyle]}>
         {isActive ? (
           <Animated.View
             entering={popEntering}
@@ -203,8 +187,7 @@ function CalendarCellInner({
         >
           {labelText}
         </Text>
-      </Animated.View>
-    </Pressable>
+    </PressableScale>
   );
 }
 

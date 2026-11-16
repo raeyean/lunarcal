@@ -3,7 +3,6 @@ import {
   Modal,
   View,
   Text,
-  Pressable,
   StyleSheet,
   Switch,
   Platform,
@@ -14,6 +13,7 @@ import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import type { BirthProfile } from '@lunarcal/shared';
 import type { ProfileInput } from '../utils/profileStorage';
+import { PressableScale } from './PressableScale';
 
 interface Props {
   visible: boolean;
@@ -158,7 +158,7 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
             const lbl = g === 'male' ? '男' : g === 'female' ? '女' : '不指定';
             const selected = gender === g;
             return (
-              <Pressable
+              <PressableScale
                 key={String(g)}
                 onPress={() => setGender(g)}
                 style={[
@@ -173,7 +173,7 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
                 accessibilityLabel={`性別 ${lbl}`}
               >
                 <Text style={{ fontFamily: Fonts.interMedium, color: selected ? colors.onPrimary : colors.foreground }}>{lbl}</Text>
-              </Pressable>
+              </PressableScale>
             );
           })}
         </View>
@@ -181,14 +181,14 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
         {error && <Text style={[styles.error, { color: colors.danger }]}>{error}</Text>}
 
         <View style={styles.actions}>
-          <Pressable
+          <PressableScale
             onPress={onCancel}
             style={[styles.btn, styles.btnGhost, { borderColor: colors.line }]}
             accessibilityRole="button"
           >
             <Text style={[styles.btnLabel, { color: colors.foreground }]}>取消</Text>
-          </Pressable>
-          <Pressable
+          </PressableScale>
+          <PressableScale
             onPress={handleSubmit}
             disabled={submitting}
             style={[
@@ -201,7 +201,7 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
             <Text style={[styles.btnLabel, { color: colors.onPrimary }]}>
               {submitting ? '儲存中…' : '儲存'}
             </Text>
-          </Pressable>
+          </PressableScale>
         </View>
       </SafeAreaView>
     </Modal>

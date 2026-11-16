@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
   FlatList,
   ActivityIndicator,
@@ -23,6 +22,8 @@ import { scanChunk, AuspiciousResult } from '../utils/auspiciousScan';
 import { getZodiac, setZodiac } from '../utils/zodiacStorage';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { PressableScale } from '../components/PressableScale';
+import { Press } from '../constants/motion';
 
 const RANGE_OPTIONS = [30, 60, 90, 180];
 const SEPARATOR_STYLE = { height: 8 };
@@ -191,7 +192,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
               {RANGE_OPTIONS.map(option => {
                 const isSelected = range === option;
                 return (
-                  <TouchableOpacity
+                  <PressableScale
                     key={option}
                     style={[
                       styles.rangeChip,
@@ -210,7 +211,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
                     ]}>
                       {option} 天
                     </Text>
-                  </TouchableOpacity>
+                  </PressableScale>
                 );
               })}
             </View>
@@ -225,7 +226,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
               paddingBottom: Math.max(insets.bottom, Spacing.md) + Spacing.md,
             },
           ]}>
-            <TouchableOpacity
+            <PressableScale scaleTo={Press.card}
               style={[
                 styles.searchButton,
                 { backgroundColor: activity ? colors.primary : colors.badgeBg },
@@ -243,7 +244,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
               ]}>
                 搜索吉日
               </Text>
-            </TouchableOpacity>
+            </PressableScale>
           </View>
         </View>
       ) : (
@@ -278,7 +279,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
               <Text style={[styles.emptySubtitle, { color: colors.muted }]}>
                 {searchError}
               </Text>
-              <TouchableOpacity
+              <PressableScale
                 style={[styles.retryButton, { backgroundColor: colors.primary }]}
                 onPress={handleSearch}
                 accessibilityRole="button"
@@ -287,7 +288,7 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
                 <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>
                   重試
                 </Text>
-              </TouchableOpacity>
+              </PressableScale>
             </View>
           ) : results.length === 0 && !loading ? (
             <View style={styles.emptyState}>

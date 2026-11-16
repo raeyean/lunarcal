@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Pressable, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,6 +8,7 @@ import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Offset } from '../constants/motion';
 import { useMotion } from '../hooks/useMotion';
+import { PressableScale } from './PressableScale';
 
 export type TabKey = 'daily' | 'calendar' | 'me';
 
@@ -102,7 +103,7 @@ export function BottomTabBar({ active, onChange }: Props) {
         const iconColor = selected ? colors.primary : colors.muted;
 
         return (
-          <Pressable
+          <PressableScale
             key={t.key}
             onPress={() => onChange(t.key)}
             style={styles.tab}
@@ -112,7 +113,7 @@ export function BottomTabBar({ active, onChange }: Props) {
           >
             <TabIcon name={iconName} color={iconColor} selected={selected} />
             <Text style={[styles.label, { color: iconColor }]}>{t.label}</Text>
-          </Pressable>
+          </PressableScale>
         );
       })}
     </View>

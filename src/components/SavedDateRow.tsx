@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useBirthProfile } from '../context/BirthProfileContext';
@@ -7,6 +7,8 @@ import { computeCompat } from '@lunarcal/shared';
 import { getDayData } from '../utils/lunar';
 import type { SavedDate } from '@lunarcal/shared';
 import { Typography } from '../constants/typography';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 interface Props {
   item: SavedDate;
@@ -49,7 +51,7 @@ export function SavedDateRow({ item, onPress, onEdit, onDelete }: Props) {
   };
 
   return (
-    <Pressable
+    <PressableScale scaleTo={Press.card}
       onPress={onPress}
       onLongPress={handleLongPress}
       style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
@@ -79,7 +81,7 @@ export function SavedDateRow({ item, onPress, onEdit, onDelete }: Props) {
           ))}
         </View>
       )}
-    </Pressable>
+    </PressableScale>
   );
 }
 

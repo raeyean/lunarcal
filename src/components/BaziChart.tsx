@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { BaziPillarCell } from './BaziPillarCell';
 import type { BaziChart as BaziChartShape } from '@lunarcal/shared';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 interface Props {
   bazi: BaziChartShape;
@@ -25,7 +27,7 @@ export function BaziChart({ bazi }: Props) {
         <BaziPillarCell label="時柱" pillar={bazi.time} unknown={!bazi.hasTime} />
       </View>
 
-      <Pressable
+      <PressableScale scaleTo={Press.card}
         onPress={() => setExpanded((p) => !p)}
         style={[styles.toggle, { borderTopColor: colors.line }]}
         accessibilityRole="button"
@@ -34,7 +36,7 @@ export function BaziChart({ bazi }: Props) {
         <Text style={[styles.toggleText, { color: colors.muted }]}>
           {expanded ? '收起 ▴' : '顯示更多 ▾'}
         </Text>
-      </Pressable>
+      </PressableScale>
 
       {expanded && (
         <View style={[styles.detail, { backgroundColor: colors.surface, borderColor: colors.line }]}>

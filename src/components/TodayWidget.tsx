@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../context/ThemeContext';
 import { getDayData } from '../utils/lunar';
@@ -10,6 +10,7 @@ import { withOpacity } from '../constants/colorUtils';
 import { DragHandle } from './DragHandle';
 import { MoreChip } from './MoreChip';
 import { AnimatedSheet } from './AnimatedSheet';
+import { PressableScale } from './PressableScale';
 
 interface TodayWidgetProps {
   visible: boolean;
@@ -115,11 +116,11 @@ export function TodayWidget({ visible, onDismiss, onDismissToday, onOpenGlossary
             向下滑動關閉
           </Text>
 
-          <TouchableOpacity onPress={onDismissToday}>
+          <PressableScale onPress={onDismissToday}>
             <Text style={[styles.dismissToday, { color: colors.subtleText }]}>
               今日不再顯示
             </Text>
-          </TouchableOpacity>
+          </PressableScale>
         </LinearGradient>
       </View>
     </AnimatedSheet>

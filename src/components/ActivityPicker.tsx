@@ -1,12 +1,14 @@
 // src/components/ActivityPicker.tsx
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { ACTIVITY_CATEGORIES, ALL_ACTIVITIES } from '../constants/activities';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { Chevron } from './Chevron';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 interface ActivityPickerProps {
   selected: string | null;
@@ -27,7 +29,7 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
         const isExpanded = expandedKey === category.key;
         return (
           <View key={category.key}>
-            <TouchableOpacity
+            <PressableScale scaleTo={Press.card}
               style={[styles.categoryRow, { borderBottomColor: colors.divider }]}
               onPress={() => toggleCategory(category.key)}
               accessibilityRole="button"
@@ -38,13 +40,13 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
                 {category.label}
               </Text>
               <Chevron expanded={isExpanded} size={14} color={colors.muted} />
-            </TouchableOpacity>
+            </PressableScale>
             {isExpanded && (
               <View style={styles.chipGrid}>
                 {category.activities.map(activity => {
                   const isSelected = selected === activity;
                   return (
-                    <TouchableOpacity
+                    <PressableScale
                       key={activity}
                       style={[
                         styles.chip,
@@ -53,7 +55,6 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
                         },
                       ]}
                       onPress={() => onSelect(activity)}
-                      activeOpacity={0.6}
                       accessibilityRole="button"
                       accessibilityLabel={activity}
                       accessibilityState={{ selected: isSelected }}
@@ -64,7 +65,7 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
                       ]}>
                         {activity}
                       </Text>
-                    </TouchableOpacity>
+                    </PressableScale>
                   );
                 })}
               </View>
@@ -74,7 +75,7 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
       })}
 
       {/* Show all */}
-      <TouchableOpacity
+      <PressableScale scaleTo={Press.card}
         style={[styles.categoryRow, styles.categoryRowLast]}
         onPress={() => toggleCategory('all')}
         accessibilityRole="button"
@@ -85,13 +86,13 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
           顯示全部
         </Text>
         <Chevron expanded={expandedKey === 'all'} size={14} color={colors.muted} />
-      </TouchableOpacity>
+      </PressableScale>
       {expandedKey === 'all' && (
         <View style={styles.chipGrid}>
           {ALL_ACTIVITIES.map(activity => {
             const isSelected = selected === activity;
             return (
-              <TouchableOpacity
+              <PressableScale
                 key={activity}
                 style={[
                   styles.chip,
@@ -110,7 +111,7 @@ export function ActivityPicker({ selected, onSelect }: ActivityPickerProps) {
                 ]}>
                   {activity}
                 </Text>
-              </TouchableOpacity>
+              </PressableScale>
             );
           })}
         </View>

@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
@@ -24,6 +24,7 @@ import { ShichenSheet } from './ShichenSheet';
 import { GlossarySheet, type GlossaryTermId } from './GlossarySheet';
 import { meaningsFor } from '../data/activityMeanings';
 import { findUpcomingDeity, type DayData } from '../utils/lunar';
+import { PressableScale } from './PressableScale';
 
 interface EditorialDailyProps {
   day: DayData;
@@ -178,17 +179,16 @@ export function EditorialDaily({
       {/* 宜 / 忌 split */}
       <View style={[styles.yijiRow, { borderBottomColor: colors.line }]}>
         <View style={[styles.yijiCol, { borderRightColor: colors.line }]}>
-          <TouchableOpacity
+          <PressableScale
             style={styles.yijiHead}
             onPress={() => setGlossaryTerm('yi')}
             accessibilityRole="button"
             accessibilityLabel="查看「宜」的說明"
-            activeOpacity={0.6}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Text style={[styles.yijiBig, { color: colors.primary }]}>宜</Text>
             <HelpIcon size={14} color={colors.muted} />
-          </TouchableOpacity>
+          </PressableScale>
           <View style={styles.yijiList}>
             {yiItems.map((it, i) => (
               <RiseIn
@@ -208,17 +208,16 @@ export function EditorialDaily({
           </View>
         </View>
         <View style={styles.yijiColRight}>
-          <TouchableOpacity
+          <PressableScale
             style={styles.yijiHead}
             onPress={() => setGlossaryTerm('ji')}
             accessibilityRole="button"
             accessibilityLabel="查看「忌」的說明"
-            activeOpacity={0.6}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Text style={[styles.yijiBig, { color: colors.ji }]}>忌</Text>
             <HelpIcon size={14} color={colors.muted} />
-          </TouchableOpacity>
+          </PressableScale>
           <View style={styles.yijiList}>
             {jiItems.map((it, i) => (
               <RiseIn
@@ -279,16 +278,15 @@ export function EditorialDaily({
       {/* 吉时 grid */}
       <View style={styles.section}>
         <View style={styles.sectionHead}>
-          <TouchableOpacity
+          <PressableScale
             style={styles.titleWithIcon}
             onPress={() => setShichenOpen(true)}
             accessibilityRole="button"
             accessibilityLabel="查看十二時辰詳情"
-            activeOpacity={0.6}
           >
             <Text style={[styles.sectionTitle, { color: colors.foreground }]}>吉時</Text>
             <HelpIcon size={15} color={colors.muted} />
-          </TouchableOpacity>
+          </PressableScale>
         </View>
         <View style={styles.luckyGrid}>
           {(day.luckyHours.length > 0 ? day.luckyHours : day.shichen.slice(0, 4)).map(s => (
@@ -309,16 +307,15 @@ export function EditorialDaily({
       {/* 方位 */}
       <View style={styles.section}>
         <View style={styles.sectionHead}>
-          <TouchableOpacity
+          <PressableScale
             style={styles.titleWithIcon}
             onPress={() => setGlossaryTerm('fangwei')}
             accessibilityRole="button"
             accessibilityLabel="查看「方位」的說明"
-            activeOpacity={0.6}
           >
             <Text style={[styles.sectionTitle, { color: colors.foreground }]}>方位</Text>
             <HelpIcon size={15} color={colors.muted} />
-          </TouchableOpacity>
+          </PressableScale>
         </View>
         <CompassRose directions={day.directions} />
       </View>
