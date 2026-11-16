@@ -22,9 +22,14 @@ interface SwipePanelProps {
  * mounted, so when the parent swaps the centre date nothing moves: the row
  * offset already matches, and the incoming panel stays mounted with its
  * entrance animations still running.
+ *
+ * Off-centre panels stay hidden while the user drags: a neighbour only becomes
+ * visible once a commit targets it, at the moment its entrance starts, so the
+ * user never sees its content static and then blank out and replay.
  */
 export function SwipePanel({ x, commit, slot, width, active, children }: SwipePanelProps) {
   const style = useAnimatedStyle(() => ({
+    opacity: active || commit.get().slot === slot ? 1 : 0,
     transform: [{ translateX: slot * width + x.get() }],
   }));
   const entrance = useMemo(() => ({ commit, slot }), [commit, slot]);
