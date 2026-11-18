@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { InfoBadge } from './InfoBadge';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 interface FestivalBannerProps {
   festivals: string[];
@@ -19,11 +21,10 @@ export function FestivalBanner({ festivals, onPressFestival }: FestivalBannerPro
   return (
     <View style={[styles.container, { backgroundColor: colors.festivalLight }]}>
       {festivals.map((name, i) => (
-        <TouchableOpacity
+        <PressableScale scaleTo={Press.card}
           key={`${name}-${i}`}
           style={styles.row}
           onPress={() => onPressFestival?.(name)}
-          activeOpacity={0.6}
           accessibilityRole="button"
           accessibilityLabel={`節日 ${name}`}
           accessibilityHint="點擊查看節日詳情"
@@ -32,7 +33,7 @@ export function FestivalBanner({ festivals, onPressFestival }: FestivalBannerPro
           <Text style={[styles.text, { color: colors.festival }]}>{name}</Text>
           <View style={styles.spacer} />
           <InfoBadge tint={colors.festival} />
-        </TouchableOpacity>
+        </PressableScale>
       ))}
     </View>
   );

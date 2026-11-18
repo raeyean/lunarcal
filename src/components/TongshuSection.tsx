@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
   LayoutAnimation,
   Platform,
   UIManager,
@@ -19,6 +18,8 @@ import type { TongshuData } from '../utils/lunar';
 import type { GlossaryTermId } from './GlossarySheet';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -101,7 +102,7 @@ function CollapsibleCard({ cardKey, title, summary, termId, onOpenGlossary, chil
 
   return (
     <View style={[styles.card, { backgroundColor: colors.surface }]}>
-      <Pressable
+      <PressableScale scaleTo={Press.card}
         onPress={toggle}
         style={styles.cardHeader}
         accessibilityRole="button"
@@ -122,7 +123,7 @@ function CollapsibleCard({ cardKey, title, summary, termId, onOpenGlossary, chil
         <View style={styles.chevron}>
           <Chevron expanded={expanded} size={14} color={colors.subtleText} />
         </View>
-      </Pressable>
+      </PressableScale>
       {expanded ? (
         <View style={styles.cardBody}>{children}</View>
       ) : (

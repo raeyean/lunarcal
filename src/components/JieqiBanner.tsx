@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
@@ -8,6 +8,8 @@ import { InfoBadge } from './InfoBadge';
 import { IconButton } from './IconButton';
 import { HelpIcon } from './HelpIcon';
 import type { GlossaryTermId } from './GlossarySheet';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 interface JieqiBannerProps {
   text: string;
@@ -22,10 +24,9 @@ export function JieqiBanner({ text, onPress, onOpenGlossary }: JieqiBannerProps)
 
   return (
     <View style={[styles.container, { backgroundColor: colors.primaryLight }]}>
-      <TouchableOpacity
+      <PressableScale scaleTo={Press.card}
         style={styles.tapRegion}
         onPress={() => onPress?.(text)}
-        activeOpacity={0.6}
         accessibilityRole="button"
         accessibilityLabel={text}
         accessibilityHint="點擊查看詳情"
@@ -35,7 +36,7 @@ export function JieqiBanner({ text, onPress, onOpenGlossary }: JieqiBannerProps)
         <View style={styles.badgeWrap}>
           <InfoBadge tint={colors.primary} />
         </View>
-      </TouchableOpacity>
+      </PressableScale>
       <IconButton
         variant="ghost"
         accessibilityLabel="關於節氣"

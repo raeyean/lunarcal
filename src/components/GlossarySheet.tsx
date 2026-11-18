@@ -1,20 +1,19 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
-  Modal,
   View,
   Text,
   ScrollView,
-  TouchableWithoutFeedback,
   StyleSheet,
-  Animated,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
+import Animated, { Easing, Keyframe, ReduceMotion } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
-import { Radius } from '../constants/radius';
+import { Stagger, Offset, EASE_OUT } from '../constants/motion';
 import { IconButton } from './IconButton';
+import { AnimatedSheet } from './AnimatedSheet';
 import type { ActivityMeaning } from '../data/activityMeanings';
 
 export type GlossaryTermId =
@@ -99,112 +98,105 @@ interface GlossarySheetProps {
   onClose: () => void;
 }
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
+/** Term chip pop-in (#24): 360 ms, first chip after ~140 ms, then +55 ms per chip. */
+const CHIP_POP_MS = 360;
+const CHIP_FIRST_EXTRA_MS = 60;
+const CHIP_STEP_MS = 55;
+/** Overshoot easing approximating the prototype spring, cubic-bezier(.34,1.56,.64,1). */
+const POP_EASING = Easing.bezier(0.34, 1.56, 0.64, 1);
+
+// Keyframe.delay() mutates the instance, so each index gets its own (cached) keyframe.
+const chipPopCache: ReturnType<typeof makeChipPop>[] = [];
+function makeChipPop(index: number) {
+  return new Keyframe({
+    0: { opacity: 0, transform: [{ scale: Offset.cellPopScaleFrom }] },
+    40: { opacity: 1, easing: EASE_OUT },
+    100: { transform: [{ scale: 1 }], easing: POP_EASING },
+  })
+    .duration(CHIP_POP_MS)
+    .delay(Stagger.base + CHIP_FIRST_EXTRA_MS + index * CHIP_STEP_MS)
+    .reduceMotion(ReduceMotion.System);
+}
+function chipPop(index: number) {
+  return (chipPopCache[index] ??= makeChipPop(index));
+}
 
 export function GlossarySheet({ visible, termId, items, onClose }: GlossarySheetProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const slideAnim = useRef(new Animated.Value(300)).current;
-  const [modalVisible, setModalVisible] = React.useState(false);
-
-  useEffect(() => {
-    if (visible) {
-      setModalVisible(true);
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        useNativeDriver: true,
-        tension: 65,
-        friction: 11,
-      }).start();
-    } else {
-      Animated.timing(slideAnim, {
-        toValue: 300,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => setModalVisible(false));
-    }
-  }, [visible]);
+  const { height: windowHeight } = useWindowDimensions();
 
   const entry = termId ? GLOSSARY[termId] : null;
   const displayItems = items ?? entry?.items;
 
   return (
-    <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent>
-      <View style={styles.container}>
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
-        </TouchableWithoutFeedback>
-        <Animated.View
-          accessibilityViewIsModal
-          style={[
-            styles.sheet,
-            {
-              backgroundColor: colors.background,
-              maxHeight: SCREEN_HEIGHT * 0.8,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
+    <AnimatedSheet
+      visible={visible}
+      onClose={onClose}
+      maxHeight={windowHeight * 0.8}
+      style={styles.sheet}
+      header={
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.foreground }]}>
+            {entry?.title ?? ''}
+          </Text>
+          <IconButton
+            onPress={onClose}
+            accessibilityLabel="關閉"
+            variant="ghost"
+            style={styles.closeButton}
+          >
+            <Text style={[styles.closeGlyph, { color: colors.primary }]}>✕</Text>
+          </IconButton>
+        </View>
+      }
+    >
+      {entry ? (
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={{ paddingBottom: Spacing.xl + insets.bottom }}
+          showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.foreground }]}>
-              {entry?.title ?? ''}
-            </Text>
-            <IconButton
-              onPress={onClose}
-              accessibilityLabel="關閉"
-              variant="ghost"
-              style={styles.closeButton}
-            >
-              <Text style={[styles.closeGlyph, { color: colors.primary }]}>✕</Text>
-            </IconButton>
-          </View>
-          {entry ? (
-            <ScrollView
-              style={styles.scroll}
-              contentContainerStyle={{ paddingBottom: Spacing.xl + insets.bottom }}
-              showsVerticalScrollIndicator={false}
-            >
-              <Text style={[styles.description, { color: colors.subtleText }]}>
-                {entry.description}
-              </Text>
-              {displayItems && displayItems.length > 0 ? (
-                <View style={styles.itemsBlock}>
-                  {entry.itemsHeading ? (
-                    <Text style={[styles.itemsHeading, { color: colors.foreground }]}>
-                      {entry.itemsHeading}
-                    </Text>
-                  ) : null}
-                  {displayItems.map((item, idx) => (
-                    <View
-                      key={item.name}
-                      style={[
-                        styles.itemRow,
-                        idx < displayItems.length - 1 && {
-                          borderBottomColor: colors.lineSoft,
-                          borderBottomWidth: StyleSheet.hairlineWidth,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.itemName,
-                          { color: termId === 'ji' ? colors.ji : colors.primary },
-                        ]}
-                      >
-                        {item.name}
-                      </Text>
-                      <Text style={[styles.itemMeaning, { color: colors.subtleText }]}>
-                        {item.meaning}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
+          <Text style={[styles.description, { color: colors.subtleText }]}>
+            {entry.description}
+          </Text>
+          {displayItems && displayItems.length > 0 ? (
+            <View style={styles.itemsBlock}>
+              {entry.itemsHeading ? (
+                <Text style={[styles.itemsHeading, { color: colors.foreground }]}>
+                  {entry.itemsHeading}
+                </Text>
               ) : null}
-            </ScrollView>
+              {displayItems.map((item, idx) => (
+                <Animated.View
+                  key={item.name}
+                  entering={chipPop(idx)}
+                  style={[
+                    styles.itemRow,
+                    idx < displayItems.length - 1 && {
+                      borderBottomColor: colors.lineSoft,
+                      borderBottomWidth: StyleSheet.hairlineWidth,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.itemName,
+                      { color: termId === 'ji' ? colors.ji : colors.primary },
+                    ]}
+                  >
+                    {item.name}
+                  </Text>
+                  <Text style={[styles.itemMeaning, { color: colors.subtleText }]}>
+                    {item.meaning}
+                  </Text>
+                </Animated.View>
+              ))}
+            </View>
           ) : null}
-        </Animated.View>
-      </View>
-    </Modal>
+        </ScrollView>
+      ) : null}
+    </AnimatedSheet>
   );
 }
 
@@ -214,12 +206,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   sheet: {
-    borderTopLeftRadius: Radius.xl,
-    borderTopRightRadius: Radius.xl,
-    paddingTop: Spacing.lg,
     paddingHorizontal: Spacing.xl,
   },
   header: {

@@ -1,10 +1,24 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import Animated, {
+  Easing,
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { Duration, Offset, Stagger } from '../constants/motion';
+import { useMotion } from '../hooks/useMotion';
+import { usePanelEntrance } from '../hooks/usePanelEntrance';
 import { Moon } from './Moon';
+import { RiseIn } from './RiseIn';
 import { DeityCard, UpcomingDeity } from './DeityCard';
 import { CompassRose } from './CompassRose';
 import { HelpIcon } from './HelpIcon';
@@ -12,17 +26,120 @@ import { ShichenSheet } from './ShichenSheet';
 import { GlossarySheet, type GlossaryTermId } from './GlossarySheet';
 import { meaningsFor } from '../data/activityMeanings';
 import { findUpcomingDeity, type DayData } from '../utils/lunar';
+import { PressableScale } from './PressableScale';
 
 interface EditorialDailyProps {
   day: DayData;
   openGlossaryTerm?: 'yi' | 'ji' | null;
   onGlossaryOpened?: () => void;
+  /**
+   * True for the centre panel: plays the plain entrance on mount and floats the
+   * moon. Off-screen prev/next panels mount static; they play the directional
+   * entrance when a swipe commit starts toward them (#29).
+   */
+  animate?: boolean;
+  /** Off-screen panels: the centre day's moon phase, shown until the entrance plays. */
+  heldMoonPhase?: number;
+}
+
+const NUMERAL_LINE_HEIGHT = 96;
+const META_DELAY = 40;
+const META_DURATION = 300;
+const MOON_FLOAT_PX = 4;
+const MOON_FLOAT_HALF_CYCLE = 2100;
+
+/**
+ * Lunar day numeral, clipped to its line box. Fades in on mount when `animate`
+ * (first open, tab switch); rolls in from the swipe direction when a swipe
+ * commit starts toward its panel (#23, #29).
+ */
+function HeroNumeral({
+  text,
+  color,
+  animate,
+}: {
+  text: string;
+  color: string;
+  animate: boolean;
+}) {
+  const { reduced, spring, timing } = useMotion();
+  const y = useSharedValue(0);
+  const opacity = useSharedValue(animate ? 0 : 1);
+  const rollTiming = useMemo(() => timing(Duration.heroRoll), [timing]);
+
+  useEffect(() => {
+    if (!animate) return;
+    opacity.set(withTiming(1, timing(META_DURATION)));
+    // Mount-only: later plays come from the swipe commit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const roll = useCallback((dir: -1 | 1) => {
+    'worklet';
+    if (reduced) return;
+    y.set(dir * Offset.heroRollFraction * NUMERAL_LINE_HEIGHT);
+    opacity.set(0);
+    y.set(withSpring(0, spring));
+    opacity.set(withTiming(1, rollTiming));
+  }, [reduced, spring, rollTiming, y, opacity]);
+  usePanelEntrance(roll);
+
+  const style = useAnimatedStyle(() => ({
+    opacity: opacity.get(),
+    transform: [{ translateY: y.get() }],
+  }));
+
+  return (
+    <View style={styles.heroNumeralClip}>
+      <Animated.Text style={[styles.heroNumeral, { color }, style]}>{text}</Animated.Text>
+    </View>
+  );
+}
+
+/** Gentle vertical float for the hero moon; static when reduced or not animating. */
+function FloatingMoon({ animate, children }: { animate: boolean; children: React.ReactNode }) {
+  const { reduced } = useMotion();
+  const y = useSharedValue(0);
+
+  useEffect(() => {
+    if (!animate || reduced) {
+      cancelAnimation(y);
+      y.set(0);
+      return;
+    }
+    // Ease out of rest instead of jumping to -4 px: `animate` turns on when a
+    // swiped-in panel becomes the centre, in full view (#29).
+    y.set(withSequence(
+      withTiming(-MOON_FLOAT_PX, {
+        duration: MOON_FLOAT_HALF_CYCLE / 2,
+        easing: Easing.out(Easing.sin),
+      }),
+      withRepeat(
+        withTiming(MOON_FLOAT_PX, {
+          duration: MOON_FLOAT_HALF_CYCLE,
+          easing: Easing.inOut(Easing.sin),
+        }),
+        -1,
+        true,
+      ),
+    ));
+    return () => cancelAnimation(y);
+  }, [animate, reduced, y]);
+
+  const style = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
+  return <Animated.View style={style}>{children}</Animated.View>;
 }
 
 const WK = ['日', '一', '二', '三', '四', '五', '六'];
 
 /** Editorial daily-view body — large lunar numeral hero, hairline-divided sections. */
-export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: EditorialDailyProps) {
+export function EditorialDaily({
+  day,
+  openGlossaryTerm,
+  onGlossaryOpened,
+  animate = true,
+  heldMoonPhase,
+}: EditorialDailyProps) {
   const { colors, isDark } = useTheme();
   const [shichenOpen, setShichenOpen] = useState(false);
   const [glossaryTerm, setGlossaryTerm] = useState<GlossaryTermId | null>(null);
@@ -49,10 +166,10 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
   return (
     <View style={{ backgroundColor: colors.background }}>
       {/* Top meta */}
-      <View style={styles.metaRow}>
+      <RiseIn style={styles.metaRow} delay={META_DELAY} duration={META_DURATION} animate={animate}>
         <Text style={[styles.metaText, { color: colors.muted }]}>{dateStr}</Text>
         <Text style={[styles.metaText, { color: colors.muted }]}>星期{WK[dateObj.getDay()]}</Text>
-      </View>
+      </RiseIn>
 
       {/* Hero — giant lunar day numeral */}
       <View style={styles.hero}>
@@ -60,13 +177,27 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
           <Text style={[styles.heroLabel, { color: colors.subtleText }]}>
             農曆 · {day.lunar.monthCn}月
           </Text>
-          <Text style={[styles.heroNumeral, { color: colors.foreground }]}>{day.lunar.dayCn}</Text>
-          <Text style={[styles.heroGanzhi, { color: colors.muted }]}>
-            {day.ganzhi.year}年 · {day.ganzhi.month}月 · {day.ganzhi.day}日
-          </Text>
+          <HeroNumeral
+            text={day.lunar.dayCn}
+            color={colors.foreground}
+            animate={animate}
+          />
+          <RiseIn delay={META_DELAY} duration={META_DURATION} animate={animate}>
+            <Text style={[styles.heroGanzhi, { color: colors.muted }]}>
+              {day.ganzhi.year}年 · {day.ganzhi.month}月 · {day.ganzhi.day}日
+            </Text>
+          </RiseIn>
         </View>
         <View style={{ marginTop: 8 }}>
-          <Moon phase={day.phase} size={72} animated theme={isDark ? 'dark' : 'light'} />
+          <FloatingMoon animate={animate}>
+            <Moon
+              phase={day.phase}
+              heldPhase={heldMoonPhase}
+              size={72}
+              animated
+              theme={isDark ? 'dark' : 'light'}
+            />
+          </FloatingMoon>
         </View>
       </View>
 
@@ -76,22 +207,26 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
       {/* 宜 / 忌 split */}
       <View style={[styles.yijiRow, { borderBottomColor: colors.line }]}>
         <View style={[styles.yijiCol, { borderRightColor: colors.line }]}>
-          <TouchableOpacity
+          <PressableScale
             style={styles.yijiHead}
             onPress={() => setGlossaryTerm('yi')}
             accessibilityRole="button"
             accessibilityLabel="查看「宜」的說明"
-            activeOpacity={0.6}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Text style={[styles.yijiBig, { color: colors.primary }]}>宜</Text>
             <HelpIcon size={14} color={colors.muted} />
-          </TouchableOpacity>
+          </PressableScale>
           <View style={styles.yijiList}>
             {yiItems.map((it, i) => (
-              <Text key={`${it}-${i}`} style={[styles.yijiItem, { color: colors.foreground }]}>
-                {it}
-              </Text>
+              <RiseIn
+                key={`${it}-${i}`}
+                delay={Stagger.base + i * Stagger.list}
+                duration={Duration.listItem}
+                animate={animate}
+              >
+                <Text style={[styles.yijiItem, { color: colors.foreground }]}>{it}</Text>
+              </RiseIn>
             ))}
             {day.yi.length > 6 && (
               <Text style={[styles.yijiItem, { color: colors.muted }]}>
@@ -101,22 +236,26 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
           </View>
         </View>
         <View style={styles.yijiColRight}>
-          <TouchableOpacity
+          <PressableScale
             style={styles.yijiHead}
             onPress={() => setGlossaryTerm('ji')}
             accessibilityRole="button"
             accessibilityLabel="查看「忌」的說明"
-            activeOpacity={0.6}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Text style={[styles.yijiBig, { color: colors.ji }]}>忌</Text>
             <HelpIcon size={14} color={colors.muted} />
-          </TouchableOpacity>
+          </PressableScale>
           <View style={styles.yijiList}>
             {jiItems.map((it, i) => (
-              <Text key={`${it}-${i}`} style={[styles.yijiItem, { color: colors.foreground }]}>
-                {it}
-              </Text>
+              <RiseIn
+                key={`${it}-${i}`}
+                delay={Stagger.base + i * Stagger.list}
+                duration={Duration.listItem}
+                animate={animate}
+              >
+                <Text style={[styles.yijiItem, { color: colors.foreground }]}>{it}</Text>
+              </RiseIn>
             ))}
             {day.ji.length > 6 && (
               <Text style={[styles.yijiItem, { color: colors.muted }]}>
@@ -148,8 +287,11 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
           ['煞', day.clash.sha],
           ['宿', day.xingxiu],
         ].map(([k, v], i) => (
-          <View
+          <RiseIn
             key={k}
+            delay={Stagger.statsBase + i * Stagger.stats}
+            duration={Duration.listItem}
+            animate={animate}
             style={[
               styles.statCell,
               i < 3 ? { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: colors.line } : null,
@@ -157,23 +299,22 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
           >
             <Text style={[styles.statKicker, { color: colors.muted }]}>{(k as string).toUpperCase()}</Text>
             <Text style={[styles.statValue, { color: colors.foreground }]}>{v}</Text>
-          </View>
+          </RiseIn>
         ))}
       </View>
 
       {/* 吉时 grid */}
       <View style={styles.section}>
         <View style={styles.sectionHead}>
-          <TouchableOpacity
+          <PressableScale
             style={styles.titleWithIcon}
             onPress={() => setShichenOpen(true)}
             accessibilityRole="button"
             accessibilityLabel="查看十二時辰詳情"
-            activeOpacity={0.6}
           >
             <Text style={[styles.sectionTitle, { color: colors.foreground }]}>吉時</Text>
             <HelpIcon size={15} color={colors.muted} />
-          </TouchableOpacity>
+          </PressableScale>
         </View>
         <View style={styles.luckyGrid}>
           {(day.luckyHours.length > 0 ? day.luckyHours : day.shichen.slice(0, 4)).map(s => (
@@ -194,16 +335,15 @@ export function EditorialDaily({ day, openGlossaryTerm, onGlossaryOpened }: Edit
       {/* 方位 */}
       <View style={styles.section}>
         <View style={styles.sectionHead}>
-          <TouchableOpacity
+          <PressableScale
             style={styles.titleWithIcon}
             onPress={() => setGlossaryTerm('fangwei')}
             accessibilityRole="button"
             accessibilityLabel="查看「方位」的說明"
-            activeOpacity={0.6}
           >
             <Text style={[styles.sectionTitle, { color: colors.foreground }]}>方位</Text>
             <HelpIcon size={15} color={colors.muted} />
-          </TouchableOpacity>
+          </PressableScale>
         </View>
         <CompassRose directions={day.directions} />
       </View>
@@ -273,6 +413,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.5,
     marginBottom: 6,
+  },
+  heroNumeralClip: {
+    height: NUMERAL_LINE_HEIGHT,
+    overflow: 'hidden',
   },
   heroNumeral: {
     fontFamily: Fonts.outfitBlack,

@@ -1,126 +1,132 @@
-import { useRef, useMemo, useCallback } from 'react';
-import {
-  Animated,
-  PanResponder,
-  PanResponderGestureState,
-  Dimensions,
-  Easing,
-} from 'react-native';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Dimensions } from 'react-native';
+import { Gesture } from 'react-native-gesture-handler';
+import { useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
+import { Duration } from '../constants/motion';
+import { useMotion } from './useMotion';
+import type { SwipeCommit, SwipeDirection } from './usePanelEntrance';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+/** Commit when the pan travels further than this (px). */
 const SWIPE_THRESHOLD = 50;
-const VELOCITY_THRESHOLD = 0.3;
-// Move threshold for *claiming* the gesture. Higher than the activation
-// threshold so a small horizontal drift on a sibling (e.g. tapping a card on
-// the DeityStrip below) can't accidentally hand the gesture to the parent
-// month-swipe.
+/** Commit when the release velocity is above this (px/s; was 0.3 px/ms). */
+const VELOCITY_THRESHOLD = 300;
+// Horizontal travel (px) before the pan *activates*. Kept at 24 so a small
+// horizontal drift while tapping a cell or button can't hand the touch to the
+// month/day swipe.
 const CLAIM_THRESHOLD = 24;
-const BASE_OFFSET = -SCREEN_WIDTH;
+// Vertical travel (px) at which the pan fails, so the daily ScrollView keeps
+// vertical scrolling. Lower than CLAIM_THRESHOLD, so a gesture must be clearly
+// horizontal (roughly 2:1) to become a swipe.
+const FAIL_Y_THRESHOLD = 12;
 
 interface SwipeConfig {
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
+  /**
+   * Slot of the centre panel (its offset, in panels, from the date the screen
+   * mounted with). Changes by exactly ±1 after each commit.
+   */
+  slot: number;
 }
 
-export function useSwipeGesture({ onSwipeLeft, onSwipeRight }: SwipeConfig) {
-  const translateX = useRef(new Animated.Value(BASE_OFFSET)).current;
-  const isAnimating = useRef(false);
+/**
+ * Three-panel (prev / current / next) horizontal swipe, driven by a Gesture
+ * Handler pan and a Reanimated shared value (issue #21).
+ *
+ * Attach `gesture` with a `GestureDetector`, and render each panel in a
+ * `SwipePanel` with `x`, `commit` and its own slot. Panels are placed at
+ * `slot * screenWidth + x`, and `x` rests at `-slot * screenWidth`, so the
+ * centre panel sits at 0.
+ *
+ * #29: a commit slides `x` to the neighbour's resting offset and, at the same
+ * moment, writes `commit` so the incoming panel plays its entrance during the
+ * slide. When the parent then moves the centre date, the incoming panel keeps
+ * its slot (and its mounted instance), so `x` is already correct and there is
+ * nothing to reset — no flicker, no replay. The gesture stays blocked until
+ * React has rendered the new centre (the `slot` effect below).
+ */
+export function useSwipeGesture({ onSwipeLeft, onSwipeRight, slot }: SwipeConfig) {
+  const { spring, timing } = useMotion();
+  const x = useSharedValue(-slot * SCREEN_WIDTH);
+  const centerSlot = useSharedValue(slot);
+  const isAnimating = useSharedValue(false);
+  const commit = useSharedValue<SwipeCommit>({ seq: 0, slot, dir: 1 });
   const handlersRef = useRef({ onSwipeLeft, onSwipeRight });
-  handlersRef.current = { onSwipeLeft, onSwipeRight };
+  useEffect(() => {
+    handlersRef.current = { onSwipeLeft, onSwipeRight };
+  }, [onSwipeLeft, onSwipeRight]);
 
-  const performSwipe = useCallback(
-    (direction: 'left' | 'right') => {
-      if (isAnimating.current) return;
-      isAnimating.current = true;
+  // The parent has rendered the new centre: its neighbours are mounted, so
+  // accept the next swipe.
+  useEffect(() => {
+    centerSlot.set(slot);
+    isAnimating.set(false);
+  }, [slot, centerSlot, isAnimating]);
 
-      const toValue = direction === 'left' ? -2 * SCREEN_WIDTH : 0;
+  // Worklets can't call `timing()` (a JS function), so build the config here.
+  const commitTiming = useMemo(() => timing(Duration.swipeCommit), [timing]);
 
-      Animated.timing(translateX, {
-        toValue,
-        duration: 200,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }).start(({ finished }) => {
-        if (!finished) return;
-        // Parent state change triggers a key change, which remounts
-        // this component with a fresh Animated.Value at BASE_OFFSET.
-        // No manual reset needed — avoids the flicker caused by
-        // Animated and React view updates going through different
-        // native channels.
-        if (direction === 'left') {
-          handlersRef.current.onSwipeLeft();
+  const finishCommit = useCallback((direction: SwipeDirection) => {
+    if (direction === 1) {
+      handlersRef.current.onSwipeLeft();
+    } else {
+      handlersRef.current.onSwipeRight();
+    }
+  }, []);
+
+  // Runs on the UI thread from the pan, and on the JS thread from ‹ › buttons.
+  const startCommit = useCallback(
+    (direction: SwipeDirection) => {
+      'worklet';
+      if (isAnimating.get()) return;
+      isAnimating.set(true);
+      const target = centerSlot.get() + direction;
+      commit.set({ seq: commit.get().seq + 1, slot: target, dir: direction });
+      x.set(withTiming(-target * SCREEN_WIDTH, commitTiming, (finished?: boolean) => {
+        'worklet';
+        if (finished) {
+          scheduleOnRN(finishCommit, direction);
         } else {
-          handlersRef.current.onSwipeRight();
+          isAnimating.set(false);
         }
-      });
+      }));
     },
-    [translateX],
+    [commitTiming, finishCommit, isAnimating, centerSlot, commit, x],
   );
 
-  const panResponder = useMemo(
+  const gesture = useMemo(
     () =>
-      PanResponder.create({
-        // Bubble phase only — let horizontally-scrollable children
-        // (e.g. DeityStrip) claim the gesture first. Parent still
-        // claims pans on non-scrollable areas (calendar grid, headers).
-        onMoveShouldSetPanResponder: (
-          _,
-          { dx, dy }: PanResponderGestureState,
-        ) => {
-          return (
-            !isAnimating.current &&
-            Math.abs(dx) > Math.abs(dy) * 1.5 &&
-            Math.abs(dx) > CLAIM_THRESHOLD
-          );
-        },
-        onPanResponderMove: (_, { dx }: PanResponderGestureState) => {
-          if (!isAnimating.current) {
-            translateX.setValue(BASE_OFFSET + dx);
-          }
-        },
-        onPanResponderRelease: (_, { dx, vx }: PanResponderGestureState) => {
-          if (isAnimating.current) return;
-
-          if (dx < -SWIPE_THRESHOLD || vx < -VELOCITY_THRESHOLD) {
-            performSwipe('left');
-          } else if (dx > SWIPE_THRESHOLD || vx > VELOCITY_THRESHOLD) {
-            performSwipe('right');
+      Gesture.Pan()
+        .activeOffsetX([-CLAIM_THRESHOLD, CLAIM_THRESHOLD])
+        .failOffsetY([-FAIL_Y_THRESHOLD, FAIL_Y_THRESHOLD])
+        .onUpdate(e => {
+          if (isAnimating.get()) return;
+          x.set(-centerSlot.get() * SCREEN_WIDTH + e.translationX);
+        })
+        .onEnd((e, success) => {
+          if (isAnimating.get()) return;
+          const dx = e.translationX;
+          const vx = e.velocityX;
+          if (success && (dx < -SWIPE_THRESHOLD || vx < -VELOCITY_THRESHOLD)) {
+            startCommit(1);
+          } else if (success && (dx > SWIPE_THRESHOLD || vx > VELOCITY_THRESHOLD)) {
+            startCommit(-1);
           } else {
-            Animated.spring(translateX, {
-              toValue: BASE_OFFSET,
-              useNativeDriver: true,
-              tension: 100,
-              friction: 10,
-            }).start();
+            x.set(withSpring(-centerSlot.get() * SCREEN_WIDTH, spring));
           }
-        },
-        onPanResponderTerminate: () => {
-          if (!isAnimating.current) {
-            Animated.spring(translateX, {
-              toValue: BASE_OFFSET,
-              useNativeDriver: true,
-              tension: 100,
-              friction: 10,
-            }).start();
-          }
-        },
-        onPanResponderTerminationRequest: () => false,
-      }),
-    [translateX, performSwipe],
+        }),
+    [isAnimating, x, centerSlot, startCommit, spring],
   );
 
-  const triggerPrev = useCallback(
-    () => performSwipe('right'),
-    [performSwipe],
-  );
-  const triggerNext = useCallback(
-    () => performSwipe('left'),
-    [performSwipe],
-  );
+  const triggerPrev = useCallback(() => startCommit(-1), [startCommit]);
+  const triggerNext = useCallback(() => startCommit(1), [startCommit]);
 
   return {
-    panHandlers: panResponder.panHandlers,
-    animatedStyle: { transform: [{ translateX }] } as const,
+    gesture,
+    x,
+    commit,
     triggerPrev,
     triggerNext,
     screenWidth: SCREEN_WIDTH,

@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import Svg, {
   Circle,
   ClipPath,
@@ -8,13 +8,28 @@ import Svg, {
   RadialGradient,
   Stop,
 } from 'react-native-svg';
+import { scheduleOnRN } from 'react-native-worklets';
 import { LightColors, DarkColors } from '../constants/colors';
+import { Duration, EASE_OUT } from '../constants/motion';
+import { useMotion } from '../hooks/useMotion';
+import { usePanelEntrance } from '../hooks/usePanelEntrance';
+
+const easeOut = EASE_OUT.factory();
 
 interface MoonProps {
   /** 0 = 朔 new, 0.25 = 上弦 first quarter, 0.5 = 望 full, 0.75 = 下弦 last quarter. */
   phase?: number;
   size?: number;
+  /**
+   * Hero moon: when a swipe commit starts toward its panel, tween from the
+   * phase on show to `phase` (#23, #29).
+   */
   animated?: boolean;
+  /**
+   * Phase to show at rest instead of `phase`. Off-screen swipe panels pass the
+   * centre day's phase, so the incoming moon visibly moves to its own (#29).
+   */
+  heldPhase?: number;
   theme?: 'light' | 'dark';
 }
 
@@ -23,33 +38,51 @@ interface MoonProps {
  * handoff. Renders a circle masked by an elliptical terminator that scales with
  * phase and flips between waxing/waning halves.
  */
-export function Moon({ phase = 0.5, size = 120, animated = false, theme = 'light' }: MoonProps) {
-  const [t, setT] = useState(phase);
-  const fromRef = useRef(phase);
+export function Moon({ phase = 0.5, size = 120, animated = false, heldPhase, theme = 'light' }: MoonProps) {
+  const { reduced } = useMotion();
+  const restPhase = heldPhase ?? phase;
+  const [t, setT] = useState(restPhase);
+  const tRef = useRef(restPhase);
   const rafRef = useRef<number | null>(null);
 
+  // At rest, follow `restPhase`. Mid-tween, leave it alone: the tween ends on
+  // `phase`, which is what `restPhase` becomes once this panel is the centre.
   useEffect(() => {
-    if (!animated) {
+    if (rafRef.current != null) return;
+    tRef.current = restPhase;
+    setT(restPhase);
+  }, [restPhase]);
+
+  useEffect(() => () => {
+    if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  const tweenToPhase = useCallback(() => {
+    if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+    if (reduced) {
+      tRef.current = phase;
       setT(phase);
-      fromRef.current = phase;
       return;
     }
     const start = Date.now();
-    const from = fromRef.current;
+    const from = tRef.current;
     const to = phase;
     const tick = () => {
-      const k = Math.min(1, (Date.now() - start) / 800);
-      const eased = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      const next = from + (to - from) * eased;
+      const k = Math.min(1, (Date.now() - start) / Duration.moonPhase);
+      const next = from + (to - from) * easeOut(k);
+      tRef.current = next;
       setT(next);
-      fromRef.current = next;
-      if (k < 1) rafRef.current = requestAnimationFrame(tick);
+      rafRef.current = k < 1 ? requestAnimationFrame(tick) : null;
     };
     rafRef.current = requestAnimationFrame(tick);
-    return () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
-    };
-  }, [phase, animated]);
+  }, [phase, reduced]);
+
+  const play = useCallback(() => {
+    'worklet';
+    if (animated) scheduleOnRN(tweenToPhase);
+  }, [animated, tweenToPhase]);
+  usePanelEntrance(play);
 
   const litFrac = t < 0.5 ? t * 2 : (1 - t) * 2;
   const waxing = t < 0.5;

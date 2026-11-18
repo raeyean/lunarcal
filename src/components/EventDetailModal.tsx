@@ -1,17 +1,10 @@
-import React, { useEffect, useRef } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TouchableWithoutFeedback,
-  StyleSheet,
-  Animated,
-} from 'react-native';
+import React from 'react';
+import { Text, View, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
-import { Radius } from '../constants/radius';
 import { IconButton } from './IconButton';
+import { AnimatedSheet } from './AnimatedSheet';
 
 interface EventDetailModalProps {
   visible: boolean;
@@ -22,70 +15,31 @@ interface EventDetailModalProps {
 
 export function EventDetailModal({ visible, name, description, onClose }: EventDetailModalProps) {
   const { colors } = useTheme();
-  const slideAnim = useRef(new Animated.Value(300)).current;
-  const [modalVisible, setModalVisible] = React.useState(false);
-
-  useEffect(() => {
-    if (visible) {
-      setModalVisible(true);
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        useNativeDriver: true,
-        tension: 65,
-        friction: 11,
-      }).start();
-    } else {
-      Animated.timing(slideAnim, {
-        toValue: 300,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => setModalVisible(false));
-    }
-  }, [visible, slideAnim]);
 
   return (
-    <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent>
-      <View style={styles.container}>
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
-        </TouchableWithoutFeedback>
-        <Animated.View
-          accessibilityViewIsModal={true}
-          style={[
-            styles.sheet,
-            {
-              backgroundColor: colors.background,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
-        >
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.foreground }]}>{name}</Text>
-            <IconButton onPress={onClose} accessibilityLabel="關閉" variant="ghost">
-              <Text style={[styles.closeButton, { color: colors.primary }]}>關閉</Text>
-            </IconButton>
-          </View>
-          <Text style={[styles.description, { color: colors.subtleText }]}>
-            {description}
-          </Text>
-        </Animated.View>
-      </View>
-    </Modal>
+    <AnimatedSheet
+      visible={visible}
+      onClose={onClose}
+      style={styles.sheet}
+      header={
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.foreground }]}>{name}</Text>
+          <IconButton onPress={onClose} accessibilityLabel="關閉" variant="ghost">
+            <Text style={[styles.closeButton, { color: colors.primary }]}>關閉</Text>
+          </IconButton>
+        </View>
+      }
+    >
+      <Text style={[styles.description, { color: colors.subtleText }]}>
+        {description}
+      </Text>
+    </AnimatedSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
   sheet: {
-    borderTopLeftRadius: Radius.xl,
-    borderTopRightRadius: Radius.xl,
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.xs,
     paddingBottom: Spacing.md,
     paddingHorizontal: Spacing.xl,
   },

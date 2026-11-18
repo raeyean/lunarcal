@@ -3,13 +3,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
   FlatList,
   ActivityIndicator,
   StyleSheet,
-  Modal,
-  Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,10 +16,14 @@ import { ActivityPicker } from '../components/ActivityPicker';
 import { ZodiacPicker } from '../components/ZodiacPicker';
 import { AuspiciousResultCard } from '../components/AuspiciousResultCard';
 import { IconButton } from '../components/IconButton';
+import { AnimatedSheet } from '../components/AnimatedSheet';
+import { DragHandle } from '../components/DragHandle';
 import { scanChunk, AuspiciousResult } from '../utils/auspiciousScan';
 import { getZodiac, setZodiac } from '../utils/zodiacStorage';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { PressableScale } from '../components/PressableScale';
+import { Press } from '../constants/motion';
 
 const RANGE_OPTIONS = [30, 60, 90, 180];
 const SEPARATOR_STYLE = { height: 8 };
@@ -48,29 +49,13 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
   const [searchError, setSearchError] = useState<string | null>(null);
   const nextStartDate = useRef<Date>(new Date());
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(1000)).current;
-
   useEffect(() => {
     if (visible) {
-      setModalVisible(true);
       getZodiac().then(saved => {
         if (saved) setZodiacState(saved);
       });
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        useNativeDriver: true,
-        tension: 65,
-        friction: 11,
-      }).start();
-    } else {
-      Animated.timing(slideAnim, {
-        toValue: 1000,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => setModalVisible(false));
     }
-  }, [visible, slideAnim]);
+  }, [visible]);
 
   const handleZodiacSelect = useCallback((animal: string) => {
     setZodiacState(animal);
@@ -164,187 +149,195 @@ export function AuspiciousFinderScreen({ visible, onClose, onSelectDate }: Auspi
   };
 
   return (
-    <Modal visible={modalVisible} animationType="none" transparent>
-      <Animated.View
-        accessibilityViewIsModal
-        style={[
-          styles.container,
-          { backgroundColor: colors.background, transform: [{ translateY: slideAnim }] },
-        ]}
-      >
-        {/* Header */}
-        <View style={[styles.header, { paddingTop: insets.top + Spacing.md }]}>
-          <IconButton
-            onPress={handleClose}
-            accessibilityLabel="關閉"
-            variant="ghost"
-          >
-            <Ionicons name="close" size={22} color={colors.muted} />
-          </IconButton>
-          <Text style={[styles.title, { color: colors.foreground }]}>擇吉日</Text>
-          <View style={styles.headerSpacer} />
-        </View>
-
-        {!searched ? (
-          <View style={styles.formContainer}>
-            <ScrollView
-              style={styles.formScroll}
-              contentContainerStyle={[styles.formContent, { paddingBottom: 80 + insets.bottom }]}
+    <AnimatedSheet
+      visible={visible}
+      onClose={handleClose}
+      showHandle={false}
+      style={styles.container}
+      header={
+        // Drag region: handle + header. Handle sits below the status bar inset.
+        <View style={{ paddingTop: insets.top }}>
+          <DragHandle style={styles.handle} />
+          <View style={styles.header}>
+            <IconButton
+              onPress={handleClose}
+              accessibilityLabel="關閉"
+              variant="ghost"
             >
-              {/* Activity Picker */}
-              <Text style={[styles.sectionLabel, { color: colors.muted }]}>選擇活動</Text>
-              <ActivityPicker selected={activity} onSelect={setActivity} />
-
-              {/* Zodiac Picker */}
-              <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: Spacing.xl }]}>你的生肖</Text>
-              <ZodiacPicker selected={zodiac} onSelect={handleZodiacSelect} />
-
-              {/* Range Selector */}
-              <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: Spacing.xl }]}>搜索範圍</Text>
-              <View style={styles.rangeRow}>
-                {RANGE_OPTIONS.map(option => {
-                  const isSelected = range === option;
-                  return (
-                    <TouchableOpacity
-                      key={option}
-                      style={[
-                        styles.rangeChip,
-                        {
-                          backgroundColor: isSelected ? colors.primary : colors.surface,
-                        },
-                      ]}
-                      onPress={() => setRange(option)}
-                      accessibilityRole="button"
-                      accessibilityLabel={`${option}天範圍`}
-                      accessibilityState={{ selected: isSelected }}
-                    >
-                      <Text style={[
-                        styles.rangeText,
-                        { color: isSelected ? colors.onPrimary : colors.foreground },
-                      ]}>
-                        {option} 天
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </ScrollView>
-
-            {/* Sticky Search CTA */}
-            <View style={[
-              styles.stickyFooter,
-              {
-                backgroundColor: colors.background,
-                borderTopColor: colors.divider,
-                paddingBottom: Math.max(insets.bottom, Spacing.md) + Spacing.md,
-              },
-            ]}>
-              <TouchableOpacity
-                style={[
-                  styles.searchButton,
-                  { backgroundColor: activity ? colors.primary : colors.badgeBg },
-                  !activity && { opacity: 0.5 },
-                ]}
-                onPress={handleSearch}
-                disabled={!activity}
-                accessibilityRole="button"
-                accessibilityLabel="搜索吉日"
-                accessibilityState={{ disabled: !activity }}
-              >
-                <Text style={[
-                  styles.searchButtonText,
-                  { color: activity ? colors.onPrimary : colors.muted },
-                ]}>
-                  搜索吉日
-                </Text>
-              </TouchableOpacity>
-            </View>
+              <Ionicons name="close" size={22} color={colors.muted} />
+            </IconButton>
+            <Text style={[styles.title, { color: colors.foreground }]}>擇吉日</Text>
+            <View style={styles.headerSpacer} />
           </View>
-        ) : (
-          <View style={styles.resultsContainer}>
-            {/* Filter summary */}
-            <View style={styles.filterSummary}>
-              <View style={[styles.filterChip, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.filterChipText, { color: colors.primary }]}>{activity}</Text>
-              </View>
-              {zodiac && (
-                <View style={[styles.filterChip, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.filterChipText, { color: colors.primary }]}>{zodiac}</Text>
-                </View>
-              )}
-              <View style={[styles.filterChip, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.filterChipText, { color: colors.muted }]}>{range} 天</Text>
-              </View>
-              <IconButton
-                onPress={() => { setSearched(false); setResults([]); setHasMore(false); setSearchError(null); }}
-                accessibilityLabel="修改搜尋條件"
-                variant="ghost"
-              >
-                <Text style={[styles.modifyText, { color: colors.primary }]}>✎ 修改</Text>
-              </IconButton>
-            </View>
+        </View>
+      }
+    >
+      {!searched ? (
+        <View style={styles.formContainer}>
+          <ScrollView
+            style={styles.formScroll}
+            contentContainerStyle={[styles.formContent, { paddingBottom: 80 + insets.bottom }]}
+          >
+            {/* Activity Picker */}
+            <Text style={[styles.sectionLabel, { color: colors.muted }]}>選擇活動</Text>
+            <ActivityPicker selected={activity} onSelect={setActivity} />
 
-            {searchError && !loading ? (
-              <View style={styles.emptyState}>
-                <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
-                  搜索失敗
-                </Text>
-                <Text style={[styles.emptySubtitle, { color: colors.muted }]}>
-                  {searchError}
-                </Text>
-                <TouchableOpacity
-                  style={[styles.retryButton, { backgroundColor: colors.primary }]}
-                  onPress={handleSearch}
-                  accessibilityRole="button"
-                  accessibilityLabel="重試"
-                >
-                  <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>
-                    重試
-                  </Text>
-                </TouchableOpacity>
+            {/* Zodiac Picker */}
+            <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: Spacing.xl }]}>你的生肖</Text>
+            <ZodiacPicker selected={zodiac} onSelect={handleZodiacSelect} />
+
+            {/* Range Selector */}
+            <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: Spacing.xl }]}>搜索範圍</Text>
+            <View style={styles.rangeRow}>
+              {RANGE_OPTIONS.map(option => {
+                const isSelected = range === option;
+                return (
+                  <PressableScale
+                    key={option}
+                    style={[
+                      styles.rangeChip,
+                      {
+                        backgroundColor: isSelected ? colors.primary : colors.surface,
+                      },
+                    ]}
+                    onPress={() => setRange(option)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${option}天範圍`}
+                    accessibilityState={{ selected: isSelected }}
+                  >
+                    <Text style={[
+                      styles.rangeText,
+                      { color: isSelected ? colors.onPrimary : colors.foreground },
+                    ]}>
+                      {option} 天
+                    </Text>
+                  </PressableScale>
+                );
+              })}
+            </View>
+          </ScrollView>
+
+          {/* Sticky Search CTA */}
+          <View style={[
+            styles.stickyFooter,
+            {
+              backgroundColor: colors.background,
+              borderTopColor: colors.divider,
+              paddingBottom: Math.max(insets.bottom, Spacing.md) + Spacing.md,
+            },
+          ]}>
+            <PressableScale scaleTo={Press.card}
+              style={[
+                styles.searchButton,
+                { backgroundColor: activity ? colors.primary : colors.badgeBg },
+                !activity && { opacity: 0.5 },
+              ]}
+              onPress={handleSearch}
+              disabled={!activity}
+              accessibilityRole="button"
+              accessibilityLabel="搜索吉日"
+              accessibilityState={{ disabled: !activity }}
+            >
+              <Text style={[
+                styles.searchButtonText,
+                { color: activity ? colors.onPrimary : colors.muted },
+              ]}>
+                搜索吉日
+              </Text>
+            </PressableScale>
+          </View>
+        </View>
+      ) : (
+        <View style={styles.resultsContainer}>
+          {/* Filter summary */}
+          <View style={styles.filterSummary}>
+            <View style={[styles.filterChip, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.filterChipText, { color: colors.primary }]}>{activity}</Text>
+            </View>
+            {zodiac && (
+              <View style={[styles.filterChip, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.filterChipText, { color: colors.primary }]}>{zodiac}</Text>
               </View>
-            ) : results.length === 0 && !loading ? (
-              <View style={styles.emptyState}>
-                <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
-                  找不到吉日
-                </Text>
-                <Text style={[styles.emptySubtitle, { color: colors.muted }]}>
-                  在未來 {range} 天內沒有適合「{activity}」的吉日，試試延長搜索範圍
-                </Text>
-              </View>
-            ) : (
-              <FlatList
-                data={results}
-                keyExtractor={(item) => `${item.date.year}-${item.date.month}-${item.date.day}`}
-                renderItem={({ item }) => (
-                  <AuspiciousResultCard
-                    result={item}
-                    matchedActivity={activity!}
-                    onPress={() => handleResultPress(item)}
-                  />
-                )}
-                contentContainerStyle={styles.resultsList}
-                ItemSeparatorComponent={ItemSeparator}
-                onEndReached={handleLoadMore}
-                onEndReachedThreshold={0.3}
-                ListHeaderComponent={
-                  <Text style={[styles.resultCount, { color: colors.muted }]}>
-                    找到 {results.length} 個吉日{hasMore ? '...' : ''}
-                  </Text>
-                }
-                ListFooterComponent={renderFooter}
-              />
             )}
+            <View style={[styles.filterChip, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.filterChipText, { color: colors.muted }]}>{range} 天</Text>
+            </View>
+            <IconButton
+              onPress={() => { setSearched(false); setResults([]); setHasMore(false); setSearchError(null); }}
+              accessibilityLabel="修改搜尋條件"
+              variant="ghost"
+            >
+              <Text style={[styles.modifyText, { color: colors.primary }]}>✎ 修改</Text>
+            </IconButton>
           </View>
-        )}
-      </Animated.View>
-    </Modal>
+
+          {searchError && !loading ? (
+            <View style={styles.emptyState}>
+              <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
+                搜索失敗
+              </Text>
+              <Text style={[styles.emptySubtitle, { color: colors.muted }]}>
+                {searchError}
+              </Text>
+              <PressableScale
+                style={[styles.retryButton, { backgroundColor: colors.primary }]}
+                onPress={handleSearch}
+                accessibilityRole="button"
+                accessibilityLabel="重試"
+              >
+                <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>
+                  重試
+                </Text>
+              </PressableScale>
+            </View>
+          ) : results.length === 0 && !loading ? (
+            <View style={styles.emptyState}>
+              <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
+                找不到吉日
+              </Text>
+              <Text style={[styles.emptySubtitle, { color: colors.muted }]}>
+                在未來 {range} 天內沒有適合「{activity}」的吉日，試試延長搜索範圍
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={results}
+              keyExtractor={(item) => `${item.date.year}-${item.date.month}-${item.date.day}`}
+              renderItem={({ item }) => (
+                <AuspiciousResultCard
+                  result={item}
+                  matchedActivity={activity!}
+                  onPress={() => handleResultPress(item)}
+                />
+              )}
+              contentContainerStyle={styles.resultsList}
+              ItemSeparatorComponent={ItemSeparator}
+              onEndReached={handleLoadMore}
+              onEndReachedThreshold={0.3}
+              ListHeaderComponent={
+                <Text style={[styles.resultCount, { color: colors.muted }]}>
+                  找到 {results.length} 個吉日{hasMore ? '...' : ''}
+                </Text>
+              }
+              ListFooterComponent={renderFooter}
+            />
+          )}
+        </View>
+      )}
+    </AnimatedSheet>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // Full-height sheet with square corners, as before.
+    height: '100%',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+  },
+  handle: {
+    // Handle + this padding keeps the header row where it was (insets.top + Spacing.md).
+    paddingVertical: Spacing.xs,
   },
   header: {
     flexDirection: 'row',

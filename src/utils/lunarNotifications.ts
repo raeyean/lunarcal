@@ -1,14 +1,19 @@
+import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { Solar, Lunar } from 'lunar-javascript';
 import { getNotificationSettings } from './notificationSettings';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+// Local notifications are native-only; skip handler setup on web.
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+}
 
 const LUNAR_MONTH_NAMES = [
   '', '正', '二', '三', '四', '五', '六',
@@ -80,6 +85,7 @@ export function getUpcomingLunarDates(): LunarDate[] {
 export type PermissionResult = 'granted' | 'denied' | 'blocked';
 
 export async function requestNotificationPermissions(): Promise<PermissionResult> {
+  if (Platform.OS === 'web') return 'denied';
   const { status: existing, canAskAgain } = await Notifications.getPermissionsAsync();
   if (existing === 'granted') return 'granted';
   // System has permanently blocked — must open Settings
@@ -90,6 +96,7 @@ export async function requestNotificationPermissions(): Promise<PermissionResult
 }
 
 export async function scheduleAllLunarNotifications(): Promise<void> {
+  if (Platform.OS === 'web') return;
   const settings = await getNotificationSettings();
 
   await Notifications.cancelAllScheduledNotificationsAsync();

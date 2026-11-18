@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, AppState, AppStateStatus, useColorScheme } from 'react-native';
+import Animated, { ReduceMotion, withTiming, type EntryExitAnimationFunction } from 'react-native-reanimated';
+import { Duration, EASE_OUT, Offset } from './src/constants/motion';
+import { View, Text, StyleSheet, ActivityIndicator, AppState, Platform, AppStateStatus, useColorScheme } from 'react-native';
 
 // Cap accessibility text scaling so layouts don't break, while still respecting the OS setting.
 // Applied via Text.defaultProps so every <Text> inherits it without per-call boilerplate.
@@ -10,6 +12,7 @@ import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './src/api/queryClient';
 import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   useFonts,
   Outfit_400Regular,
@@ -62,6 +65,20 @@ function AppContent() {
   const [finderVisible, setFinderVisible] = useState(false);
   const [deityListVisible, setDeityListVisible] = useState(false);
   const [pendingGlossary, setPendingGlossary] = useState<'yi' | 'ji' | null>(null);
+  // Bumped by direct date jumps (今天, finder, 我的), never by prev/next steps.
+  // The calendar and daily screens are keyed by it: a step keeps them mounted
+  // so the swiped-in panel's entrance runs on across the swap; a jump remounts
+  // them with the plain entrance (#29).
+  const [jumpId, setJumpId] = useState(0);
+  const changeTab = useCallback((tab: TabKey) => {
+    setActiveTab(tab);
+  }, []);
+  const jumpTo = useCallback((y: number, m: number, d: number) => {
+    setYear(y);
+    setMonth(m);
+    setSelectedDay(d);
+    setJumpId(id => id + 1);
+  }, []);
 
   useEffect(() => {
     AsyncStorage.getItem('todayWidgetDismissedDate')
@@ -90,6 +107,9 @@ function AppContent() {
   const appState = useRef(AppState.currentState);
 
   useEffect(() => {
+    // Notifications, background fetch and the home-screen widget are native-only.
+    if (Platform.OS === 'web') return;
+
     async function initNotifications() {
       try {
         await scheduleAllLunarNotifications();
@@ -114,7 +134,7 @@ function AppContent() {
     // Reschedule when the app comes to the foreground in case background fetch
     // was killed by the OS (common on Android with battery optimisation).
     const subscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
-      if (appState.current.match(/inactive|background/) && nextState === 'active') {
+      if (appState.current?.match(/inactive|background/) && nextState === 'active') {
         scheduleAllLunarNotifications().catch(err =>
           console.warn('Failed to reschedule notifications on resume:', err),
         );
@@ -163,10 +183,8 @@ function AppContent() {
 
   const handleGoToday = useCallback(() => {
     const now = new Date();
-    setYear(now.getFullYear());
-    setMonth(now.getMonth() + 1);
-    setSelectedDay(now.getDate());
-  }, []);
+    jumpTo(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  }, [jumpTo]);
 
   const isToday = (() => {
     const now = new Date();
@@ -174,11 +192,9 @@ function AppContent() {
   })();
 
   const handleFinderSelectDate = useCallback((y: number, m: number, d: number) => {
-    setYear(y);
-    setMonth(m);
-    setSelectedDay(d);
-    setActiveTab('daily');
-  }, []);
+    jumpTo(y, m, d);
+    changeTab('daily');
+  }, [jumpTo, changeTab]);
 
   const handleGlossaryOpened = useCallback(() => setPendingGlossary(null), []);
 
@@ -204,9 +220,10 @@ function AppContent() {
         </IconButton>
       </View>
       <ErrorBoundary>
+        <Animated.View key={activeTab} entering={tabEntering} style={{ flex: 1 }}>
         {activeTab === 'calendar' ? (
           <CalendarScreen
-            key={`${year}-${month}`}
+            key={jumpId}
             year={year}
             month={month}
             selectedDay={selectedDay}
@@ -217,15 +234,13 @@ function AppContent() {
         ) : activeTab === 'me' ? (
           <MeScreen
             onNavigateToDate={(y, m, d) => {
-              setYear(y);
-              setMonth(m);
-              setSelectedDay(d);
-              setActiveTab('daily');
+              jumpTo(y, m, d);
+              changeTab('daily');
             }}
           />
         ) : (
           <DailyDetailScreen
-            key={`${year}-${month}-${selectedDay}`}
+            key={jumpId}
             year={year}
             month={month}
             day={selectedDay}
@@ -235,8 +250,9 @@ function AppContent() {
             onGlossaryOpened={handleGlossaryOpened}
           />
         )}
+        </Animated.View>
       </ErrorBoundary>
-      <BottomTabBar active={activeTab} onChange={setActiveTab} />
+      <BottomTabBar active={activeTab} onChange={changeTab} />
       <SettingsModal
         visible={settingsVisible}
         onClose={() => setSettingsVisible(false)}
@@ -251,7 +267,7 @@ function AppContent() {
         onDismiss={handleWidgetDismiss}
         onDismissToday={handleWidgetDismissToday}
         onOpenGlossary={(term) => {
-          setActiveTab('daily');
+          changeTab('daily');
           setPendingGlossary(term);
         }}
       />
@@ -273,6 +289,18 @@ function AppContent() {
     </SafeAreaView>
   );
 }
+
+const tabEntering: EntryExitAnimationFunction = () => {
+  'worklet';
+  const config = { duration: Duration.tabIn, easing: EASE_OUT, reduceMotion: ReduceMotion.System };
+  return {
+    initialValues: { opacity: 0, transform: [{ translateY: Offset.tabY }] },
+    animations: {
+      opacity: withTiming(1, config),
+      transform: [{ translateY: withTiming(0, config) }],
+    },
+  };
+};
 
 export default function App() {
   const systemScheme = useColorScheme();
@@ -299,15 +327,17 @@ export default function App() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SafeAreaProvider>
-        <ThemeProvider>
-          <BirthProfileProvider>
-            <AppContent />
-          </BirthProfileProvider>
-        </ThemeProvider>
-      </SafeAreaProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <SafeAreaProvider>
+          <ThemeProvider>
+            <BirthProfileProvider>
+              <AppContent />
+            </BirthProfileProvider>
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
 

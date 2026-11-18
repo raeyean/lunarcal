@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useBirthProfile } from '../context/BirthProfileContext';
 import { computeCompat } from '@lunarcal/shared';
 import { getDayData } from '../utils/lunar';
 import { Typography } from '../constants/typography';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 interface Props {
   targetSolarDate: string;     // 'YYYY-MM-DD'
@@ -68,7 +70,7 @@ export function CompatStrip({ targetSolarDate, onPress, compact }: Props) {
   );
 
   if (onPress) {
-    return <Pressable onPress={onPress} accessibilityRole="button">{body}</Pressable>;
+    return <PressableScale scaleTo={Press.card} onPress={onPress} accessibilityRole="button">{body}</PressableScale>;
   }
   return body;
 }

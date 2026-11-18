@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { DEITY_LABEL, deityColor } from '../constants/colors';
 import { Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import type { DayData } from '../utils/lunar';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 interface DeityStripProps {
   /** Deity days falling in the displayed solar month. */
@@ -34,7 +36,7 @@ export function DeityStrip({ days, onSelect }: DeityStripProps) {
           if (!d.deity) return null;
           const c = deityColor(d.deity.kind, colors);
           return (
-            <TouchableOpacity
+            <PressableScale scaleTo={Press.card}
               key={`${d.solar.year}-${d.solar.month}-${d.solar.day}`}
               style={[
                 styles.card,
@@ -44,7 +46,6 @@ export function DeityStrip({ days, onSelect }: DeityStripProps) {
                   borderLeftColor: c,
                 },
               ]}
-              activeOpacity={0.7}
               onPress={() => onSelect?.(d.solar.day)}
               accessibilityRole="button"
               accessibilityLabel={`${d.solar.month}月${d.solar.day}日 ${DEITY_LABEL[d.deity.kind]} ${d.deity.deity}`}
@@ -60,7 +61,7 @@ export function DeityStrip({ days, onSelect }: DeityStripProps) {
               <Text style={[styles.kind, { color: colors.subtleText }]}>
                 {DEITY_LABEL[d.deity.kind]}
               </Text>
-            </TouchableOpacity>
+            </PressableScale>
           );
         })}
       </ScrollView>
@@ -85,6 +86,8 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   card: {
+    // Equal-height cards in the row: tells PressableScale to fill the stretched height.
+    alignSelf: 'stretch',
     minWidth: 130,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm + 2,

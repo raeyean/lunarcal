@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TouchableWithoutFeedback,
-  TouchableOpacity,
   Switch,
   StyleSheet,
   Platform,
@@ -24,6 +23,8 @@ import { scheduleAllLunarNotifications, requestNotificationPermissions, Permissi
 import { IconButton } from './IconButton';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { PressableScale } from './PressableScale';
+import { Press } from '../constants/motion';
 
 interface SettingsModalProps {
   visible: boolean;
@@ -139,62 +140,67 @@ export function SettingsModal({ visible, onClose, onOpenDeityList }: SettingsMod
             />
           </View>
 
-          <Text style={[styles.sectionHeader, { color: colors.muted }]}>通知</Text>
+          {/* Local notifications are native-only; hide the controls on web. */}
+          {Platform.OS !== 'web' && (
+            <>
+              <Text style={[styles.sectionHeader, { color: colors.muted }]}>通知</Text>
 
-          <View style={[styles.row, { borderBottomColor: colors.divider }]}>
-            <View style={styles.rowLabel}>
-              <Text style={[styles.rowTitle, { color: colors.foreground }]}>初一十五提醒</Text>
-              <Text style={[styles.rowSubtitle, { color: colors.muted }]}>
-                農曆初一、十五前一晚提醒
-              </Text>
-            </View>
-            <Switch
-              value={settings.enabled}
-              onValueChange={handleToggle}
-              trackColor={{ true: colors.primary }}
-              accessibilityLabel="初一十五提醒"
-              accessibilityRole="switch"
-              accessibilityState={{ checked: settings.enabled }}
-            />
-          </View>
-
-          {settings.enabled && (
-            <View style={[styles.row, { borderBottomColor: colors.divider }]}>
-              <Text style={[styles.rowTitle, { color: colors.foreground }]}>提醒時間</Text>
-              {Platform.OS === 'ios' ? (
-                <DateTimePicker
-                  value={pickerDate}
-                  mode="time"
-                  display="compact"
-                  onChange={handleTimeChange}
-                  themeVariant={isDark ? 'dark' : 'light'}
+              <View style={[styles.row, { borderBottomColor: colors.divider }]}>
+                <View style={styles.rowLabel}>
+                  <Text style={[styles.rowTitle, { color: colors.foreground }]}>初一十五提醒</Text>
+                  <Text style={[styles.rowSubtitle, { color: colors.muted }]}>
+                    農曆初一、十五前一晚提醒
+                  </Text>
+                </View>
+                <Switch
+                  value={settings.enabled}
+                  onValueChange={handleToggle}
+                  trackColor={{ true: colors.primary }}
+                  accessibilityLabel="初一十五提醒"
+                  accessibilityRole="switch"
+                  accessibilityState={{ checked: settings.enabled }}
                 />
-              ) : (
-                <>
-                  <IconButton
-                    onPress={() => setShowTimePicker(true)}
-                    accessibilityLabel={`提醒時間 ${timeDisplay}`}
-                    variant="ghost"
-                  >
-                    <Text style={[styles.timeText, { color: colors.primary }]}>{timeDisplay}</Text>
-                  </IconButton>
-                  {showTimePicker && (
+              </View>
+
+              {settings.enabled && (
+                <View style={[styles.row, { borderBottomColor: colors.divider }]}>
+                  <Text style={[styles.rowTitle, { color: colors.foreground }]}>提醒時間</Text>
+                  {Platform.OS === 'ios' ? (
                     <DateTimePicker
                       value={pickerDate}
                       mode="time"
-                      display="default"
+                      display="compact"
                       onChange={handleTimeChange}
+                      themeVariant={isDark ? 'dark' : 'light'}
                     />
+                  ) : (
+                    <>
+                      <IconButton
+                        onPress={() => setShowTimePicker(true)}
+                        accessibilityLabel={`提醒時間 ${timeDisplay}`}
+                        variant="ghost"
+                      >
+                        <Text style={[styles.timeText, { color: colors.primary }]}>{timeDisplay}</Text>
+                      </IconButton>
+                      {showTimePicker && (
+                        <DateTimePicker
+                          value={pickerDate}
+                          mode="time"
+                          display="default"
+                          onChange={handleTimeChange}
+                        />
+                      )}
+                    </>
                   )}
-                </>
+                </View>
               )}
-            </View>
+            </>
           )}
 
           {onOpenDeityList && (
             <>
               <Text style={[styles.sectionHeader, { color: colors.muted }]}>資料</Text>
-              <TouchableOpacity
+              <PressableScale scaleTo={Press.card}
                 style={[styles.row, { borderBottomColor: colors.divider }]}
                 onPress={() => {
                   onClose();
@@ -211,7 +217,7 @@ export function SettingsModal({ visible, onClose, onOpenDeityList }: SettingsMod
                   </Text>
                 </View>
                 <Text style={[styles.timeText, { color: colors.primary }]}>›</Text>
-              </TouchableOpacity>
+              </PressableScale>
             </>
           )}
         </Animated.View>
@@ -226,7 +232,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   sheet: {
     borderTopLeftRadius: Radius.xl,

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TextInput, Pressable, StyleSheet, Platform, KeyboardAvoidingView } from 'react-native';
+import { Modal, View, Text, TextInput, StyleSheet, Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
+import { PressableScale } from './PressableScale';
 
 interface Props {
   visible: boolean;
@@ -96,14 +97,14 @@ export function SavedDateForm({ visible, initialLabel, initialSolarDate, onCance
           {error && <Text style={[styles.error, { color: colors.danger }]}>{error}</Text>}
 
           <View style={styles.actions}>
-            <Pressable
+            <PressableScale
               onPress={onCancel}
               style={[styles.btn, styles.btnGhost, { borderColor: colors.line }]}
               accessibilityRole="button"
             >
               <Text style={[styles.btnLabel, { color: colors.foreground }]}>取消</Text>
-            </Pressable>
-            <Pressable
+            </PressableScale>
+            <PressableScale
               onPress={handleSubmit}
               disabled={submitting}
               style={[styles.btn, { backgroundColor: colors.primary, opacity: submitting ? 0.6 : 1 }]}
@@ -112,7 +113,7 @@ export function SavedDateForm({ visible, initialLabel, initialSolarDate, onCance
               <Text style={[styles.btnLabel, { color: colors.onPrimary }]}>
                 {submitting ? '儲存中…' : '儲存'}
               </Text>
-            </Pressable>
+            </PressableScale>
           </View>
         </SafeAreaView>
       </KeyboardAvoidingView>

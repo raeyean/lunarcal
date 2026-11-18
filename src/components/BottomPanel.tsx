@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { ClashInfo } from './ClashInfo';
@@ -9,6 +9,9 @@ import { meaningsFor } from '../data/activityMeanings';
 import { DayData } from '../utils/lunar';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { Duration } from '../constants/motion';
+import { RiseIn } from './RiseIn';
+import { PressableScale } from './PressableScale';
 
 interface BottomPanelProps {
   dayData: DayData;
@@ -43,6 +46,11 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bottomPanelBg }]}>
+      <RiseIn
+        key={`${dayData.solar.year}-${dayData.solar.month}-${dayData.solar.day}`}
+        style={styles.content}
+        duration={Duration.panelRise}
+      >
       <View style={styles.dateRow}>
         <View style={styles.dateLeft}>
           <Text style={[styles.dateNum, { color: colors.foreground }]}>{dateStr}</Text>
@@ -55,36 +63,35 @@ export function BottomPanel({ dayData }: BottomPanelProps) {
       </View>
       <View style={styles.yiJiRow}>
         <View style={[styles.yiJiCol, { backgroundColor: colors.surface }]}>
-          <TouchableOpacity
+          <PressableScale
             style={styles.yiJiHead}
             onPress={() => setGlossaryTerm('yi')}
             accessibilityRole="button"
             accessibilityLabel="查看「宜」的說明"
-            activeOpacity={0.6}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Text style={[styles.yiJiLabel, { color: colors.primary }]}>宜</Text>
             <HelpIcon size={13} color={colors.muted} />
-          </TouchableOpacity>
+          </PressableScale>
           {yiStr1 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{yiStr1}</Text> : null}
           {yiStr2 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{yiStr2}</Text> : null}
         </View>
         <View style={[styles.yiJiCol, { backgroundColor: colors.surface }]}>
-          <TouchableOpacity
+          <PressableScale
             style={styles.yiJiHead}
             onPress={() => setGlossaryTerm('ji')}
             accessibilityRole="button"
             accessibilityLabel="查看「忌」的說明"
-            activeOpacity={0.6}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Text style={[styles.yiJiLabel, { color: colors.jiDark }]}>忌</Text>
             <HelpIcon size={13} color={colors.muted} />
-          </TouchableOpacity>
+          </PressableScale>
           {jiStr1 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{jiStr1}</Text> : null}
           {jiStr2 ? <Text style={[styles.yiJiText, { color: colors.subtleText }]}>{jiStr2}</Text> : null}
         </View>
       </View>
+      </RiseIn>
 
       <GlossarySheet
         visible={glossaryTerm !== null}
@@ -101,6 +108,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: Spacing.lg,
     paddingHorizontal: Spacing.xl,
+  },
+  content: {
+    flex: 1,
     gap: Spacing.md,
   },
   dateRow: {

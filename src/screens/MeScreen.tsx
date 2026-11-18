@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, View, Text, Pressable, StyleSheet, Alert } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
@@ -11,6 +11,7 @@ import { ProfileForm } from '../components/ProfileForm';
 import { SavedDateRow } from '../components/SavedDateRow';
 import { SavedDateForm } from '../components/SavedDateForm';
 import type { SavedDate } from '@lunarcal/shared';
+import { PressableScale } from '../components/PressableScale';
 
 interface Props {
   onNavigateToDate: (year: number, month: number, day: number) => void;
@@ -73,13 +74,13 @@ export function MeScreen({ onNavigateToDate }: Props) {
       <View style={[styles.empty, { backgroundColor: colors.background }]}>
         <Text style={[styles.emptyTitle, { color: colors.foreground }]}>無個人資料</Text>
         <Text style={[styles.emptyBody, { color: colors.muted }]}>輸入生辰可看每日運勢</Text>
-        <Pressable
+        <PressableScale
           style={[styles.cta, { backgroundColor: colors.primary }]}
           onPress={() => setProfileFormVisible(true)}
           accessibilityRole="button"
         >
           <Text style={[styles.ctaText, { color: colors.onPrimary }]}>開始設定</Text>
-        </Pressable>
+        </PressableScale>
         <ProfileForm
           visible={profileFormVisible}
           initial={null}
@@ -98,13 +99,13 @@ export function MeScreen({ onNavigateToDate }: Props) {
       <View style={[styles.empty, { backgroundColor: colors.background }]}>
         <Text style={[styles.emptyTitle, { color: colors.foreground }]}>個人資料異常</Text>
         <Text style={[styles.emptyBody, { color: colors.muted }]}>請重新輸入</Text>
-        <Pressable
+        <PressableScale
           style={[styles.cta, { backgroundColor: colors.primary }]}
           onPress={() => setProfileFormVisible(true)}
           accessibilityRole="button"
         >
           <Text style={[styles.ctaText, { color: colors.onPrimary }]}>重新輸入</Text>
-        </Pressable>
+        </PressableScale>
         <ProfileForm
           visible={profileFormVisible}
           initial={profile}
@@ -139,14 +140,14 @@ export function MeScreen({ onNavigateToDate }: Props) {
             日主 {chart.dayMaster}{chart.dayMasterWuXing}
           </Text>
         </View>
-        <Pressable
+        <PressableScale
           onPress={() => setProfileFormVisible(true)}
           accessibilityLabel="編輯個人資料"
           accessibilityRole="button"
           style={styles.editBtn}
         >
           <Ionicons name="pencil-outline" size={18} color={colors.muted} />
-        </Pressable>
+        </PressableScale>
       </View>
 
       <Text style={[styles.sectionLabel, { color: colors.muted }]}>八字四柱</Text>
@@ -163,19 +164,16 @@ export function MeScreen({ onNavigateToDate }: Props) {
 
       <View style={styles.savedHeader}>
         <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: 20 }]}>已存日子</Text>
-        <Pressable
+        <PressableScale
           onPress={() => setAdding(true)}
-          style={({ pressed }) => [
-            styles.addBtn,
-            { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
-          ]}
+          style={[styles.addBtn, { backgroundColor: colors.primary }]}
           accessibilityLabel="新增日子"
           accessibilityRole="button"
           hitSlop={6}
         >
           <Ionicons name="add" size={18} color={colors.onPrimary} style={{ marginRight: 4 }} />
           <Text style={[styles.addBtnText, { color: colors.onPrimary }]}>新增</Text>
-        </Pressable>
+        </PressableScale>
       </View>
       {savedDates.length === 0 ? (
         <Text style={[styles.savedEmpty, { color: colors.muted }]}>尚未新增日子</Text>
@@ -197,9 +195,9 @@ export function MeScreen({ onNavigateToDate }: Props) {
       <Text style={[styles.disclaimer, { color: colors.muted }]}>
         日柱對比僅作日常參考，{'\n'}非完整命理分析。
       </Text>
-      <Pressable onPress={handleClearProfile} style={styles.clearBtn} accessibilityRole="button">
+      <PressableScale onPress={handleClearProfile} style={styles.clearBtn} accessibilityRole="button">
         <Text style={[styles.clearText, { color: colors.primary }]}>清除個人資料</Text>
-      </Pressable>
+      </PressableScale>
 
       <ProfileForm
         visible={profileFormVisible}

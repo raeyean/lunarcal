@@ -1,10 +1,11 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
 import { withOpacity } from '../constants/colorUtils';
+import { PressableScale } from './PressableScale';
 
 interface MoreChipProps {
   count?: number;
@@ -20,14 +21,13 @@ export function MoreChip({ count, label, onPress, accessibilityLabel }: MoreChip
   const a11yLabel = accessibilityLabel ?? displayLabel;
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
       accessibilityLabel={a11yLabel}
       accessibilityRole="button"
-      style={({ pressed }) => [
+      style={[
         styles.container,
         { backgroundColor: withOpacity(colors.muted, 0.13) },
-        pressed && { opacity: 0.6 },
       ]}
     >
       <Text
@@ -36,7 +36,7 @@ export function MoreChip({ count, label, onPress, accessibilityLabel }: MoreChip
       >
         {displayLabel}
       </Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 

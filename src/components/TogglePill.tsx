@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import { Spacing } from '../constants/spacing';
 import { Radius } from '../constants/radius';
+import { PressableScale } from './PressableScale';
 
 interface TogglePillProps {
   activeTab: 'daily' | 'calendar';
@@ -16,8 +17,8 @@ export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
   const renderTab = (tab: 'daily' | 'calendar', label: string) => {
     const isActive = activeTab === tab;
     return (
-      <Pressable
-        style={({ pressed }) => [
+      <PressableScale
+        style={[
           styles.tab,
           isActive && {
             backgroundColor: colors.primary,
@@ -27,7 +28,6 @@ export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
             shadowOffset: { width: 0, height: 2 },
             elevation: 2,
           },
-          pressed && { opacity: 0.85 },
         ]}
         onPress={() => onToggle(tab)}
         accessibilityRole="tab"
@@ -46,7 +46,7 @@ export function TogglePill({ activeTab, onToggle }: TogglePillProps) {
         >
           {label}
         </Text>
-      </Pressable>
+      </PressableScale>
     );
   };
 
