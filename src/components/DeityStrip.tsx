@@ -86,6 +86,8 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   card: {
+    // Equal-height cards in the row: tells PressableScale to fill the stretched height.
+    alignSelf: 'stretch',
     minWidth: 130,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm + 2,

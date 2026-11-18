@@ -40,6 +40,25 @@ function splitStyle(style: StyleProp<ViewStyle>) {
   return { outer: outer as ViewStyle, inner: inner as ViewStyle };
 }
 
+/**
+ * True when the caller gave the outer view a size along the main axis, so the
+ * inner view must grow to cover it. Without this the inner view stays
+ * content-sized, like a plain Pressable (an unconditional flexGrow inflated
+ * auto-height parents, issue #31).
+ */
+function isSized(outer: Record<string, unknown>) {
+  const grows = (v: unknown) => typeof v === 'number' && v > 0;
+  return (
+    grows(outer.flex) ||
+    grows(outer.flexGrow) ||
+    outer.height !== undefined ||
+    outer.minHeight !== undefined ||
+    outer.aspectRatio !== undefined ||
+    outer.alignSelf === 'stretch' ||
+    (outer.top !== undefined && outer.bottom !== undefined)
+  );
+}
+
 export interface PressableScaleProps extends Omit<PressableProps, 'style'> {
   /** Scale while pressed. Defaults to `Press.control`; use `Press.card` for wide rows. */
   scaleTo?: number;
@@ -85,6 +104,10 @@ export function PressableScale({
 
   const resolve = (pressed: boolean) =>
     splitStyle(typeof style === 'function' ? style({ pressed }) : style);
+  const fillStyle = (pressed: boolean) => {
+    const { outer, inner } = resolve(pressed);
+    return [isSized(outer as Record<string, unknown>) && styles.fill, inner];
+  };
 
   return (
     <Pressable
@@ -95,7 +118,7 @@ export function PressableScale({
       style={({ pressed }) => resolve(pressed).outer}
     >
       {(state) => (
-        <Animated.View style={[styles.fill, resolve(state.pressed).inner, animatedStyle]}>
+        <Animated.View style={[fillStyle(state.pressed), animatedStyle]}>
           {typeof children === 'function' ? children(state) : children}
         </Animated.View>
       )}
