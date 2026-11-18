@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Animated, { ReduceMotion, withTiming, type EntryExitAnimationFunction } from 'react-native-reanimated';
 import { Duration, EASE_OUT, Offset } from './src/constants/motion';
-import { View, Text, StyleSheet, ActivityIndicator, AppState, AppStateStatus, useColorScheme } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, AppState, Platform, AppStateStatus, useColorScheme } from 'react-native';
 
 // Cap accessibility text scaling so layouts don't break, while still respecting the OS setting.
 // Applied via Text.defaultProps so every <Text> inherits it without per-call boilerplate.
@@ -107,6 +107,9 @@ function AppContent() {
   const appState = useRef(AppState.currentState);
 
   useEffect(() => {
+    // Notifications, background fetch and the home-screen widget are native-only.
+    if (Platform.OS === 'web') return;
+
     async function initNotifications() {
       try {
         await scheduleAllLunarNotifications();
