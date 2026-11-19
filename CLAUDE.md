@@ -135,3 +135,17 @@ No navigation library. App.tsx manages screen state directly:
 - No mobile UI test runner (Jest, Detox) — pure-fn code in `@lunarcal/shared` has Vitest coverage; mobile screens rely on manual QA
 - Web layout not optimised for desktop/tablet widths
 - Notification background fetch may be killed by Android battery optimisation; foreground fallback on app resume is in place via AppState listener
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues for `raeyean/lunarcal`, managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
