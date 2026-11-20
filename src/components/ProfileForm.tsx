@@ -8,7 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { DateTimeField } from './DateTimeField';
 import { useTheme } from '../context/ThemeContext';
 import { Typography, Fonts } from '../constants/typography';
 import type { BirthProfile } from '@lunarcal/shared';
@@ -115,7 +115,7 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
 
         <View style={styles.fieldRow}>
           <Text style={[styles.fieldLabel, { color: colors.muted }]}>出生日期</Text>
-          <DateTimePicker
+          <DateTimeField
             value={dateValue}
             mode="date"
             display={Platform.OS === 'ios' ? 'compact' : 'default'}
@@ -142,7 +142,7 @@ export function ProfileForm({ visible, initial, onCancel, onSubmit }: Props) {
         {timeKnown && (
           <View style={styles.fieldRow}>
             <Text style={[styles.fieldLabel, { color: colors.muted }]}>時辰</Text>
-            <DateTimePicker
+            <DateTimeField
               value={timeValue}
               mode="time"
               display={Platform.OS === 'ios' ? 'compact' : 'default'}
