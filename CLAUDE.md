@@ -136,6 +136,27 @@ No navigation library. App.tsx manages screen state directly:
 - Web layout not optimised for desktop/tablet widths
 - Notification background fetch may be killed by Android battery optimisation; foreground fallback on app resume is in place via AppState listener
 
+## PR Evidence
+
+Every PR must include screenshots as evidence that the change works. A PR without them isn't ready for review.
+
+- **What to capture:** each screen or state the change affects, in its final working state. Where it matters, include before and after shots, or light and dark mode. Use test data only: the repo is public, so a screenshot must never show personal information.
+- **How to capture:**
+  - Web: run Playwright (installed in a scratch directory, never added to the project) against `npx expo export -p web` output.
+  - iOS simulator: `xcrun simctl io <UDID> screenshot <file>.png`.
+  - Android emulator: `adb exec-out screencap -p > <file>.png`.
+- **How to upload:** GitHub has no attachment API for `gh`, so screenshots live on the orphan branch `pr-assets`, under `pr/<PR number>/`. They never go on `main` or the feature branch. Use a worktree so the current branch isn't touched:
+  ```bash
+  git fetch origin pr-assets 2>/dev/null \
+    && git worktree add /tmp/pr-assets pr-assets \
+    || { git worktree add --detach /tmp/pr-assets && git -C /tmp/pr-assets switch --orphan pr-assets; }
+  mkdir -p /tmp/pr-assets/pr/<N> && cp <screenshots> /tmp/pr-assets/pr/<N>/
+  git -C /tmp/pr-assets add . && git -C /tmp/pr-assets commit -m "evidence: PR #<N>" && git -C /tmp/pr-assets push -u origin pr-assets
+  git worktree remove /tmp/pr-assets
+  ```
+- **How to embed:** add a `## Screenshots` section to the PR body (`gh pr edit <N> --body ...`) with `![caption](https://raw.githubusercontent.com/raeyean/lunarcal/pr-assets/pr/<N>/<file>.png)` and one line saying what each shot proves.
+- **Changes with no UI** (API, shared package, tooling): screenshots don't apply. Paste the verification commands and their output under `## Evidence` instead, and say there's no UI.
+
 ## Agent skills
 
 ### Issue tracker
