@@ -44,8 +44,10 @@ struct GlanceView: View {
                     .font(.system(size: 12))
                     .foregroundColor(.secondary)
 
-                chipRow(label: "宜", items: info.yi, chip: .yiChip)
-                chipRow(label: "忌", items: info.ji, chip: .jiChip)
+                if info.hasYiJi {
+                    chipRow(label: "宜", items: info.yi, chip: .yiChip)
+                    chipRow(label: "忌", items: info.ji, chip: .jiChip)
+                }
 
                 Divider().padding(.top, 4)
 

@@ -26,6 +26,11 @@ struct LunarDayInfo: Codable {
     let ji: [String]
 }
 
+extension LunarDayInfo {
+    /// False outside the solar-term table's range, where 宜/忌 are unknown.
+    var hasYiJi: Bool { !yi.isEmpty || !ji.isEmpty }
+}
+
 struct LunarCalculator {
 
     // MARK: - Shared data (App Group)
@@ -86,111 +91,9 @@ struct LunarCalculator {
         "申":"南","酉":"東","戌":"北","亥":"西"
     ]
 
-    // Yi/Ji activities based on day Heavenly Stem index (fallback only)
-    private static let yiByDayStem: [[String]] = [
-        ["祭祀","祈福","求嗣","開光","出行","納采"],      // 甲
-        ["嫁娶","納采","祭祀","祈福","出行","動土"],      // 乙
-        ["祭祀","修造","動土","開市","交易","納財"],      // 丙
-        ["祈福","求嗣","齋醮","開光","入學","納采"],      // 丁
-        ["修造","動土","豎柱","開市","納財","立券"],      // 戊
-        ["祭祀","治病","破屋","壞垣","餘事勿取"],        // 己
-        ["嫁娶","開市","交易","立券","納財","掛匾"],      // 庚
-        ["祭祀","祈福","安葬","啟攅","除服","成服"],      // 辛
-        ["出行","納采","嫁娶","祭祀","祈福","動土"],      // 壬
-        ["塞穴","結網","取漁","畋獵","餘事勿取"]          // 癸
-    ]
-
-    private static let jiByDayStem: [[String]] = [
-        ["動土","破土","安葬","開倉","修造","掘井"],      // 甲
-        ["開倉","造屋","安葬","行喪","詞訟","修造"],      // 乙
-        ["嫁娶","安葬","出行","詞訟","安門","移徙"],      // 丙
-        ["動土","開市","交易","安葬","破土","修造"],      // 丁
-        ["嫁娶","出行","安葬","祈福","探病","入宅"],      // 戊
-        ["諸事不宜"],                                    // 己
-        ["動土","安葬","修造","破土","行喪","開光"],      // 庚
-        ["嫁娶","開市","動土","交易","入宅","出行"],      // 辛
-        ["安葬","破土","修造","開倉","造屋","移徙"],      // 壬
-        ["嫁娶","安門","移徙","開市","入宅","安葬"]       // 癸
-    ]
-
-    // MARK: - Jieqi dates for 2023-2031
-    // Format: [year: [(month, day, name)]]
-    // Generated from lunar-javascript (the app's engine, UTC+8 dates) so the
-    // widget's solar-term month boundaries agree with the app exactly.
-    private static let jieqiDates: [Int: [(Int, Int, String)]] = [
-        2023: [
-            (1,5,"小寒"),(1,20,"大寒"),(2,4,"立春"),(2,19,"雨水"),
-            (3,6,"驚蟄"),(3,21,"春分"),(4,5,"清明"),(4,20,"穀雨"),
-            (5,6,"立夏"),(5,21,"小滿"),(6,6,"芒種"),(6,21,"夏至"),
-            (7,7,"小暑"),(7,23,"大暑"),(8,8,"立秋"),(8,23,"處暑"),
-            (9,8,"白露"),(9,23,"秋分"),(10,8,"寒露"),(10,24,"霜降"),
-            (11,8,"立冬"),(11,22,"小雪"),(12,7,"大雪"),(12,22,"冬至")
-        ],
-        2024: [
-            (1,6,"小寒"),(1,20,"大寒"),(2,4,"立春"),(2,19,"雨水"),
-            (3,5,"驚蟄"),(3,20,"春分"),(4,4,"清明"),(4,19,"穀雨"),
-            (5,5,"立夏"),(5,20,"小滿"),(6,5,"芒種"),(6,21,"夏至"),
-            (7,6,"小暑"),(7,22,"大暑"),(8,7,"立秋"),(8,22,"處暑"),
-            (9,7,"白露"),(9,22,"秋分"),(10,8,"寒露"),(10,23,"霜降"),
-            (11,7,"立冬"),(11,22,"小雪"),(12,6,"大雪"),(12,21,"冬至")
-        ],
-        2025: [
-            (1,5,"小寒"),(1,20,"大寒"),(2,3,"立春"),(2,18,"雨水"),
-            (3,5,"驚蟄"),(3,20,"春分"),(4,4,"清明"),(4,20,"穀雨"),
-            (5,5,"立夏"),(5,21,"小滿"),(6,5,"芒種"),(6,21,"夏至"),
-            (7,7,"小暑"),(7,22,"大暑"),(8,7,"立秋"),(8,23,"處暑"),
-            (9,7,"白露"),(9,23,"秋分"),(10,8,"寒露"),(10,23,"霜降"),
-            (11,7,"立冬"),(11,22,"小雪"),(12,7,"大雪"),(12,21,"冬至")
-        ],
-        2026: [
-            (1,5,"小寒"),(1,20,"大寒"),(2,4,"立春"),(2,18,"雨水"),
-            (3,5,"驚蟄"),(3,20,"春分"),(4,5,"清明"),(4,20,"穀雨"),
-            (5,5,"立夏"),(5,21,"小滿"),(6,5,"芒種"),(6,21,"夏至"),
-            (7,7,"小暑"),(7,23,"大暑"),(8,7,"立秋"),(8,23,"處暑"),
-            (9,7,"白露"),(9,23,"秋分"),(10,8,"寒露"),(10,23,"霜降"),
-            (11,7,"立冬"),(11,22,"小雪"),(12,7,"大雪"),(12,22,"冬至")
-        ],
-        2027: [
-            (1,5,"小寒"),(1,20,"大寒"),(2,4,"立春"),(2,19,"雨水"),
-            (3,6,"驚蟄"),(3,21,"春分"),(4,5,"清明"),(4,20,"穀雨"),
-            (5,6,"立夏"),(5,21,"小滿"),(6,6,"芒種"),(6,21,"夏至"),
-            (7,7,"小暑"),(7,23,"大暑"),(8,8,"立秋"),(8,23,"處暑"),
-            (9,8,"白露"),(9,23,"秋分"),(10,8,"寒露"),(10,23,"霜降"),
-            (11,7,"立冬"),(11,22,"小雪"),(12,7,"大雪"),(12,22,"冬至")
-        ],
-        2028: [
-            (1,6,"小寒"),(1,20,"大寒"),(2,4,"立春"),(2,19,"雨水"),
-            (3,5,"驚蟄"),(3,20,"春分"),(4,4,"清明"),(4,19,"穀雨"),
-            (5,5,"立夏"),(5,20,"小滿"),(6,5,"芒種"),(6,21,"夏至"),
-            (7,6,"小暑"),(7,22,"大暑"),(8,7,"立秋"),(8,22,"處暑"),
-            (9,7,"白露"),(9,22,"秋分"),(10,8,"寒露"),(10,23,"霜降"),
-            (11,7,"立冬"),(11,22,"小雪"),(12,6,"大雪"),(12,21,"冬至")
-        ],
-        2029: [
-            (1,5,"小寒"),(1,20,"大寒"),(2,3,"立春"),(2,18,"雨水"),
-            (3,5,"驚蟄"),(3,20,"春分"),(4,4,"清明"),(4,20,"穀雨"),
-            (5,5,"立夏"),(5,21,"小滿"),(6,5,"芒種"),(6,21,"夏至"),
-            (7,7,"小暑"),(7,22,"大暑"),(8,7,"立秋"),(8,23,"處暑"),
-            (9,7,"白露"),(9,23,"秋分"),(10,8,"寒露"),(10,23,"霜降"),
-            (11,7,"立冬"),(11,22,"小雪"),(12,7,"大雪"),(12,21,"冬至")
-        ],
-        2030: [
-            (1,5,"小寒"),(1,20,"大寒"),(2,4,"立春"),(2,18,"雨水"),
-            (3,5,"驚蟄"),(3,20,"春分"),(4,5,"清明"),(4,20,"穀雨"),
-            (5,5,"立夏"),(5,21,"小滿"),(6,5,"芒種"),(6,21,"夏至"),
-            (7,7,"小暑"),(7,23,"大暑"),(8,7,"立秋"),(8,23,"處暑"),
-            (9,7,"白露"),(9,23,"秋分"),(10,8,"寒露"),(10,23,"霜降"),
-            (11,7,"立冬"),(11,22,"小雪"),(12,7,"大雪"),(12,22,"冬至")
-        ],
-        2031: [
-            (1,5,"小寒"),(1,20,"大寒"),(2,4,"立春"),(2,19,"雨水"),
-            (3,6,"驚蟄"),(3,21,"春分"),(4,5,"清明"),(4,20,"穀雨"),
-            (5,6,"立夏"),(5,21,"小滿"),(6,6,"芒種"),(6,21,"夏至"),
-            (7,7,"小暑"),(7,23,"大暑"),(8,8,"立秋"),(8,23,"處暑"),
-            (9,8,"白露"),(9,23,"秋分"),(10,8,"寒露"),(10,23,"霜降"),
-            (11,7,"立冬"),(11,22,"小雪"),(12,7,"大雪"),(12,22,"冬至")
-        ]
-    ]
+    // Solar-term dates (AlmanacData.jieqiDates) and the 宜/忌 rules
+    // (AlmanacData.dayYiJi) are generated from lunar-javascript by
+    // scripts/verify-swift-almanac/generate-data.js (issue #41, ADR 0001).
 
     // The 12 sectional terms (節) that start each Ganzhi month, mapped to the
     // month branch and its 0-based index in the 寅-first month order.
@@ -235,17 +138,18 @@ struct LunarCalculator {
 
     /// 立春 (month, day) for a year, if known.
     private static func lichun(_ year: Int) -> (Int, Int)? {
-        guard let terms = jieqiDates[year] else { return nil }
+        guard let terms = AlmanacData.jieqiDates[year] else { return nil }
         for (m, d, name) in terms where name == "立春" { return (m, d) }
         return nil
     }
 
-    /// Month pillar (月柱) from the most recent sectional term (節) on or before
-    /// the date — NOT the Gregorian month. The lunar year stem flips at 立春.
-    private static func monthGanzhi(year: Int, month: Int, day: Int) -> String {
+    /// Month Pillar (月柱) from the most recent Sectional Term (節) on or before
+    /// the date — NOT the Gregorian month. The year stem for 五虎遁 flips at 立春.
+    /// Nil outside the solar-term table's range.
+    private static func monthPillar(year: Int, month: Int, day: Int) -> String? {
         var best: (y: Int, m: Int, d: Int, name: String)?
         for y in [year - 1, year] {
-            guard let terms = jieqiDates[y] else { continue }
+            guard let terms = AlmanacData.jieqiDates[y] else { continue }
             for (m, d, name) in terms where sectionalTerms[name] != nil {
                 let onOrBefore = y < year || m < month || (m == month && d <= day)
                 guard onOrBefore else { continue }
@@ -257,14 +161,11 @@ struct LunarCalculator {
             }
         }
 
-        guard let term = best, let info = sectionalTerms[term.name] else {
-            // Deep fallback (jieqi table lacks the year): rough Gregorian mapping.
-            let yIdx = yearGanzhiIndex(year: year) % 10
-            let stemIdx = (startStem(forYearStem: yIdx) + month - 1) % 10
-            return heavenlyStems[stemIdx] + earthlyBranches[(month + 1) % 12]
-        }
+        // The latest term must come from this year or last December's 大雪,
+        // which needs both years in the table.
+        guard AlmanacData.jieqiDates[year] != nil, AlmanacData.jieqiDates[year - 1] != nil,
+              let term = best, let info = sectionalTerms[term.name] else { return nil }
 
-        // Year stem for 五虎遁: flips to the previous year before 立春.
         var stemYear = year
         if let (lm, ld) = lichun(year), month < lm || (month == lm && day < ld) {
             stemYear = year - 1
@@ -272,6 +173,97 @@ struct LunarCalculator {
         let yearStemIdx = yearGanzhiIndex(year: stemYear) % 10
         let stemIdx = (startStem(forYearStem: yearStemIdx) + info.idx) % 10
         return heavenlyStems[stemIdx] + info.branch
+    }
+
+    /// Rough month 干支 from the Gregorian month, for display only when the
+    /// date is outside the solar-term table.
+    private static func approximateMonthGanzhi(year: Int, month: Int) -> String {
+        let yIdx = yearGanzhiIndex(year: year) % 10
+        let stemIdx = (startStem(forYearStem: yIdx) + month - 1) % 10
+        return heavenlyStems[stemIdx] + earthlyBranches[(month + 1) % 12]
+    }
+
+    // MARK: - 宜/忌 (port of lunar-javascript LunarUtil.getDayYi / getDayJi)
+
+    private static let dayYiJiBytes: [UInt8] = Array(AlmanacData.dayYiJi.utf8)
+    private static let hexDigits: [UInt8] = Array("0123456789ABCDEF".utf8)
+
+    /// Index (0-59) of a 干支 in the sexagenary cycle.
+    private static func jiaZiIndex(_ ganzhi: String) -> Int? {
+        let chars = Array(ganzhi)
+        guard chars.count == 2,
+              let s = heavenlyStems.firstIndex(of: String(chars[0])),
+              let b = earthlyBranches.firstIndex(of: String(chars[1])) else { return nil }
+        return (0..<60).first { $0 % 10 == s && $0 % 12 == b }
+    }
+
+    private static func hexCode(_ n: Int) -> (UInt8, UInt8) {
+        (hexDigits[n / 16], hexDigits[n % 16])
+    }
+
+    private static func hexValue(_ hi: UInt8, _ lo: UInt8) -> Int? {
+        guard let h = hexDigits.firstIndex(of: hi), let l = hexDigits.firstIndex(of: lo) else { return nil }
+        return h * 16 + l
+    }
+
+    /// 宜 and 忌 for a day, the same as lunar-javascript's
+    /// `Lunar.getDayYi()` / `getDayJi()` (default sect: day-level Month Pillar).
+    ///
+    /// DAY_YI_JI is a run of records `DD=MMMM…:YYYY…,JJJJ…`: the day's 干支
+    /// index, the Month Pillar indexes the record applies to, then the 宜 and
+    /// 忌 activity codes, all as two-digit hex. The first record for the day
+    /// whose months include this Month Pillar wins; no match gives `无`.
+    static func yiJi(monthPillar: String, dayGanzhi: String) -> (yi: [String], ji: [String]) {
+        guard let dayIdx = jiaZiIndex(dayGanzhi), let monthIdx = jiaZiIndex(monthPillar) else {
+            return ([], [])
+        }
+        let bytes = dayYiJiBytes
+        let (d0, d1) = hexCode(dayIdx)
+        let (m0, m1) = hexCode(monthIdx)
+        let eq = UInt8(ascii: "="), colon = UInt8(ascii: ":"), comma = UInt8(ascii: ",")
+
+        func decode(_ range: Range<Int>) -> [String] {
+            var out: [String] = []
+            var i = range.lowerBound
+            while i + 1 < range.upperBound {
+                if let v = hexValue(bytes[i], bytes[i + 1]), v < AlmanacData.yiJi.count {
+                    out.append(AlmanacData.yiJi[v])
+                }
+                i += 2
+            }
+            return out
+        }
+
+        var pos = 0
+        while pos + 2 < bytes.count {
+            // Find the next "DD=" record for this day.
+            guard bytes[pos] == d0, bytes[pos + 1] == d1, bytes[pos + 2] == eq else {
+                pos += 1
+                continue
+            }
+            let start = pos + 3
+            // The record ends two characters before the next "=" (the next key).
+            var end = bytes.count
+            if let nextEq = bytes[start...].firstIndex(of: eq) { end = nextEq - 2 }
+            guard let colonIdx = bytes[start..<end].firstIndex(of: colon),
+                  let commaIdx = bytes[colonIdx..<end].firstIndex(of: comma) else {
+                pos = start
+                continue
+            }
+            var matched = false
+            var i = start
+            while i + 1 < colonIdx {
+                if bytes[i] == m0 && bytes[i + 1] == m1 { matched = true; break }
+                i += 2
+            }
+            if matched {
+                let yi = decode((colonIdx + 1)..<commaIdx)
+                let ji = decode((commaIdx + 1)..<end)
+                return (yi.isEmpty ? [AlmanacData.none] : yi, ji.isEmpty ? [AlmanacData.none] : ji)
+            }
+            pos = start
+        }
+        return ([AlmanacData.none], [AlmanacData.none])
     }
 
     private static func ganzhiString(index: Int) -> String {
@@ -300,7 +292,7 @@ struct LunarCalculator {
     /// Find the next Jieqi from a given date
     private static func findNextJieqi(year: Int, month: Int, day: Int) -> (name: String, dateStr: String)? {
         for y in [year, year + 1] {
-            guard let terms = jieqiDates[y] else { continue }
+            guard let terms = AlmanacData.jieqiDates[y] else { continue }
             for (m, d, name) in terms {
                 if y > year || m > month || (m == month && d > day) {
                     return (name, "\(m)月\(d)日")
@@ -312,7 +304,7 @@ struct LunarCalculator {
 
     /// Check if a given date is a Jieqi
     private static func jieqiOnDate(year: Int, month: Int, day: Int) -> String? {
-        guard let terms = jieqiDates[year] else { return nil }
+        guard let terms = AlmanacData.jieqiDates[year] else { return nil }
         for (m, d, name) in terms {
             if m == month && d == day { return name }
         }
@@ -338,8 +330,12 @@ struct LunarCalculator {
         // Lunar month/day names
         let lunarMonth = (lunarComps.month ?? 1) - 1
         let lunarDay = (lunarComps.day ?? 1) - 1
-        let monthCn = lunarMonthNames[min(lunarMonth, 11)]
-        let dayCn = lunarDayNames[min(lunarDay, 29)]
+        // TEMPORARY clamp: Apple's Chinese calendar returns day 0 for some
+        // dates (e.g. 2057-09-28), which indexed -1 and crashed. The lunar date
+        // itself can still disagree with lunar-javascript there; see the
+        // follow-up issue.
+        let monthCn = lunarMonthNames[max(0, min(lunarMonth, 11))]
+        let dayCn = lunarDayNames[max(0, min(lunarDay, 29))]
 
         // Year pillar flips at lunar new year (matching the app's
         // getYearInGanZhi), so use the Chinese calendar's sexagenary year
@@ -350,12 +346,12 @@ struct LunarCalculator {
         } else {
             yearGZ = ganzhiString(index: yearGanzhiIndex(year: year))
         }
-        let monthGZ = monthGanzhi(year: year, month: month, day: day)
+        let pillar = monthPillar(year: year, month: month, day: day)
+        let monthGZ = pillar ?? approximateMonthGanzhi(year: year, month: month)
 
         // Day Ganzhi
         let dayIdx = dayGanzhiIndex(year: year, month: month, day: day)
         let dayGZ = ganzhiString(index: dayIdx)
-        let dayStemIdx = dayIdx % 10
         let dayBranchIdx = dayIdx % 12
 
         // Clash: branch 6 positions away
@@ -374,9 +370,9 @@ struct LunarCalculator {
         let jieqiToday = jieqiOnDate(year: year, month: month, day: day)
         let nextJieqi = findNextJieqi(year: year, month: month, day: day)
 
-        // Yi/Ji
-        let yi = yiByDayStem[dayStemIdx]
-        let ji = jiByDayStem[dayStemIdx]
+        // Yi/Ji: only when the Month Pillar is known (inside the solar-term
+        // table); otherwise empty so the UI hides the rows rather than guess.
+        let (yi, ji) = pillar.map { yiJi(monthPillar: $0, dayGanzhi: dayGZ) } ?? ([], [])
 
         return LunarDayInfo(
             solarYear: year,
