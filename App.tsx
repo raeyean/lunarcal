@@ -44,6 +44,7 @@ import { TodayWidget } from './src/components/TodayWidget';
 import { AuspiciousFinderScreen } from './src/screens/AuspiciousFinderScreen';
 import { MeScreen } from './src/screens/MeScreen';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { ActionMenuHost } from './src/components/ActionMenu';
 import { IconButton } from './src/components/IconButton';
 import { Ionicons } from '@expo/vector-icons';
 import { Spacing } from './src/constants/spacing';
@@ -276,6 +277,7 @@ function AppContent() {
         onClose={() => setFinderVisible(false)}
         onSelectDate={handleFinderSelectDate}
       />
+      <ActionMenuHost />
       {!isToday && (
         <IconButton
           onPress={handleGoToday}
