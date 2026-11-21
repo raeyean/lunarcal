@@ -14,8 +14,12 @@ _Avoid_: Bookmark, favourite, saved day
 
 ### Almanac
 
+**Activity** (宜忌事項):
+A named undertaking, such as 嫁娶 or 開市, that a day's 宜/忌 favours or advises against, and that the 擇吉 finder searches for.
+_Avoid_: Event, task
+
 **Yi / Ji** (宜/忌):
-The activities a day is said to favour (宜) and advise against (忌), set by the day's 干支 together with its Month Pillar.
+The Activities a day is said to favour (宜) and advise against (忌), set by the day's 干支 together with its Month Pillar.
 _Avoid_: Do's and don'ts, good/bad activities
 
 **Month Pillar** (月柱):
