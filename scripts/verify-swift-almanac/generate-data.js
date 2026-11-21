@@ -12,6 +12,10 @@ const fs = require('fs');
 const path = require('path');
 const { Solar, LunarUtil } = require('lunar-javascript');
 const version = require('lunar-javascript/package.json').version;
+// Activity names are shown in traditional characters, through the same table
+// the phone uses (toTraditionalActivity in @lunarcal/shared, #42 / #45).
+const ACTIVITY_TRADITIONAL = require('../../packages/shared/src/data/activityNamesTraditional.json');
+const toTraditionalActivity = (name) => ACTIVITY_TRADITIONAL[name] ?? name;
 
 // Solar-term table range. Month Pillars are correct from FIRST_YEAR + 1 on:
 // early January needs the previous year's 大雪.
@@ -48,7 +52,9 @@ for (let y = FIRST_YEAR; y <= LAST_YEAR; y++) {
   years.push(`        ${y}: [\n${rows.join(',\n')}\n        ]`);
 }
 
-const yiJi = LunarUtil.YI_JI;
+const yiJi = LunarUtil.YI_JI.map(toTraditionalActivity);
+const missing = LunarUtil.YI_JI.filter((name) => !(name in ACTIVITY_TRADITIONAL));
+if (missing.length) throw new Error(`no traditional name for: ${missing.join(' ')}`);
 const yiJiRows = [];
 for (let i = 0; i < yiJi.length; i += 10) {
   yiJiRows.push('        ' + yiJi.slice(i, i + 10).map((s) => JSON.stringify(s)).join(', '));
@@ -77,14 +83,15 @@ enum AlmanacData {
 ${years.join(',\n')}
     ]
 
-    /// lunar-javascript LunarUtil.YI_JI: activity names, indexed by the
-    /// two-digit hex codes in \`dayYiJi\`.
+    /// lunar-javascript LunarUtil.YI_JI in the same order (indexed by the
+    /// two-digit hex codes in \`dayYiJi\`), converted to traditional names
+    /// with the shared Activity table, exactly as the phone shows them.
     static let yiJi: [String] = [
 ${yiJiRows.join(',\n')}
     ]
 
-    /// lunar-javascript LunarUtil.SHEN_SHA[0], returned when no rule matches.
-    static let none = ${JSON.stringify(LunarUtil.SHEN_SHA[0])}
+    /// lunar-javascript LunarUtil.SHEN_SHA[0] (traditional), returned when no rule matches.
+    static let none = ${JSON.stringify(toTraditionalActivity(LunarUtil.SHEN_SHA[0]))}
 
     /// lunar-javascript LunarUtil.DAY_YI_JI: 宜/忌 rules keyed by the day's
     /// 干支 index, then by Month Pillar index (both as two-digit hex).

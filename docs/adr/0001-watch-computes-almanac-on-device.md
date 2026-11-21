@@ -28,3 +28,7 @@ The watch computes the almanac on-device. The Swift engine ports lunar-javascrip
 - There are now two engines that must agree. `scripts/verify-swift-almanac/verify.sh` compares Month Pillar, 宜 and 忌 for every day from 2020 to 2060 and must report 0 mismatches. Rerun `generate-data.js` and `verify.sh` after any lunar-javascript upgrade.
 - About 35 KB of generated data ships in the widget and the watch app.
 - The table ends in 2060. Extending it means changing `LAST_YEAR` in the generator and regenerating.
+
+## Update (2026-11-21, #42 / #45)
+
+The phone now shows Activity names in traditional characters through a shared table (`activityNamesTraditional.json` in `@lunarcal/shared`). The generator applies the same table, so the watch still shows exactly the phone's strings, now in traditional characters. The verify script compares against the converted names.
