@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TextInput, StyleSheet, Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { DateTimeField } from './DateTimeField';
 import { useTheme } from '../context/ThemeContext';
 import { Typography } from '../constants/typography';
 import { PressableScale } from './PressableScale';
@@ -83,7 +83,7 @@ export function SavedDateForm({ visible, initialLabel, initialSolarDate, onCance
 
           <View style={styles.fieldRow}>
             <Text style={[styles.fieldLabel, { color: colors.muted }]}>日期</Text>
-            <DateTimePicker
+            <DateTimeField
               value={date}
               mode="date"
               display={Platform.OS === 'ios' ? 'compact' : 'default'}

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useBirthProfile } from '../context/BirthProfileContext';
@@ -8,6 +8,8 @@ import { getDayData } from '../utils/lunar';
 import type { SavedDate } from '@lunarcal/shared';
 import { Typography } from '../constants/typography';
 import { PressableScale } from './PressableScale';
+import { IconButton } from './IconButton';
+import { showActions } from './ActionMenu';
 import { Press } from '../constants/motion';
 
 interface Props {
@@ -43,18 +45,31 @@ export function SavedDateRow({ item, onPress, onEdit, onDelete }: Props) {
   }, [item.solarDate]);
 
   const handleLongPress = () => {
-    Alert.alert(item.label, undefined, [
+    showActions(item.label, undefined, [
       { text: '編輯', onPress: onEdit },
       { text: '刪除', style: 'destructive', onPress: onDelete },
       { text: '取消', style: 'cancel' },
     ]);
   };
 
-  return (
+  // Long press is hard to discover with a mouse, so web also opens the menu on
+  // right-click and from a visible ⋯ button (issue #38). Native rows are unchanged.
+  const isWeb = Platform.OS === 'web';
+  const webProps = isWeb
+    ? {
+        onContextMenu: (e: { preventDefault: () => void }) => {
+          e.preventDefault();
+          handleLongPress();
+        },
+      }
+    : {};
+
+  const row = (
     <PressableScale scaleTo={Press.card}
+      {...webProps}
       onPress={onPress}
       onLongPress={handleLongPress}
-      style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
+      style={[styles.row, isWeb && styles.rowWeb, { backgroundColor: colors.surface, borderColor: colors.line }]}
       accessibilityRole="button"
       accessibilityLabel={`${item.label} ${item.solarDate}${compat ? ` ${compat.stars} 星 ${compat.reasonText}` : ''}`}
       accessibilityActions={[{ name: 'magicTap', label: '編輯或刪除' }]}
@@ -83,6 +98,24 @@ export function SavedDateRow({ item, onPress, onEdit, onDelete }: Props) {
       )}
     </PressableScale>
   );
+
+  if (!isWeb) return row;
+
+  // The ⋯ button sits over the row as a sibling, not inside it: react-native-web
+  // renders both as <button>, and a button can't contain another button.
+  return (
+    <View>
+      {row}
+      <IconButton
+        onPress={handleLongPress}
+        accessibilityLabel={`${item.label} 編輯或刪除`}
+        variant="ghost"
+        style={styles.moreBtn}
+      >
+        <Ionicons name="ellipsis-horizontal" size={18} color={colors.muted} />
+      </IconButton>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -98,4 +131,6 @@ const styles = StyleSheet.create({
   label: { ...Typography.bodyMedium, fontSize: 14 },
   date: { ...Typography.subtitle, marginTop: 2 },
   starsRow: { flexDirection: 'row', alignItems: 'center' },
+  rowWeb: { paddingRight: 52 },
+  moreBtn: { position: 'absolute', right: 4, top: 0, bottom: 8 },
 });
