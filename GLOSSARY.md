@@ -11,3 +11,7 @@ _Avoid_: Profile (alone), account, user
 **Saved Date** (已存日子):
 A solar date the user has labelled and kept, shown with how well it suits their Birth Profile. A Saved Date can outlive the Birth Profile: clearing the profile lets the user choose to keep or remove their Saved Dates.
 _Avoid_: Bookmark, favourite, saved day
+
+**Activity** (宜忌事項):
+A named undertaking, such as 嫁娶 or 開市, that a day's 宜/忌 favours or advises against, and that the 擇吉 finder searches for.
+_Avoid_: Event, task

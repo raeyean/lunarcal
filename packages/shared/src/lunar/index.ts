@@ -2,6 +2,7 @@
 import { Solar } from 'lunar-javascript';
 import { getSpecialEvents } from '../data/specialEvents';
 import { getDeityDay, type DeityDay } from '../data/deityDays';
+import { dayYi, dayJi } from '../data/activityNames';
 
 export interface TongshuData {
   taishen: string;
@@ -213,8 +214,8 @@ export function getDayData(year: number, month: number, day: number, currentMont
   const stemIdx = TIANGAN.indexOf(dayGanzhi[0] ?? '');
   const wuxingChar = stemIdx >= 0 ? STEM_ELEMENT[stemIdx] : (wuxing[0] ?? '');
   const xingxiu = (lunar.getXiu() ?? '').slice(0, 1);
-  const yi = lunar.getDayYi();
-  const ji = lunar.getDayJi();
+  const yi = dayYi(lunar);
+  const ji = dayJi(lunar);
   const xiuLuck = lunar.getXiuLuck();
   const score = Math.max(
     20,

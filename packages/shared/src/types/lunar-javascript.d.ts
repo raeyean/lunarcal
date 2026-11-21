@@ -1,4 +1,9 @@
 declare module 'lunar-javascript' {
+  export const LunarUtil: {
+    /** Every 宜/忌 Activity name lunar-javascript can return (simplified). */
+    YI_JI: string[];
+  };
+
   export class Solar {
     static fromYmd(year: number, month: number, day: number): Solar;
     static fromYmdHms(year: number, month: number, day: number, hour: number, minute: number, second: number): Solar;

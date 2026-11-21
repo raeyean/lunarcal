@@ -29,6 +29,12 @@ export {
   meaningsFor,
   type ActivityMeaning,
 } from './data/activityMeanings';
+export {
+  ACTIVITY_NAMES_TRADITIONAL,
+  toTraditionalActivity,
+  dayYi,
+  dayJi,
+} from './data/activityNames';
 
 // Zod schemas (inferred types usable on both server and client)
 export {
