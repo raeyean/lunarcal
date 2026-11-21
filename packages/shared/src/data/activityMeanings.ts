@@ -1,3 +1,5 @@
+import { toTraditionalActivity } from './activityNames';
+
 export interface ActivityMeaning {
   name: string;
   meaning: string;
@@ -127,30 +129,6 @@ export const ACTIVITY_MEANINGS: ActivityMeaning[] = [
   { name: '酬神', meaning: '酬謝神明，還願祭祀。' },
 ];
 
-const S_TO_T: Record<string, string> = {
-  开: '開', 绘: '繪', 斋: '齋', 订: '訂', 纳: '納',
-  动: '動', 梁: '樑', 启: '啟', 攒: '攢', 坟: '墳',
-  货: '貨', 财: '財', 种: '種', 养: '養', 医: '醫',
-  诉: '訴', 讼: '訟', 会: '會', 进: '進', 经: '經',
-  络: '絡', 酝: '醞', 酿: '釀', 结: '結', 网: '網',
-  渔: '漁', 学: '學', 仓: '倉', 扫: '掃', 补: '補',
-  盖: '蓋', 涂: '塗', 头: '頭', 发: '髮', 挂: '掛',
-  乘: '乘', 务: '務', 馀: '餘', 词: '詞', 亲: '親',
-  门: '門', 殓: '殮', 钻: '鑽', 机: '機', 竖: '豎',
-  坏: '壞', 谢: '謝', 猎: '獵', 车: '車', 饰: '飾',
-  墙: '牆', 马: '馬', 产: '產', 厕: '廁', 帐: '帳',
-  筑: '築', 寿: '壽', 断: '斷', 蚁: '蟻', 庙: '廟',
-  桥: '橋', 针: '針', 问: '問', 诸: '諸', 习: '習',
-  艺: '藝', 归: '歸', 佣: '傭', 宁: '寧', 丧: '喪',
-  无: '無',
-};
-
-function toTraditional(s: string): string {
-  let out = '';
-  for (const c of s) out += S_TO_T[c] ?? c;
-  return out;
-}
-
 const MEANING_LOOKUP: Record<string, string> = ACTIVITY_MEANINGS.reduce(
   (acc, item) => {
     acc[item.name] = item.meaning;
@@ -165,7 +143,7 @@ export function meaningsFor(names: readonly string[]): ActivityMeaning[] {
   for (const name of names) {
     if (seen.has(name)) continue;
     seen.add(name);
-    const meaning = MEANING_LOOKUP[name] ?? MEANING_LOOKUP[toTraditional(name)];
+    const meaning = MEANING_LOOKUP[name] ?? MEANING_LOOKUP[toTraditionalActivity(name)];
     if (meaning) result.push({ name, meaning });
   }
   return result;

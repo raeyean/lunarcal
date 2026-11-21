@@ -1,4 +1,5 @@
 import { Solar } from 'lunar-javascript';
+import { dayYi, dayJi } from '@lunarcal/shared';
 
 export interface AuspiciousResult {
   date: { year: number; month: number; day: number };
@@ -36,7 +37,8 @@ export function scanChunk(
     const solar = Solar.fromYmd(year, month, day);
     const lunar = solar.getLunar();
 
-    const yi: string[] = lunar.getDayYi();
+    // Traditional names, the same as the activity list the user picks from (#42).
+    const yi = dayYi(lunar);
 
     if (yi.includes(activity)) {
       const clashAnimal: string = lunar.getDayChongShengXiao();
@@ -48,7 +50,7 @@ export function scanChunk(
           ganzhiDay: lunar.getDayInGanZhi(),
           weekDay: solar.getWeek(),
           yi,
-          ji: lunar.getDayJi(),
+          ji: dayJi(lunar),
           tianShen: lunar.getDayTianShen(),
           tianShenType: lunar.getDayTianShenType(),
         });
