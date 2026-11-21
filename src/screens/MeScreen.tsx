@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, Alert } from 'react-native';
+import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
@@ -12,6 +12,7 @@ import { SavedDateRow } from '../components/SavedDateRow';
 import { SavedDateForm } from '../components/SavedDateForm';
 import type { SavedDate } from '@lunarcal/shared';
 import { PressableScale } from '../components/PressableScale';
+import { showActions } from '../components/ActionMenu';
 
 interface Props {
   onNavigateToDate: (year: number, month: number, day: number) => void;
@@ -49,7 +50,7 @@ export function MeScreen({ onNavigateToDate }: Props) {
   }, [profile, userBazi]);
 
   const handleClearProfile = () => {
-    Alert.alert(
+    showActions(
       '清除個人資料？',
       '此操作無法復原。',
       [
