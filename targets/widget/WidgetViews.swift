@@ -70,25 +70,27 @@ struct SmallWidgetView: View {
             Spacer(minLength: 4)
 
             // Yi/Ji columns
-            HStack(alignment: .top, spacing: 12) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("宜")
-                        .font(.system(size: 12, weight: .heavy))
-                        .foregroundColor(c.primary)
-                    ForEach(info.yi.prefix(3), id: \.self) { item in
-                        Text(item)
-                            .font(.system(size: 9))
-                            .foregroundColor(c.textSecondary)
+            if info.hasYiJi {
+                HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("宜")
+                            .font(.system(size: 12, weight: .heavy))
+                            .foregroundColor(c.primary)
+                        ForEach(info.yi.prefix(3), id: \.self) { item in
+                            Text(item)
+                                .font(.system(size: 9))
+                                .foregroundColor(c.textSecondary)
+                        }
                     }
-                }
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("忌")
-                        .font(.system(size: 12, weight: .heavy))
-                        .foregroundColor(c.textMuted)
-                    ForEach(info.ji.prefix(3), id: \.self) { item in
-                        Text(item)
-                            .font(.system(size: 9))
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("忌")
+                            .font(.system(size: 12, weight: .heavy))
                             .foregroundColor(c.textMuted)
+                        ForEach(info.ji.prefix(3), id: \.self) { item in
+                            Text(item)
+                                .font(.system(size: 9))
+                                .foregroundColor(c.textMuted)
+                        }
                     }
                 }
             }
@@ -99,7 +101,7 @@ struct SmallWidgetView: View {
             HStack(spacing: 4) {
                 Text(info.clashEmoji)
                     .font(.system(size: 9))
-                Text("沖\(info.clashAnimal) · 農曆\(info.lunarMonthCn)月\(info.lunarDayCn)")
+                Text(info.lunarDateCn.isEmpty ? "沖\(info.clashAnimal)" : "沖\(info.clashAnimal) · 農曆\(info.lunarDateCn)")
                     .font(.system(size: 8))
                     .foregroundColor(c.textMuted)
                     .lineLimit(1)
@@ -141,9 +143,11 @@ struct MediumWidgetView: View {
                         Text("\(monthName) · \(info.weekdayCn)")
                             .font(.system(size: 10, weight: .medium))
                             .foregroundColor(c.textSecondary)
-                        Text("農曆 \(info.lunarMonthCn)月\(info.lunarDayCn)")
-                            .font(.system(size: 9))
-                            .foregroundColor(c.textMuted)
+                        if !info.lunarDateCn.isEmpty {
+                            Text("農曆 \(info.lunarDateCn)")
+                                .font(.system(size: 9))
+                                .foregroundColor(c.textMuted)
+                        }
                     }
                 }
 
@@ -180,28 +184,30 @@ struct MediumWidgetView: View {
             Spacer(minLength: 6)
 
             // Bottom: Yi/Ji
-            HStack(alignment: .top, spacing: 20) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("宜")
-                        .font(.system(size: 14, weight: .heavy))
-                        .foregroundColor(c.primary)
-                    Text(info.yi.prefix(6).joined(separator: " · "))
-                        .font(.system(size: 10))
-                        .foregroundColor(c.textSecondary)
-                        .lineLimit(2)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if info.hasYiJi {
+                HStack(alignment: .top, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("宜")
+                            .font(.system(size: 14, weight: .heavy))
+                            .foregroundColor(c.primary)
+                        Text(info.yi.prefix(6).joined(separator: " · "))
+                            .font(.system(size: 10))
+                            .foregroundColor(c.textSecondary)
+                            .lineLimit(2)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("忌")
-                        .font(.system(size: 14, weight: .heavy))
-                        .foregroundColor(c.textMuted)
-                    Text(info.ji.prefix(6).joined(separator: " · "))
-                        .font(.system(size: 10))
-                        .foregroundColor(c.textMuted)
-                        .lineLimit(2)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("忌")
+                            .font(.system(size: 14, weight: .heavy))
+                            .foregroundColor(c.textMuted)
+                        Text(info.ji.prefix(6).joined(separator: " · "))
+                            .font(.system(size: 10))
+                            .foregroundColor(c.textMuted)
+                            .lineLimit(2)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding(.horizontal, 20)
@@ -247,9 +253,11 @@ struct LargeWidgetView: View {
                     Text("\(info.dayGanzhi)日 · \(info.monthGanzhi)月 · \(info.yearGanzhi)年")
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(c.primary)
-                    Text("農曆\(info.lunarMonthCn)月\(info.lunarDayCn)")
-                        .font(.system(size: 10))
-                        .foregroundColor(c.textMuted)
+                    if !info.lunarDateCn.isEmpty {
+                        Text("農曆\(info.lunarDateCn)")
+                            .font(.system(size: 10))
+                            .foregroundColor(c.textMuted)
+                    }
                 }
             }
 
@@ -286,30 +294,32 @@ struct LargeWidgetView: View {
             Spacer(minLength: 8)
 
             // Yi/Ji section
-            HStack(alignment: .top, spacing: 16) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("宜")
-                        .font(.system(size: 16, weight: .heavy))
-                        .foregroundColor(c.primary)
-                    ForEach(yiPairs, id: \.self) { pair in
-                        Text(pair)
-                            .font(.system(size: 11))
-                            .foregroundColor(c.textSecondary)
+            if info.hasYiJi {
+                HStack(alignment: .top, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("宜")
+                            .font(.system(size: 16, weight: .heavy))
+                            .foregroundColor(c.primary)
+                        ForEach(yiPairs, id: \.self) { pair in
+                            Text(pair)
+                                .font(.system(size: 11))
+                                .foregroundColor(c.textSecondary)
+                        }
                     }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("忌")
-                        .font(.system(size: 16, weight: .heavy))
-                        .foregroundColor(c.textMuted)
-                    ForEach(jiPairs, id: \.self) { pair in
-                        Text(pair)
-                            .font(.system(size: 11))
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("忌")
+                            .font(.system(size: 16, weight: .heavy))
                             .foregroundColor(c.textMuted)
+                        ForEach(jiPairs, id: \.self) { pair in
+                            Text(pair)
+                                .font(.system(size: 11))
+                                .foregroundColor(c.textMuted)
+                        }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Spacer(minLength: 8)

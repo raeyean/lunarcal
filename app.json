@@ -27,6 +27,7 @@
       "expo-font",
       "./plugins/withAppGroup",
       "./plugins/withWidget",
+      "./plugins/withWatch",
       [
         "expo-notifications",
         {
