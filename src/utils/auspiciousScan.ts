@@ -1,5 +1,5 @@
 import { Solar } from 'lunar-javascript';
-import { dayYi, dayJi } from '@lunarcal/shared';
+import { dayYi, dayJi, toTraditionalLunarMonth } from '@lunarcal/shared';
 
 export interface AuspiciousResult {
   date: { year: number; month: number; day: number };
@@ -46,7 +46,7 @@ export function scanChunk(
       if (!zodiac || clashAnimal !== zodiac) {
         results.push({
           date: { year, month, day },
-          lunarDate: `${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`,
+          lunarDate: `${toTraditionalLunarMonth(lunar.getMonthInChinese())}月${lunar.getDayInChinese()}`,
           ganzhiDay: lunar.getDayInGanZhi(),
           weekDay: solar.getWeek(),
           yi,

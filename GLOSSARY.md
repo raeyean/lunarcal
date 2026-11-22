@@ -15,3 +15,11 @@ _Avoid_: Bookmark, favourite, saved day
 **Activity** (宜忌事項):
 A named undertaking, such as 嫁娶 or 開市, that a day's 宜/忌 favours or advises against, and that the 擇吉 finder searches for.
 _Avoid_: Event, task
+
+**Lunar Date** (農曆日期):
+A day's lunar month and day, such as 閏二月十一 or 臘月初八, without the year. It is written in traditional characters, like the rest of the app.
+_Avoid_: Chinese date, lunar day (when the month is meant too)
+
+**Leap Month** (閏月):
+An extra lunar month inserted in some years. It is labelled 閏 followed by the number of the month it repeats (閏二 follows 二月), and it does not change the Month Pillar.
+_Avoid_: Intercalary month
