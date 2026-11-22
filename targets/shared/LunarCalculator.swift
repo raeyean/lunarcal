@@ -29,6 +29,10 @@ struct LunarDayInfo: Codable {
 extension LunarDayInfo {
     /// False outside the solar-term table's range, where 宜/忌 are unknown.
     var hasYiJi: Bool { !yi.isEmpty || !ji.isEmpty }
+
+    /// The Lunar Date as shown, e.g. "閏二月十一", or "" outside the generated
+    /// lunar-month table's range (views hide it then).
+    var lunarDateCn: String { lunarMonthCn.isEmpty ? "" : "\(lunarMonthCn)月\(lunarDayCn)" }
 }
 
 struct LunarCalculator {
@@ -266,16 +270,28 @@ struct LunarCalculator {
         return ([AlmanacData.none], [AlmanacData.none])
     }
 
+    // MARK: - Lunar Date (generated from lunar-javascript, issue #43)
+
+    /// Lunar year, month, Leap Month flag and day for a date, from
+    /// AlmanacData.lunarMonths. Nil outside the table's range.
+    private static func lunarDate(jd: Int) -> (year: Int, month: Int, leap: Bool, day: Int)? {
+        let months = AlmanacData.lunarMonths
+        guard jd >= AlmanacData.lunarFirstJD, jd <= AlmanacData.lunarLastJD,
+              let first = months.first, jd >= first.jd else { return nil }
+        // Binary search for the last month starting on or before jd.
+        var lo = 0, hi = months.count - 1
+        while lo < hi {
+            let mid = (lo + hi + 1) / 2
+            if months[mid].jd <= jd { lo = mid } else { hi = mid - 1 }
+        }
+        let m = months[lo]
+        return (m.year, m.month, m.leap, jd - m.jd + 1)
+    }
+
     private static func ganzhiString(index: Int) -> String {
         let stemIdx = index % 10
         let branchIdx = index % 12
         return heavenlyStems[stemIdx] + earthlyBranches[branchIdx]
-    }
-
-    /// Get lunar date components using iOS Chinese Calendar
-    private static func lunarComponents(from date: Date) -> DateComponents {
-        let cal = Calendar(identifier: .chinese)
-        return cal.dateComponents([.year, .month, .day, .weekday], from: date)
     }
 
     /// Build a Date from year/month/day
@@ -323,29 +339,19 @@ struct LunarCalculator {
 
     private static func computeFallback(year: Int, month: Int, day: Int) -> LunarDayInfo {
         let date = makeDate(year: year, month: month, day: day)
-        let lunarComps = lunarComponents(from: date)
         let gregorianCal = Calendar(identifier: .gregorian)
         let weekday = gregorianCal.component(.weekday, from: date) - 1 // 0=Sunday
 
-        // Lunar month/day names
-        let lunarMonth = (lunarComps.month ?? 1) - 1
-        let lunarDay = (lunarComps.day ?? 1) - 1
-        // TEMPORARY clamp: Apple's Chinese calendar returns day 0 for some
-        // dates (e.g. 2057-09-28), which indexed -1 and crashed. The lunar date
-        // itself can still disagree with lunar-javascript there; see the
-        // follow-up issue.
-        let monthCn = lunarMonthNames[max(0, min(lunarMonth, 11))]
-        let dayCn = lunarDayNames[max(0, min(lunarDay, 29))]
-
-        // Year pillar flips at lunar new year (matching the app's
-        // getYearInGanZhi), so use the Chinese calendar's sexagenary year
-        // (1-60, year 1 = 甲子) instead of the Gregorian year.
-        let yearGZ: String
-        if let chineseYear = lunarComps.year, chineseYear >= 1 {
-            yearGZ = ganzhiString(index: (chineseYear - 1) % 60)
-        } else {
-            yearGZ = ganzhiString(index: yearGanzhiIndex(year: year))
-        }
+        // Lunar Date and year pillar from the generated lunar-month table, the
+        // same as the phone (lunar-javascript). Outside the table the Lunar
+        // Date is empty, and the year pillar is estimated from the Gregorian
+        // year, as the month pillar is.
+        let lunar = lunarDate(jd: julianDay(year: year, month: month, day: day))
+        let monthCn = lunar.map { ($0.leap ? "閏" : "") + lunarMonthNames[$0.month - 1] } ?? ""
+        let dayCn = lunar.map { lunarDayNames[$0.day - 1] } ?? ""
+        // The year pillar flips at Lunar New Year (正月初一), like the app's
+        // getYearInGanZhi.
+        let yearGZ = ganzhiString(index: yearGanzhiIndex(year: lunar?.year ?? year))
         let pillar = monthPillar(year: year, month: month, day: day)
         let monthGZ = pillar ?? approximateMonthGanzhi(year: year, month: month)
 

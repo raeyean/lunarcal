@@ -101,7 +101,7 @@ struct SmallWidgetView: View {
             HStack(spacing: 4) {
                 Text(info.clashEmoji)
                     .font(.system(size: 9))
-                Text("沖\(info.clashAnimal) · 農曆\(info.lunarMonthCn)月\(info.lunarDayCn)")
+                Text(info.lunarDateCn.isEmpty ? "沖\(info.clashAnimal)" : "沖\(info.clashAnimal) · 農曆\(info.lunarDateCn)")
                     .font(.system(size: 8))
                     .foregroundColor(c.textMuted)
                     .lineLimit(1)
@@ -143,9 +143,11 @@ struct MediumWidgetView: View {
                         Text("\(monthName) · \(info.weekdayCn)")
                             .font(.system(size: 10, weight: .medium))
                             .foregroundColor(c.textSecondary)
-                        Text("農曆 \(info.lunarMonthCn)月\(info.lunarDayCn)")
-                            .font(.system(size: 9))
-                            .foregroundColor(c.textMuted)
+                        if !info.lunarDateCn.isEmpty {
+                            Text("農曆 \(info.lunarDateCn)")
+                                .font(.system(size: 9))
+                                .foregroundColor(c.textMuted)
+                        }
                     }
                 }
 
@@ -251,9 +253,11 @@ struct LargeWidgetView: View {
                     Text("\(info.dayGanzhi)日 · \(info.monthGanzhi)月 · \(info.yearGanzhi)年")
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(c.primary)
-                    Text("農曆\(info.lunarMonthCn)月\(info.lunarDayCn)")
-                        .font(.system(size: 10))
-                        .foregroundColor(c.textMuted)
+                    if !info.lunarDateCn.isEmpty {
+                        Text("農曆\(info.lunarDateCn)")
+                            .font(.system(size: 10))
+                            .foregroundColor(c.textMuted)
+                    }
                 }
             }
 

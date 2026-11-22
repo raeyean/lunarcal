@@ -35,10 +35,11 @@ struct GlanceView: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(offset == 0 ? .lunarAccent : .secondary)
 
-                // lunarMonthCn does NOT include 月 (e.g. "四"), so we append it explicitly.
-                // Same pattern used in all widget views: "\(info.lunarMonthCn)月\(info.lunarDayCn)"
-                Text("\(info.lunarMonthCn)月\(info.lunarDayCn)")
-                    .font(.system(size: 28, weight: .medium))
+                // Empty outside the generated lunar-month table (#43).
+                if !info.lunarDateCn.isEmpty {
+                    Text(info.lunarDateCn)
+                        .font(.system(size: 28, weight: .medium))
+                }
 
                 Text("\(info.yearGanzhi)年 \(info.monthGanzhi)月 \(info.dayGanzhi)日")
                     .font(.system(size: 12))

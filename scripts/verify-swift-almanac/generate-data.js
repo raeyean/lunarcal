@@ -2,7 +2,7 @@
 /**
  * Generates targets/shared/AlmanacData.swift from lunar-javascript, the engine
  * the phone app uses, so the Swift engine (widget fallback + watch) gives the
- * same Month Pillar and 宜/忌 (issue #41, ADR 0001).
+ * same Month Pillar, 宜/忌, Lunar Date and year pillar (issues #41, #43, ADR 0001).
  *
  * Run from the repo root after upgrading lunar-javascript:
  *   node scripts/verify-swift-almanac/generate-data.js
@@ -60,6 +60,32 @@ for (let i = 0; i < yiJi.length; i += 10) {
   yiJiRows.push('        ' + yiJi.slice(i, i + 10).map((s) => JSON.stringify(s)).join(', '));
 }
 
+// Lunar months (issue #43): the first solar day of every lunar month that
+// overlaps FIRST_YEAR-01-01 .. LAST_YEAR-12-31, as a Julian Day Number, with
+// the lunar year, the month number and the Leap Month flag. The Swift engine
+// takes the Lunar Date and the year pillar from this table, not from Apple's
+// Chinese calendar, so it always agrees with the phone.
+const jdn = (y, m, d) => Math.floor(Date.UTC(y, m - 1, d) / 86400000) + 2440588;
+const lunarMonths = [];
+{
+  const d = new Date(Date.UTC(FIRST_YEAR, 0, 1));
+  const first = Solar.fromYmd(FIRST_YEAR, 1, 1).getLunar();
+  // The month already under way on FIRST_YEAR-01-01 started (day - 1) days before.
+  const push = (jd, lunar) => lunarMonths.push([jd, lunar.getYear(), Math.abs(lunar.getMonth()), lunar.getMonth() < 0]);
+  push(jdn(FIRST_YEAR, 1, 1) - (first.getDay() - 1), first);
+  d.setUTCDate(2);
+  while (d.getUTCFullYear() <= LAST_YEAR) {
+    const lunar = Solar.fromYmd(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()).getLunar();
+    if (lunar.getDay() === 1) push(jdn(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()), lunar);
+    d.setUTCDate(d.getUTCDate() + 1);
+  }
+}
+const lunarMonthRows = [];
+for (let i = 0; i < lunarMonths.length; i += 4) {
+  lunarMonthRows.push('        ' + lunarMonths.slice(i, i + 4)
+    .map(([jd, y, m, leap]) => `(${jd}, ${y}, ${m}, ${leap})`).join(', '));
+}
+
 const dayYiJi = LunarUtil.DAY_YI_JI;
 if (!/^[0-9A-F=:,]+$/.test(dayYiJi)) throw new Error('DAY_YI_JI has unexpected characters');
 const chunks = dayYiJi.match(/.{1,100}/g);
@@ -83,6 +109,18 @@ enum AlmanacData {
 ${years.join(',\n')}
     ]
 
+    /// The Lunar Date is only computed from \`lunarFirstJD\` (FIRST_YEAR-01-01)
+    /// through \`lunarLastJD\` (LAST_YEAR-12-31), as Julian Day Numbers.
+    static let lunarFirstJD = ${jdn(FIRST_YEAR, 1, 1)}
+    static let lunarLastJD = ${jdn(LAST_YEAR, 12, 31)}
+
+    /// Every lunar month overlapping that range, in order: the Julian Day
+    /// Number of its first day, its lunar year (the Gregorian year its 正月
+    /// falls in), its month number (1-12) and whether it is a Leap Month.
+    static let lunarMonths: [(jd: Int, year: Int, month: Int, leap: Bool)] = [
+${lunarMonthRows.join(',\n')}
+    ]
+
     /// lunar-javascript LunarUtil.YI_JI in the same order (indexed by the
     /// two-digit hex codes in \`dayYiJi\`), converted to traditional names
     /// with the shared Activity table, exactly as the phone shows them.
@@ -103,4 +141,4 @@ ${chunks.map((c) => '        "' + c + '"').join(',\n')}
 
 const out = path.join(__dirname, '..', '..', 'targets', 'shared', 'AlmanacData.swift');
 fs.writeFileSync(out, swift);
-console.log(`wrote ${path.relative(process.cwd(), out)}: ${LAST_YEAR - FIRST_YEAR + 1} years of solar terms, ${yiJi.length} activities, ${dayYiJi.length} rule chars`);
+console.log(`wrote ${path.relative(process.cwd(), out)}: ${LAST_YEAR - FIRST_YEAR + 1} years of solar terms, ${yiJi.length} activities, ${dayYiJi.length} rule chars, ${lunarMonths.length} lunar months`);
