@@ -32,3 +32,11 @@ The watch computes the almanac on-device. The Swift engine ports lunar-javascrip
 ## Update (2026-11-21, #42 / #45)
 
 The phone now shows Activity names in traditional characters through a shared table (`activityNamesTraditional.json` in `@lunarcal/shared`). The generator applies the same table, so the watch still shows exactly the phone's strings, now in traditional characters. The verify script compares against the converted names.
+
+## Update (2026-11-22, #43)
+
+The Lunar Date and the year pillar now come from generated data too. The generator writes a lunar-month table (each month's first day, lunar year, month number and Leap Month flag) for 2019-01-01 to 2060-12-31, and the engine no longer uses Apple's `Calendar(identifier: .chinese)`. Apple's calendar labelled every Leap Month as the ordinary month, and it disagreed with lunar-javascript on 2057-09-28.
+
+- Leap Months are labelled 閏, with the same traditional month labels as the phone (#48).
+- Outside the table the Lunar Date is empty and the views hide it. The year pillar falls back to an estimate from the Gregorian year, as the month pillar does.
+- `verify.sh` also compares the year pillar and the Lunar Date.
