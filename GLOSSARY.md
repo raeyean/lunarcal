@@ -29,3 +29,11 @@ _Avoid_: Monthly 干支, lunar month 干支
 **Sectional Term** (節):
 One of the 12 solar terms (立春, 驚蟄, 清明 … 小寒) that begin a new Month Pillar. The other 12 solar terms (中氣) don't change it.
 _Avoid_: Solar term (when only these 12 are meant)
+
+**Lunar Date** (農曆日期):
+A day's lunar month and day, such as 閏二月十一 or 臘月初八, without the year. It is written in traditional characters, like the rest of the app.
+_Avoid_: Chinese date, lunar day (when the month is meant too)
+
+**Leap Month** (閏月):
+An extra lunar month inserted in some years. It is labelled 閏 followed by the number of the month it repeats (閏二 follows 二月), and it does not change the Month Pillar.
+_Avoid_: Intercalary month

@@ -35,6 +35,10 @@ export {
   dayYi,
   dayJi,
 } from './data/activityNames';
+export {
+  LUNAR_MONTH_TRADITIONAL,
+  toTraditionalLunarMonth,
+} from './data/lunarMonthNames';
 
 // Zod schemas (inferred types usable on both server and client)
 export {
