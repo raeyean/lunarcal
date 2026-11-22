@@ -3,6 +3,7 @@ import { Solar } from 'lunar-javascript';
 import { getSpecialEvents } from '../data/specialEvents';
 import { getDeityDay, type DeityDay } from '../data/deityDays';
 import { dayYi, dayJi } from '../data/activityNames';
+import { toTraditionalLunarMonth } from '../data/lunarMonthNames';
 
 export interface TongshuData {
   taishen: string;
@@ -244,7 +245,7 @@ export function getDayData(year: number, month: number, day: number, currentMont
       weekDay: solar.getWeek(),
     },
     lunar: {
-      monthCn: lunar.getMonthInChinese(),
+      monthCn: toTraditionalLunarMonth(lunar.getMonthInChinese()),
       dayCn: lunar.getDayInChinese(),
       yearCn: lunar.getYearInChinese(),
       monthNum: lunarMonth,
