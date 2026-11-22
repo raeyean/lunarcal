@@ -39,6 +39,13 @@ export {
   LUNAR_MONTH_TRADITIONAL,
   toTraditionalLunarMonth,
 } from './data/lunarMonthNames';
+export {
+  ZODIAC_NAMES_TRADITIONAL,
+  SOLAR_TERM_NAMES_TRADITIONAL,
+  FESTIVAL_NAMES_TRADITIONAL,
+  toTraditionalZodiac,
+  toTraditionalEventName,
+} from './data/traditionalNames';
 
 // Zod schemas (inferred types usable on both server and client)
 export {

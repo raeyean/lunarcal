@@ -2,6 +2,10 @@ declare module 'lunar-javascript' {
   export const LunarUtil: {
     /** Every 宜/忌 Activity name lunar-javascript can return (simplified). */
     YI_JI: string[];
+    SHENGXIAO: string[];
+    JIE_QI: string[];
+    FESTIVAL: Record<string, string>;
+    OTHER_FESTIVAL: Record<string, string[]>;
   };
 
   export class Solar {
