@@ -1,5 +1,5 @@
 import { Solar } from 'lunar-javascript';
-import { dayYi, dayJi, toTraditionalLunarMonth } from '@lunarcal/shared';
+import { dayYi, dayJi, toTraditionalLunarMonth, toTraditionalZodiac } from '@lunarcal/shared';
 
 export interface AuspiciousResult {
   date: { year: number; month: number; day: number };
@@ -41,7 +41,8 @@ export function scanChunk(
     const yi = dayYi(lunar);
 
     if (yi.includes(activity)) {
-      const clashAnimal: string = lunar.getDayChongShengXiao();
+      // Traditional, like the stored zodiac (馬, not 马; #52).
+      const clashAnimal = toTraditionalZodiac(lunar.getDayChongShengXiao());
 
       if (!zodiac || clashAnimal !== zodiac) {
         results.push({

@@ -37,3 +37,7 @@ _Avoid_: Chinese date, lunar day (when the month is meant too)
 **Leap Month** (閏月):
 An extra lunar month inserted in some years. It is labelled 閏 followed by the number of the month it repeats (閏二 follows 二月), and it does not change the Month Pillar.
 _Avoid_: Intercalary month
+
+**Clash Animal** (沖):
+The zodiac animal whose earthly branch is opposite the day's branch. People born in that animal's year are advised to be cautious that day, and the 擇吉 finder leaves such days out for them.
+_Avoid_: Clash zodiac, 冲 (simplified)

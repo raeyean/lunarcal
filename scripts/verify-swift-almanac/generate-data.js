@@ -23,11 +23,12 @@ const FIRST_YEAR = 2019;
 const LAST_YEAR = 2060;
 
 // lunar-javascript names terms in simplified Chinese; the Swift table and the
-// UI use traditional.
-const TRADITIONAL = {
-  惊蛰: '驚蟄', 谷雨: '穀雨', 小满: '小滿', 芒种: '芒種', 处暑: '處暑',
+// UI use traditional, through the shared solar-term table (#52).
+const SOLAR_TERM_TRADITIONAL = require('../../packages/shared/src/data/solarTermNamesTraditional.json');
+const trad = (name) => {
+  if (!(name in SOLAR_TERM_TRADITIONAL)) throw new Error(`no traditional name for solar term ${name}`);
+  return SOLAR_TERM_TRADITIONAL[name];
 };
-const trad = (name) => TRADITIONAL[name] || name;
 
 function jieqiForYear(year) {
   const out = [];

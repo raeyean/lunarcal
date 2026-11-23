@@ -4,6 +4,7 @@ import { getSpecialEvents } from '../data/specialEvents';
 import { getDeityDay, type DeityDay } from '../data/deityDays';
 import { dayYi, dayJi } from '../data/activityNames';
 import { toTraditionalLunarMonth } from '../data/lunarMonthNames';
+import { toTraditionalZodiac, toTraditionalEventName } from '../data/traditionalNames';
 
 export interface TongshuData {
   taishen: string;
@@ -146,10 +147,13 @@ export function getDayData(year: number, month: number, day: number, currentMont
   const lunar = solar.getLunar();
 
   const chong = lunar.getDayChong();
-  const chongAnimal = lunar.getDayChongShengXiao();
+  // Traditional names (#52): the zodiac the user picks and the event
+  // descriptions are keyed in traditional characters.
+  const rawChongAnimal = lunar.getDayChongShengXiao();
+  const chongAnimal = toTraditionalZodiac(rawChongAnimal);
   const sha = lunar.getDaySha();
   const wuxing = lunar.getDayNaYin();
-  const jieqi = lunar.getJieQi();
+  const jieqi = toTraditionalEventName(lunar.getJieQi());
 
   let nextJieqi: { name: string; date: string } | null = null;
   for (let i = 1; i <= 45; i++) {
@@ -158,7 +162,7 @@ export function getDayData(year: number, month: number, day: number, currentMont
     const futureJq = futureLunar.getJieQi();
     if (futureJq) {
       nextJieqi = {
-        name: futureJq,
+        name: toTraditionalEventName(futureJq),
         date: `${future.getMonth()}月${future.getDay()}日`,
       };
       break;
@@ -168,7 +172,7 @@ export function getDayData(year: number, month: number, day: number, currentMont
   const festivals: string[] = [
     ...lunar.getFestivals(),
     ...lunar.getOtherFestivals(),
-  ];
+  ].map(toTraditionalEventName);
   const specialEvents = getSpecialEvents(lunar.getMonth(), lunar.getDay());
   for (const evt of specialEvents) {
     festivals.push(evt.name);
@@ -179,7 +183,7 @@ export function getDayData(year: number, month: number, day: number, currentMont
       ? festivals[0]
       : null;
 
-  const chongDesc = `${lunar.getDayChongDesc()}，屬${chongAnimal}者今日不宜動土、出行`;
+  const chongDesc = `${lunar.getDayChongDesc().replace(rawChongAnimal, chongAnimal)}，屬${chongAnimal}者今日不宜動土、出行`;
   const taishen = lunar.getDayPositionTai();
   const pengzuGan = lunar.getPengZuGan();
   const pengzuZhi = lunar.getPengZuZhi();
