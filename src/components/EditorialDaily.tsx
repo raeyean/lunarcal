@@ -279,11 +279,11 @@ export function EditorialDaily({
         ) : null}
       </View>
 
-      {/* Stats strip — 五行 冲 煞 宿 */}
+      {/* Stats strip — 五行 沖 煞 宿 */}
       <View style={[styles.statsRow, { borderColor: colors.line }]}>
         {[
           ['五行', day.wuxing],
-          ['冲', day.clash.zodiac],
+          ['沖', day.clash.zodiac],
           ['煞', day.clash.sha],
           ['宿', day.xingxiu],
         ].map(([k, v], i) => (

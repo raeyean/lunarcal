@@ -72,10 +72,10 @@ export function ClashSection({ animal, emoji, description, direction, element, t
         onPress={toggle}
         style={styles.header}
         accessibilityRole="button"
-        accessibilityLabel={`相冲生肖, ${expanded ? '已展開' : '已收起'}`}
+        accessibilityLabel={`相沖生肖, ${expanded ? '已展開' : '已收起'}`}
         accessibilityState={{ expanded }}
       >
-        <Text style={[styles.sectionTitle, { color: colors.foreground }]}>相冲生肖</Text>
+        <Text style={[styles.sectionTitle, { color: colors.foreground }]}>相沖生肖</Text>
         <View style={styles.chevron}>
           <Chevron expanded={expanded} size={14} color={colors.subtleText} />
         </View>

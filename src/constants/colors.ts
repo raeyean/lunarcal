@@ -58,10 +58,10 @@ export const LightColors = {
   jiShen: 'rgba(160,38,23,0.75)',
 
   // deity color tokens (kind → dot)
-  deityFo: '#c9a86a',           // 佛诞 — antique gold
-  deityPusa: '#a02617',         // 菩萨诞 — vermilion
-  deityShen: '#3d6b4a',         // 神诞 — deep jade
-  deityDao: '#6b3d6b',          // 道诞 — plum
+  deityFo: '#c9a86a',           // 佛誕 — antique gold
+  deityPusa: '#a02617',         // 菩薩誕 — vermilion
+  deityShen: '#3d6b4a',         // 神誕 — deep jade
+  deityDao: '#6b3d6b',          // 道誕 — plum
 
   // moon (SVG) tokens
   moonSurface: '#fffdf6',
@@ -137,9 +137,9 @@ export const Colors = LightColors;
 // Deity-kind helper
 export type DeityKind = 'fo' | 'pusa' | 'shen' | 'dao';
 export const DEITY_LABEL: Record<DeityKind, string> = {
-  fo: '佛诞',
-  pusa: '菩萨',
-  shen: '神诞',
+  fo: '佛誕',
+  pusa: '菩薩',
+  shen: '神誕',
   dao: '道',
 };
 export function deityColor(kind: DeityKind, colors: ThemeColors): string {
