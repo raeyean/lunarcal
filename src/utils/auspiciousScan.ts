@@ -1,5 +1,5 @@
 import { Solar } from 'lunar-javascript';
-import { dayYi, dayJi, toTraditionalLunarMonth, toTraditionalZodiac } from '@lunarcal/shared';
+import { dayYi, dayJi, toTraditionalLunarMonth, toTraditionalText, toTraditionalZodiac } from '@lunarcal/shared';
 
 export interface AuspiciousResult {
   date: { year: number; month: number; day: number };
@@ -52,8 +52,8 @@ export function scanChunk(
           weekDay: solar.getWeek(),
           yi,
           ji: dayJi(lunar),
-          tianShen: lunar.getDayTianShen(),
-          tianShenType: lunar.getDayTianShenType(),
+          tianShen: toTraditionalText(lunar.getDayTianShen()),
+          tianShenType: toTraditionalText(lunar.getDayTianShenType()),
         });
       }
     }

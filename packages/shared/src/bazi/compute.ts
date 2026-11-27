@@ -1,6 +1,7 @@
 import { Solar } from 'lunar-javascript';
 import { BaziError } from './errors';
 import { WUXING_OF_GAN, WUXING_OF_ZHI } from './tables';
+import { toTraditionalText, toTraditionalTexts } from '../data/traditionalText';
 import type {
   BirthProfile,
   BaziChart,
@@ -16,10 +17,11 @@ function buildPillar(slot: Slot, ec: any): BaziPillar {
   const zhi: string = ec[`get${slot}Zhi`]();
   const ganZhi: string = ec[`get${slot}`]();
   const hideGan: string[] = ec[`get${slot}HideGan`]() ?? [];
-  const naYin: string = ec[`get${slot}NaYin`]();
-  const shiShenGan: string = ec[`get${slot}ShiShenGan`]();
-  const shiShenZhi: string[] = ec[`get${slot}ShiShenZhi`]() ?? [];
-  const diShi: string = ec[`get${slot}DiShi`]();
+  // 納音, 十神 and 十二長生 in traditional characters (#51); gan and zhi are the same in both scripts.
+  const naYin: string = toTraditionalText(ec[`get${slot}NaYin`]());
+  const shiShenGan: string = toTraditionalText(ec[`get${slot}ShiShenGan`]());
+  const shiShenZhi: string[] = toTraditionalTexts(ec[`get${slot}ShiShenZhi`]() ?? []);
+  const diShi: string = toTraditionalText(ec[`get${slot}DiShi`]());
   const wuXing = `${WUXING_OF_GAN[gan as keyof typeof WUXING_OF_GAN] ?? ''}${WUXING_OF_ZHI[zhi as keyof typeof WUXING_OF_ZHI] ?? ''}`;
 
   return { gan, zhi, ganZhi, wuXing, hideGan, naYin, shiShenGan, shiShenZhi, diShi };

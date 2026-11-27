@@ -5,6 +5,7 @@ import { getDeityDay, type DeityDay } from '../data/deityDays';
 import { dayYi, dayJi } from '../data/activityNames';
 import { toTraditionalLunarMonth } from '../data/lunarMonthNames';
 import { toTraditionalZodiac, toTraditionalEventName } from '../data/traditionalNames';
+import { toTraditionalText as t, toTraditionalTexts } from '../data/traditionalText';
 
 export interface TongshuData {
   taishen: string;
@@ -151,8 +152,9 @@ export function getDayData(year: number, month: number, day: number, currentMont
   // descriptions are keyed in traditional characters.
   const rawChongAnimal = lunar.getDayChongShengXiao();
   const chongAnimal = toTraditionalZodiac(rawChongAnimal);
-  const sha = lunar.getDaySha();
-  const wuxing = lunar.getDayNaYin();
+  // Free text in traditional characters (#51).
+  const sha = t(lunar.getDaySha());
+  const wuxing = t(lunar.getDayNaYin());
   const jieqi = toTraditionalEventName(lunar.getJieQi());
 
   let nextJieqi: { name: string; date: string } | null = null;
@@ -183,31 +185,31 @@ export function getDayData(year: number, month: number, day: number, currentMont
       ? festivals[0]
       : null;
 
-  const chongDesc = `${lunar.getDayChongDesc().replace(rawChongAnimal, chongAnimal)}，屬${chongAnimal}者今日不宜動土、出行`;
-  const taishen = lunar.getDayPositionTai();
-  const pengzuGan = lunar.getPengZuGan();
-  const pengzuZhi = lunar.getPengZuZhi();
+  const chongDesc = `${t(lunar.getDayChongDesc().replace(rawChongAnimal, chongAnimal))}，屬${chongAnimal}者今日不宜動土、出行`;
+  const taishen = t(lunar.getDayPositionTai());
+  const pengzuGan = t(lunar.getPengZuGan());
+  const pengzuZhi = t(lunar.getPengZuZhi());
 
   const tongshu: TongshuData = {
     taishen,
     pengzuGan,
     pengzuZhi,
-    jiShen: lunar.getDayJiShen(),
-    xiongSha: lunar.getDayXiongSha(),
-    tianShen: lunar.getDayTianShen(),
-    tianShenType: lunar.getDayTianShenType(),
-    tianShenLuck: lunar.getDayTianShenLuck(),
-    zhiXing: lunar.getZhiXing(),
-    xiu: lunar.getXiu(),
-    xiuLuck: lunar.getXiuLuck(),
-    xiuSong: lunar.getXiuSong(),
-    positionXi: lunar.getDayPositionXiDesc(),
-    positionCai: lunar.getDayPositionCaiDesc(),
-    positionFu: lunar.getDayPositionFuDesc(),
-    dayLu: lunar.getDayLu(),
-    yueXiang: lunar.getYueXiang(),
-    liuYao: lunar.getLiuYao(),
-    wuHou: lunar.getWuHou(),
+    jiShen: toTraditionalTexts(lunar.getDayJiShen()),
+    xiongSha: toTraditionalTexts(lunar.getDayXiongSha()),
+    tianShen: t(lunar.getDayTianShen()),
+    tianShenType: t(lunar.getDayTianShenType()),
+    tianShenLuck: t(lunar.getDayTianShenLuck()),
+    zhiXing: t(lunar.getZhiXing()),
+    xiu: t(lunar.getXiu()),
+    xiuLuck: t(lunar.getXiuLuck()),
+    xiuSong: t(lunar.getXiuSong()),
+    positionXi: t(lunar.getDayPositionXiDesc()),
+    positionCai: t(lunar.getDayPositionCaiDesc()),
+    positionFu: t(lunar.getDayPositionFuDesc()),
+    dayLu: t(lunar.getDayLu()),
+    yueXiang: t(lunar.getYueXiang()),
+    liuYao: t(lunar.getLiuYao()),
+    wuHou: t(lunar.getWuHou()),
   };
 
   const lunarMonth = lunar.getMonth();
@@ -218,10 +220,10 @@ export function getDayData(year: number, month: number, day: number, currentMont
   const seed = dayHash(year, month, day);
   const stemIdx = TIANGAN.indexOf(dayGanzhi[0] ?? '');
   const wuxingChar = stemIdx >= 0 ? STEM_ELEMENT[stemIdx] : (wuxing[0] ?? '');
-  const xingxiu = (lunar.getXiu() ?? '').slice(0, 1);
+  const xingxiu = tongshu.xiu.slice(0, 1);
   const yi = dayYi(lunar);
   const ji = dayJi(lunar);
-  const xiuLuck = lunar.getXiuLuck();
+  const xiuLuck = tongshu.xiuLuck;
   const score = Math.max(
     20,
     Math.min(
@@ -231,11 +233,11 @@ export function getDayData(year: number, month: number, day: number, currentMont
     ),
   );
   const directions: Record<string, string> = {
-    財神: lunar.getDayPositionCaiDesc(),
-    喜神: lunar.getDayPositionXiDesc(),
-    福神: lunar.getDayPositionFuDesc(),
-    陽貴: lunar.getDayPositionYangGuiDesc(),
-    陰貴: lunar.getDayPositionYinGuiDesc(),
+    財神: tongshu.positionCai,
+    喜神: tongshu.positionXi,
+    福神: tongshu.positionFu,
+    陽貴: t(lunar.getDayPositionYangGuiDesc()),
+    陰貴: t(lunar.getDayPositionYinGuiDesc()),
   };
   const shichen = buildShichen(dayGanzhi, seed);
   const luckyHours = shichen.filter(s => s.luck === '吉').slice(0, 4);

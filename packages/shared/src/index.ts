@@ -46,6 +46,13 @@ export {
   toTraditionalZodiac,
   toTraditionalEventName,
 } from './data/traditionalNames';
+export {
+  TRADITIONAL_CHARS,
+  TRADITIONAL_PHRASES,
+  TRADITIONAL_UNCHANGED,
+  toTraditionalText,
+  toTraditionalTexts,
+} from './data/traditionalText';
 
 // Zod schemas (inferred types usable on both server and client)
 export {
